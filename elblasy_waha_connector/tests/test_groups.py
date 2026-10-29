@@ -623,6 +623,75 @@ class TestGroups(TransactionCase):
             active_model='hr.employee', active_id=employee.id).create({'session_id': self.session.id})
         self.assertEqual((wiz.phone, wiz.send_to_customer), ('+20 111 000 2222', True))
 
+    # ------------------------------------------------------------------ slow WAHA (production)
+    def _sync_fixtures(self):
+        import time
+        now = int(time.time())
+        chats = [{'id': f'20100123{i}000@c.us', 'lastMessage': {'timestamp': now}} for i in range(1, 4)]
+        msgs = {c['id']: [{'id': f"false_{c['id']}_S", 'timestamp': now + 2, 'from': c['id'], 'fromMe': False,
+                           'body': f"hello from {c['id'][:9]}", 'hasMedia': False}] for c in chats}
+        return chats, msgs
+
+    def test_35_sync_skips_a_slow_chat_keeps_the_rest_and_does_not_advance(self):
+        chats, msgs = self._sync_fixtures()
+        seen = []
+
+        def fake_get(self_, path, params=None):
+            if path.endswith('/overview'):
+                return chats
+            chat_id = path.split('/chats/')[1].split('/messages')[0]
+            seen.append((chat_id, params.get('filter.timestamp.gte')))
+            if chat_id == chats[1]['id']:
+                raise WahaError('network', 'The WAHA server did not answer in time.')
+            return msgs[chat_id]
+        self.session.messages_synced_at = fields_dt_sub_minutes(5)
+        before = self.session.messages_synced_at
+        with patch(f'{CLIENT}.get', fake_get):
+            res = self.session.with_user(self.manager).action_sync_messages()
+        self.assertEqual(res['params']['type'], 'warning')  # partial result, told to the user
+        self.assertEqual(self.env['elblasy.waha.message'].search_count([('session_id', '=', self.session.id)]), 2)
+        self.assertEqual(self.session.messages_synced_at, before)  # nothing can be lost: next run retries
+        self.assertTrue(all(ts for _chat, ts in seen))  # only messages newer than the last sync are requested
+        with patch(f'{CLIENT}.get', lambda s_, p, params=None: chats if p.endswith('/overview') else msgs[p.split('/chats/')[1].split('/messages')[0]]):
+            res = self.session.with_user(self.manager).action_sync_messages()
+        self.assertEqual(res['params']['type'], 'success')
+        self.assertEqual(self.env['elblasy.waha.message'].search_count([('session_id', '=', self.session.id)]), 3)
+        self.assertGreater(self.session.messages_synced_at, before)
+
+    def test_36_sync_stops_when_server_is_down_or_out_of_time(self):
+        chats, msgs = self._sync_fixtures()
+        calls = []
+
+        def down(self_, path, params=None):
+            if path.endswith('/overview'):
+                return chats * 3  # many chats
+            calls.append(path)
+            raise WahaError('network', 'down')
+        self.session.messages_synced_at = fields_dt_sub_minutes(5)
+        with patch(f'{CLIENT}.get', down):
+            imported, skipped = self.session._sync_messages()
+        self.assertEqual(len(calls), 3)  # three failures in a row: stop instead of hammering WAHA
+        self.assertEqual(imported, 0)
+        with patch(f'{CLIENT}.get', lambda s_, p, params=None: chats if p.endswith('/overview') else msgs[p.split('/chats/')[1].split('/messages')[0]]):
+            imported, skipped = self.session._sync_messages(budget=-1)  # no time left
+        self.assertEqual((imported, skipped), (0, 3))
+        # the overview itself failing is a real error for the user
+        with patch(f'{CLIENT}.get', side_effect=WahaError('network', 'down')):
+            with self.assertRaises(UserError):
+                self.session.with_user(self.manager).action_sync_messages()
+
+    def test_37_cron_refreshes_status_of_a_failing_session(self):
+        self.session.auto_sync_messages = True
+        self.session.messages_synced_at = fields_dt_sub_minutes(2)
+        with patch(f'{CLIENT}.get', side_effect=WahaError('http', 'Session status is not as expected', 422)), \
+                patch(f'{CLIENT}.get_session', return_value={'status': 'FAILED'}) as status:
+            self.env['elblasy.waha.session']._cron_sync_messages()
+        status.assert_called_once()
+        self.assertEqual(self.session.status, 'FAILED')  # so the next cron run skips it
+        with patch(f'{CLIENT}.get') as get:
+            self.env['elblasy.waha.session']._cron_sync_messages()
+        get.assert_not_called()
+
 
 def fields_dt_sub_minutes(minutes):
     from odoo import fields

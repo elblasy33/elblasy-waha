@@ -223,15 +223,19 @@ class WahaSession(models.Model):
         """Fetch the real state from WAHA (source of truth)."""
         self._check_manager()
         for rec in self:
-            client = rec._client()
             try:
-                data = client.get_session(rec.session_name)
-                rec._apply_remote(data)
-                rec._wait_for_qr(client, timeout=8)
-                rec._refresh_profile(client)
+                rec._refresh_status()
             except WahaError as e:
                 rec._fail(e)
         return True
+
+    def _refresh_status(self):
+        """Fetch the real state from WAHA (no permission check: also used by crons). Raises WahaError."""
+        self.ensure_one()
+        client = self._client()
+        self._apply_remote(client.get_session(self.session_name))
+        self._wait_for_qr(client, timeout=8)
+        self._refresh_profile(client)
 
     def _refresh_profile(self, client):
         """Avatar of the connected WhatsApp account (best effort: privacy or engines may not provide it)."""
@@ -364,56 +368,79 @@ class WahaSession(models.Model):
     SYNC_CHATS = 30
     SYNC_MESSAGES = 20
 
-    def _sync_messages(self, default_days=2):
-        """Pull recent messages (also the ones sent from the phone) from WAHA and feed them through the normal event pipeline.
+    SYNC_BUDGET_SECONDS = 50  # stay well below the HTTP worker limit (Odoo.sh: 120 s)
+    SYNC_MIN_READ_TIMEOUT = 60
 
-        Bounded (30 chats x 20 messages) and idempotent (event key ``sync_<message id>`` plus the
-        per-message de-duplication of the handlers). Returns the number of messages imported.
+    def _sync_messages(self, default_days=2, budget=None):
+        """Pull recent messages (also the ones sent from the phone) from WAHA and feed them through the normal
+        event pipeline.
+
+        Bounded (30 chats x 20 messages, only messages newer than the last sync) and idempotent (event key
+        ``sync_<message id>`` plus the per-message de-duplication of the handlers). A slow or failing chat is
+        skipped, the others continue, and the sync point only advances when everything was fetched, so nothing
+        is lost: the next run simply retries. Returns ``(imported, skipped_chats)``.
         """
         self.ensure_one()
         client = self._client()
+        client.timeout = (client.timeout[0], max(client.timeout[1], self.SYNC_MIN_READ_TIMEOUT))
+        deadline = time.monotonic() + (self.SYNC_BUDGET_SECONDS if budget is None else budget)
         since = self.messages_synced_at or fields.Datetime.subtract(fields.Datetime.now(), days=default_days)
         since_ts = int(since.replace(tzinfo=timezone.utc).timestamp())
         Event = self.env['elblasy.waha.webhook.event'].sudo()
-        count = 0
-        try:
-            chats = client.get(f'/api/{self.session_name}/chats/overview', {'limit': self.SYNC_CHATS})
-            for chat in chats if isinstance(chats, list) else []:
-                chat_id = chat.get('id')
-                chat_id = chat_id.get('_serialized') if isinstance(chat_id, dict) else chat_id
-                if not isinstance(chat_id, str) or chat_id.rpartition('@')[2] not in ('c.us', 'lid'):
-                    continue
-                last = chat.get('lastMessage') if isinstance(chat.get('lastMessage'), dict) else {}
-                if last.get('timestamp') and last['timestamp'] < since_ts:
-                    continue  # nothing new in this chat: spare an API call
+        imported = skipped = consecutive_failures = 0
+        chats = client.get(f'/api/{self.session_name}/chats/overview', {'limit': self.SYNC_CHATS})  # failure: abort
+        for chat in chats if isinstance(chats, list) else []:
+            chat_id = chat.get('id')
+            chat_id = chat_id.get('_serialized') if isinstance(chat_id, dict) else chat_id
+            if not isinstance(chat_id, str) or chat_id.rpartition('@')[2] not in ('c.us', 'lid'):
+                continue
+            last = chat.get('lastMessage') if isinstance(chat.get('lastMessage'), dict) else {}
+            if last.get('timestamp') and last['timestamp'] < since_ts:
+                continue  # nothing new in this chat: spare an API call
+            if time.monotonic() >= deadline:
+                skipped += 1  # out of time: the remaining chats are fetched by the next run
+                continue
+            try:
                 messages = client.get(f'/api/{self.session_name}/chats/{chat_id}/messages', {
-                    'limit': self.SYNC_MESSAGES, 'downloadMedia': 'true'})
-                for message in messages if isinstance(messages, list) else []:
-                    msg_id = message.get('id')
-                    msg_id = msg_id.get('_serialized') if isinstance(msg_id, dict) else msg_id
-                    if not msg_id or (message.get('timestamp') or 0) < since_ts:
-                        continue
-                    message['id'] = msg_id
-                    data = {'id': f'sync_{msg_id}', 'event': 'message.any', 'session': self.session_name,
-                            'payload': message}
-                    event = Event._store_event(self.sudo(), json.dumps(data).encode(), data)
-                    if event:
-                        event._process_event()
-                        count += event.state == 'done'
-        finally:
+                    'limit': self.SYNC_MESSAGES, 'downloadMedia': 'true', 'filter.timestamp.gte': since_ts})
+            except WahaError as e:
+                _logger.info("Sync of chat %s skipped: %s", chat_id.partition('@')[0][-4:], e)
+                skipped += 1
+                consecutive_failures += 1
+                if consecutive_failures >= 3:
+                    skipped += 1  # the server is not answering: stop hammering it
+                    break
+                continue
+            consecutive_failures = 0
+            for message in messages if isinstance(messages, list) else []:
+                msg_id = message.get('id')
+                msg_id = msg_id.get('_serialized') if isinstance(msg_id, dict) else msg_id
+                if not msg_id or (message.get('timestamp') or 0) < since_ts:
+                    continue
+                message['id'] = msg_id
+                data = {'id': f'sync_{msg_id}', 'event': 'message.any', 'session': self.session_name,
+                        'payload': message}
+                event = Event._store_event(self.sudo(), json.dumps(data).encode(), data)
+                if event:
+                    event._process_event()
+                    imported += event.state == 'done'
+        if not skipped:
             self.sudo().messages_synced_at = fields.Datetime.now()
-        return count
+        return imported, skipped
 
     def action_sync_messages(self):
         self.ensure_one()
         self._check_manager()
         try:
-            count = self._sync_messages()
+            imported, skipped = self._sync_messages()
         except WahaError as e:
             self._fail(e)
+        message = self.env._("%s new message(s) imported.", imported)
+        if skipped:
+            message += " " + self.env._(
+                "%s chat(s) were skipped because WAHA was slow; press Sync again, nothing is lost.", skipped)
         return {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {
-            'title': self.env._("Messages sync"), 'type': 'success',
-            'message': self.env._("%s new message(s) imported.", count)}}
+            'title': self.env._("Messages sync"), 'type': 'warning' if skipped else 'success', 'message': message}}
 
     @api.model
     def _cron_sync_messages(self):
@@ -422,6 +449,10 @@ class WahaSession(models.Model):
                 session.messages_synced_at = fields.Datetime.now()  # start from now: never import old history
                 continue
             try:
-                session._sync_messages()
+                session._sync_messages(budget=40)
             except WahaError as e:
                 _logger.warning("Auto-sync of session %s failed: %s", session.id, e)
+                try:
+                    session._refresh_status()  # a FAILED/STOPPED session must stop being polled every minute
+                except WahaError as e2:
+                    _logger.info("Status of session %s unavailable: %s", session.id, e2)
