@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="waha_session_view_list" model="ir.ui.view">
+        <field name="name">elblasy.waha.session.list</field>
+        <field name="model">elblasy.waha.session</field>
+        <field name="arch" type="xml">
+            <list decoration-success="status == 'WORKING'" decoration-danger="status == 'FAILED'" decoration-muted="status == 'STOPPED'">
+                <field name="name"/>
+                <field name="session_name"/>
+                <field name="server_id"/>
+                <field name="status" widget="badge"/>
+                <field name="phone_number"/>
+                <field name="last_status_update"/>
+            </list>
+        </field>
+    </record>
+    <record id="waha_session_view_form" model="ir.ui.view">
+        <field name="name">elblasy.waha.session.form</field>
+        <field name="model">elblasy.waha.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_connect" type="object" string="Connect" class="btn-primary"
+                            invisible="status == 'WORKING'" groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_refresh_status" type="object" string="Refresh Status"
+                            groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_restart" type="object" string="Restart"
+                            groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_stop" type="object" string="Stop" invisible="status == 'STOPPED'"
+                            groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_sync_messages" type="object" string="Sync Messages"
+                            invisible="status != 'WORKING'" groups="elblasy_waha_connector.group_waha_manager"
+                            help="Import recent incoming messages from WAHA (no webhook needed)."/>
+                    <button name="action_sync_labels" type="object" string="Sync Labels"
+                            invisible="status != 'WORKING'" groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_sync_groups" type="object" string="Sync Groups"
+                            invisible="status != 'WORKING'" groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_logout" type="object" string="Log out"
+                            confirm="Log out of WhatsApp? You will need to scan a QR code again."
+                            groups="elblasy_waha_connector.group_waha_admin"/>
+                    <field name="status" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <field name="profile_image" widget="image" class="oe_avatar" invisible="not profile_image"/>
+                    <div class="alert alert-warning" role="status" invisible="not timelock_active">
+                        WhatsApp is limiting messages to new contacts on this number<field name="timelock_ends" class="ms-1"/>.
+                    </div>
+                    <div class="alert alert-warning" role="status" invisible="not status_hint"><field name="status_hint"/></div>
+                    <div class="alert alert-danger" role="status" invisible="not last_error"><field name="last_error"/></div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="session_name" readonly="id"/>
+                            <field name="server_id"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="phone_number"/>
+                            <field name="whatsapp_profile_name"/>
+                            <field name="engine"/>
+                            <field name="auto_sync_messages" groups="elblasy_waha_connector.group_waha_manager"/>
+                            <field name="check_numbers" groups="elblasy_waha_connector.group_waha_manager"/>
+                            <field name="sync_read_state" groups="elblasy_waha_connector.group_waha_manager"/>
+                            <field name="reject_calls" groups="elblasy_waha_connector.group_waha_manager"/>
+                            <field name="reject_calls_message" invisible="not reject_calls" groups="elblasy_waha_connector.group_waha_manager"/>
+                            <field name="last_connected_at"/>
+                            <field name="last_status_update"/>
+                            <field name="capping_status" invisible="not capping_status" groups="elblasy_waha_connector.group_waha_manager"/>
+                            <field name="capping_used" invisible="capping_total &lt;= 0" groups="elblasy_waha_connector.group_waha_manager"/>
+                            <field name="capping_total" invisible="capping_total &lt;= 0" groups="elblasy_waha_connector.group_waha_manager"/>
+                        </group>
+                        <group string="Webhook" groups="elblasy_waha_connector.group_waha_manager">
+                            <field name="webhook_url" widget="CopyClipboardChar"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- compact QR dialog -->
+    <record id="waha_session_view_form_qr" model="ir.ui.view">
+        <field name="name">elblasy.waha.session.form.qr</field>
+        <field name="model">elblasy.waha.session</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <sheet>
+                    <field name="status" widget="statusbar"/>
+                    <div class="text-center my-3" invisible="status != 'SCAN_QR_CODE'">
+                        <p>Open WhatsApp &gt; Linked devices &gt; Link a device, then scan:</p>
+                        <field name="qr_image" widget="image" options="{'size': [300, 300]}" invisible="not qr_image"/>
+                        <p invisible="qr_image" class="text-muted">The QR code is not ready yet, press Refresh.</p>
+                    </div>
+                    <div class="alert alert-success" role="status" invisible="status != 'WORKING'">
+                        Connected as <field name="whatsapp_profile_name" class="fw-bold"/> <field name="phone_number"/>
+                    </div>
+                    <div class="alert alert-warning" role="status" invisible="not status_hint"><field name="status_hint"/></div>
+                    <div class="alert alert-danger" role="status" invisible="not last_error"><field name="last_error"/></div>
+                </sheet>
+                <footer>
+                    <button name="action_poll" type="object" string="Refresh" class="btn-primary"
+                            groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button special="cancel" string="Close" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="waha_session_action" model="ir.actions.act_window">
+        <field name="name">WhatsApp Sessions</field>
+        <field name="res_model">elblasy.waha.session</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

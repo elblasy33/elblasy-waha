@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*.pot~
+.venv/
+.idea/
+.vscode/
+*.dump
+*.sql
+*.log
+.env

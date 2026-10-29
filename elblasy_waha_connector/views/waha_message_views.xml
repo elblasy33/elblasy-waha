@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="waha_message_view_list" model="ir.ui.view">
+        <field name="name">elblasy.waha.message.list</field>
+        <field name="model">elblasy.waha.message</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0">
+                <field name="date"/><field name="conversation_id"/><field name="direction"/>
+                <field name="message_type"/><field name="body"/><field name="delivery_status"/>
+            </list>
+        </field>
+    </record>
+    <record id="waha_message_action" model="ir.actions.act_window">
+        <field name="name">Messages</field>
+        <field name="res_model">elblasy.waha.message</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

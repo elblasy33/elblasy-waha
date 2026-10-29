@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="waha_session_view_form_bridge" model="ir.ui.view">
+        <field name="name">elblasy.waha.session.form.bridge</field>
+        <field name="model">elblasy.waha.session</field>
+        <field name="inherit_id" ref="elblasy_waha_connector.waha_session_view_form"/>
+        <field name="arch" type="xml">
+            <button name="action_logout" position="after">
+                <field name="odoo_whatsapp_enabled" invisible="1"/>
+                <button name="action_enable_odoo_whatsapp" type="object" string="Enable Odoo WhatsApp"
+                        invisible="odoo_whatsapp_enabled" groups="whatsapp.group_whatsapp_admin"
+                        help="Use Odoo's native WhatsApp app (Discuss, templates, chatter) through this WAHA session."/>
+                <button name="action_open_whatsapp_account" type="object" string="WhatsApp Account"
+                        invisible="not odoo_whatsapp_enabled" groups="whatsapp.group_whatsapp_admin"/>
+                <button name="action_disable_odoo_whatsapp" type="object" string="Disable Odoo WhatsApp"
+                        invisible="not odoo_whatsapp_enabled" groups="whatsapp.group_whatsapp_admin"
+                        confirm="Unlink the native WhatsApp account from this session?"/>
+            </button>
+        </field>
+    </record>
+</odoo>

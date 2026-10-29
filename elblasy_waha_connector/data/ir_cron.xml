@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="cron_waha_retry_events" model="ir.cron">
+        <field name="name">WAHA: retry failed webhook events</field>
+        <field name="model_id" ref="model_elblasy_waha_webhook_event"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_retry_failed()</field>
+        <field name="interval_number">10</field>
+        <field name="interval_type">minutes</field>
+    </record>
+
+    <record id="cron_waha_queue" model="ir.cron">
+        <field name="name">WAHA: send queued WhatsApp messages</field>
+        <field name="model_id" ref="model_elblasy_waha_queue"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_process()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+    </record>
+
+    <record id="cron_waha_purge_group_messages" model="ir.cron">
+        <field name="name">WAHA: purge old group messages</field>
+        <field name="model_id" ref="model_elblasy_waha_group"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_purge_messages()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+    </record>
+    <record id="cron_waha_sync_messages" model="ir.cron">
+        <field name="name">WAHA: auto-sync incoming messages</field>
+        <field name="model_id" ref="model_elblasy_waha_session"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sync_messages()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+    </record>
+    <record id="cron_waha_group_pictures" model="ir.cron">
+        <field name="name">WAHA: fetch group pictures</field>
+        <field name="model_id" ref="model_elblasy_waha_group"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sync_pictures()</field>
+        <field name="interval_number">15</field>
+        <field name="interval_type">minutes</field>
+    </record>
+    <record id="cron_waha_conversation_pictures" model="ir.cron">
+        <field name="name">WAHA: fetch chat pictures</field>
+        <field name="model_id" ref="model_elblasy_waha_conversation"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_sync_pictures()</field>
+        <field name="interval_number">15</field>
+        <field name="interval_type">minutes</field>
+    </record>
+</odoo>

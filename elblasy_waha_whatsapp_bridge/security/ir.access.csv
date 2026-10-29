@@ -1,0 +1,2 @@
+id,name,model_id,group_id/id,operation,domain
+access_waha_new_chat_user,waha.new.chat.user,elblasy.waha.new.chat,elblasy_waha_connector.group_waha_user,crud,

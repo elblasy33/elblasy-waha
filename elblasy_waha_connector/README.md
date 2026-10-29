@@ -1,0 +1,45 @@
+# Elblasy WhatsApp (WAHA) - `elblasy_waha_connector` 20.0.3.0.0
+
+Unified module (it replaces the former `elblasy_waha_connector`, `elblasy_waha_groups`, `elblasy_waha_automation` and `elblasy_waha_groups_hr`).
+Target: **Odoo 20.0**. WhatsApp through your own [WAHA](https://waha.devlike.pro) server.
+
+## What is inside
+| Area | Models / files |
+|---|---|
+| HTTP client (no ORM) | `models/waha_client.py` |
+| Servers & sessions (QR login, status from WAHA) | `waha_server.py`, `waha_session.py` |
+| Inbox (conversations, messages) | `waha_conversation.py`, `waha_message.py`, `static/src/inbox/` |
+| Webhook receiver + idempotent event processing | `controllers/main.py`, `waha_webhook_event.py` |
+| Groups: sync, whitelist, members, invite, create, posts, opt-in message log | `waha_group*.py`, `wizard/` |
+| Instant messages / documents to a number and groups | `wizard/waha_group_send.py` |
+| Automation (server action "Send WhatsApp (WAHA)") + throttled queue | `ir_actions_server.py`, `waha_queue.py` |
+| Auto-replies, opt-out, reporting | `waha_autoreply.py`, `waha_optout.py`, `views/waha_report_views.xml` |
+
+Optional add-on (separate on purpose, Enterprise only): `elblasy_waha_whatsapp_bridge` (Odoo's `whatsapp` app over WAHA, incl. *New Chat (Discuss)* and free-text messages without templates).
+The employee button is part of this module and is created when `hr` is installed.
+
+## Setup
+1. WAHA with an API key behind HTTPS. 2. *WhatsApp > Configuration > Servers*: URL + key, **Test Connection**.
+3. *Sessions*: create, **Connect**, scan the QR. 4. Set **Odoo Public URL** (WAHA must reach it) and press Connect once
+so the webhook (with `X-Odoo-Database` header) is configured. 5. Group features: **Sync Groups**, then tick
+"Odoo can post here" on the groups you want.
+
+## Upgrading from the three separate modules
+`migrations/20.0.2.0.0` and `20.0.3.0.0` move the XML ids of the absorbed modules to this module and remove their
+leftover records from the Apps list; model/table names are unchanged so no data is touched.
+Remove the old folders from the addons path before upgrading.
+
+## Security notes
+Groups User / Manager / Administrator (`security/`), multi-company rules on every model. API key and HMAC secret are
+plain database fields readable only by managers (not encrypted at rest). Raw webhook payloads: administrators only,
+purged after 14 days; group messages are stored only for opted-in groups and purged after 90 days.
+Automatic messages respect opt-out keywords; sends are rate-limited (10/min per chat) and the queue sends slowly.
+
+## Limits
+Inbox sends text and files (max 15 MB); inbound media is stored and displayed. Auto-sync is a polling fallback (about 1 minute delay), not a replacement for the webhook. WEBJS is unofficial:
+avoid bulk campaigns. Numbers need the country code. LID-only chats are not matched to contacts automatically.
+The inbox JavaScript is covered by manual testing only (no JS test suite).
+
+## Tests
+`odoo-bin -d <db> --http-port=<free port> -i elblasy_waha_connector --test-tags /elblasy_waha_connector --stop-after-init`
+(WAHA is mocked; the HTTP webhook tests need a free port).

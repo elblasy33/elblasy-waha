@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="elblasy_waha_connector.Inbox">
+        <div class="o_waha_inbox d-flex h-100">
+            <div class="o_waha_list d-flex flex-column border-end">
+                <div class="p-2 border-bottom">
+                    <select class="form-select mb-2" t-on-change="this.onSessionChange">
+                        <option value="0">All sessions</option>
+                        <option t-foreach="this.state.sessions" t-as="s" t-key="s.id" t-att-value="s.id" t-out="s.name"/>
+                    </select>
+                    <select t-if="this.state.labels.length" class="form-select mb-2" t-on-change="this.onLabelFilterChange">
+                        <option value="0">All labels</option>
+                        <option t-foreach="this.state.labels" t-as="l" t-key="l.id" t-att-value="l.id" t-out="l.name"/>
+                    </select>
+                    <input class="form-control" type="search" placeholder="Search…" t-on-input="this.onSearchInput"/>
+                </div>
+                <div class="flex-grow-1 overflow-auto">
+                    <div t-foreach="this.state.conversations" t-as="c" t-key="c.id"
+                         class="o_waha_conv px-3 py-2 border-bottom"
+                         t-att-class="{ 'active': this.state.current and this.state.current.id === c.id }"
+                         t-on-click="() => this.openConversation(c)">
+                        <div class="d-flex justify-content-between">
+                            <img t-if="c.has_image" class="rounded-circle me-2 o_waha_avatar" width="36" height="36" alt=""
+                                 t-att-src="'/web/image/elblasy.waha.conversation/' + c.id + '/image_128?unique=' + c.image_ts"/>
+                            <i t-else="" class="fa fa-user-circle fa-2x text-muted me-2"/>
+                            <strong class="text-truncate flex-grow-1" t-out="c.name"/>
+                            <small class="text-muted ms-2" t-out="c.last_date"/>
+                        </div>
+                        <div t-if="c.labels.length" class="mb-1">
+                            <span t-foreach="c.labels" t-as="l" t-key="l.id" class="badge me-1 o_waha_label"
+                                  t-att-style="'background-color:' + l.color" t-out="l.name"/>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted text-truncate" t-out="c.last_message"/>
+                            <span t-if="c.unread" class="badge rounded-pill text-bg-success ms-2" t-out="c.unread"/>
+                        </div>
+                        <small t-if="c.session_status !== 'WORKING'" class="text-warning">Session offline</small>
+                    </div>
+                    <div t-if="!this.state.conversations.length" class="p-4 text-muted text-center">No conversations yet.</div>
+                </div>
+            </div>
+            <div class="o_waha_thread d-flex flex-column flex-grow-1">
+                <t t-if="this.state.current">
+                    <div class="d-flex align-items-center justify-content-between p-2 border-bottom">
+                        <div>
+                            <strong t-out="this.state.current.name"/>
+                            <div class="text-muted small" t-if="this.state.current.phone" t-out="'+' + this.state.current.phone"/>
+                        </div>
+                        <div class="position-relative">
+                            <button t-if="this.currentSessionLabels.length" class="btn btn-light btn-sm me-1" t-on-click="this.toggleLabelsMenu">
+                                <i class="fa fa-tags"/> Labels
+                            </button>
+                            <div t-if="this.state.labelsOpen" class="o_waha_labels_menu border rounded shadow-sm p-1">
+                                <div t-foreach="this.currentSessionLabels" t-as="l" t-key="l.id" class="px-2 py-1 o_waha_label_option"
+                                     t-on-click="() => this.toggleLabel(l)">
+                                    <i t-attf-class="fa {{ this.isLabelOn(l) ? 'fa-check-square-o' : 'fa-square-o' }} me-1"/>
+                                    <span class="badge o_waha_label" t-att-style="'background-color:' + l.color" t-out="l.name"/>
+                                </div>
+                            </div>
+                            <button t-if="this.state.current.partner_id" class="btn btn-secondary btn-sm" t-on-click="this.openPartner">Open Contact</button>
+                            <button t-else="" class="btn btn-secondary btn-sm" t-on-click="this.createPartner">Create Contact</button>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 overflow-auto p-3" t-ref="this.threadRef">
+                        <div t-if="this.state.hasMore" class="text-center mb-2">
+                            <button class="btn btn-link btn-sm" t-on-click="this.loadOlder">Load older messages</button>
+                        </div>
+                        <div t-foreach="this.state.messages" t-as="m" t-key="m.id"
+                             class="o_waha_msg d-flex mb-2"
+                             t-att-class="m.direction === 'out' ? 'justify-content-end' : 'justify-content-start'">
+                            <div class="o_waha_bubble px-3 py-2 rounded" t-att-class="m.direction === 'out' ? 'o_out' : 'o_in'">
+                                <t t-foreach="m.attachments" t-as="a" t-key="a.id">
+                                    <a t-if="a.image" t-att-href="'/web/content/' + a.id" target="_blank">
+                                        <img class="img-fluid rounded mb-1 o_waha_img" t-att-src="'/web/image/' + a.id" t-att-alt="a.name"/>
+                                    </a>
+                                    <div t-else="" class="mb-1">
+                                        <i class="fa fa-paperclip me-1"/>
+                                        <a t-att-href="'/web/content/' + a.id + '?download=true'" t-out="a.name"/>
+                                    </div>
+                                </t>
+                                <div t-if="m.body or !m.attachments.length" class="o_waha_body" t-out="m.type === 'text' ? m.body : (m.body || '[' + m.type + ']')"/>
+                                <div class="small text-muted text-end">
+                                    <span t-out="m.date"/>
+                                    <span t-if="m.direction === 'out'" t-out="this.statusLabel(m.status)" t-att-title="m.failure"/>
+                                </div>
+                                <div t-if="m.failure" class="small text-danger" t-out="m.failure"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div t-if="this.sessionDisconnected" class="alert alert-warning m-2">The WhatsApp session is not connected. Messages cannot be sent.</div>
+                    <div class="d-flex p-2 border-top">
+                        <input type="file" class="d-none" t-ref="this.fileRef" t-on-change="this.onFileChange"/>
+                        <button class="btn btn-light me-2" title="Attach a file" t-att-disabled="this.state.sending or this.sessionDisconnected" t-on-click="this.onAttachClick">
+                            <i class="fa fa-paperclip"/>
+                        </button>
+                        <textarea class="form-control" rows="2" placeholder="Type a message…" t-att-value="this.state.draft" t-on-input="this.onDraftInput"
+                                  t-att-disabled="this.sessionDisconnected" t-on-keydown="this.onDraftKeydown"/>
+                        <button class="btn btn-primary ms-2" t-att-disabled="this.state.sending or this.sessionDisconnected" t-on-click="this.send">
+                            <i t-attf-class="fa {{ this.state.sending ? 'fa-spinner fa-spin' : 'fa-paper-plane' }}"/> Send
+                        </button>
+                    </div>
+                </t>
+                <div t-else="" class="m-auto text-muted">Select a conversation</div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_partner_view_form_waha" model="ir.ui.view">
+        <field name="name">res.partner.form.waha</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button name="action_send_whatsapp" type="object" class="oe_stat_button" icon="fa-whatsapp"
+                        string="Send WhatsApp" groups="elblasy_waha_connector.group_waha_user"/>
+                <button name="action_open_waha_conversations" type="object" class="oe_stat_button"
+                        icon="fa-whatsapp" invisible="not waha_conversation_count"
+                        groups="elblasy_waha_connector.group_waha_user">
+                    <field name="waha_conversation_count" widget="statinfo" string="WhatsApp"/>
+                </button>
+            </div>
+            <notebook position="inside">
+                <page string="WhatsApp" name="waha_groups" groups="elblasy_waha_connector.group_waha_user">
+                    <group>
+                        <field name="waha_group_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    </group>
+                    <p class="text-muted">Documents sent with "Send WhatsApp" also go to these groups.</p>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

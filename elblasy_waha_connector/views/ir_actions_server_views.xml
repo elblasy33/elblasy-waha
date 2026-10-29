@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_actions_server_view_form_waha" model="ir.ui.view">
+        <field name="name">ir.actions.server.form.waha</field>
+        <field name="model">ir.actions.server</field>
+        <field name="inherit_id" ref="base.view_server_action_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//t[@name='action_content']" position="inside">
+                <group invisible="state != 'waha_send'">
+                    <group>
+                        <field name="waha_session_id" required="state == 'waha_send'" options="{'no_create': True}"/>
+                        <field name="waha_user_id" required="state == 'waha_send'" options="{'no_create': True}"/>
+                        <field name="waha_send_customer"/>
+                        <field name="waha_use_partner_groups"/>
+                        <field name="waha_group_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    </group>
+                    <group>
+                        <field name="waha_report_id" options="{'no_create': True}"/>
+                        <field name="waha_once_per_record"/>
+                        <field name="waha_delay_minutes"/>
+                    </group>
+                    <field name="waha_body" colspan="2" placeholder="Hello {{ object.partner_id.name }}, your order {{ object.name }} is confirmed."/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

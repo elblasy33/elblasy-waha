@@ -1,0 +1,24 @@
+.o_waha_inbox {
+    background: var(--body-bg, #fff);
+
+    .o_waha_list { width: 340px; max-width: 40%; }
+    .o_waha_conv {
+        cursor: pointer;
+        &:hover, &.active { background-color: rgba(0, 0, 0, .05); }
+    }
+    .o_waha_label { color: #fff; font-weight: 500; }
+    .o_waha_labels_menu { position: absolute; right: 0; top: 100%; z-index: 10; min-width: 180px; background: var(--body-bg, #fff); }
+    .o_waha_label_option { cursor: pointer; &:hover { background-color: rgba(0, 0, 0, .05); } }
+    .o_waha_avatar { object-fit: cover; flex: none; }
+    .o_waha_img { max-height: 280px; }
+    .o_waha_bubble {
+        max-width: 70%;
+        white-space: pre-wrap;
+        word-break: break-word;
+        &.o_in { background: #f1f3f5; }
+        &.o_out { background: #d9fdd3; color: #111; }
+    }
+}
+@media (max-width: 767.98px) {
+    .o_waha_inbox .o_waha_list { width: 45%; }
+}

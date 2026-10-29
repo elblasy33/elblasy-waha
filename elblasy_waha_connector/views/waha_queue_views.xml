@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="waha_queue_view_list" model="ir.ui.view">
+        <field name="name">elblasy.waha.queue.list</field>
+        <field name="model">elblasy.waha.queue</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-danger="state == 'failed'" decoration-warning="state == 'unknown'"
+                  decoration-muted="state in ('done', 'skipped')">
+                <header>
+                    <button name="action_run_now" type="object" string="Send now"/>
+                    <button name="action_retry" type="object" string="Retry"/>
+                </header>
+                <field name="create_date"/><field name="action_id"/><field name="res_model"/><field name="record_name"/>
+                <field name="scheduled_for"/><field name="state"/><field name="attempts"/><field name="error"/>
+            </list>
+        </field>
+    </record>
+    <record id="waha_queue_action" model="ir.actions.act_window">
+        <field name="name">Automation Queue</field>
+        <field name="res_model">elblasy.waha.queue</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

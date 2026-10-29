@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="waha_group_view_list" model="ir.ui.view">
+        <field name="name">elblasy.waha.group.list</field>
+        <field name="model">elblasy.waha.group</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="image_128" widget="image" options="{'size': [28, 28]}" string=""/>
+                <field name="name"/><field name="session_id"/>
+                <field name="allow_send" widget="boolean_toggle" groups="elblasy_waha_connector.group_waha_manager"/>
+                <field name="last_sync_date"/>
+            </list>
+        </field>
+    </record>
+    <record id="waha_group_view_form" model="ir.ui.view">
+        <field name="name">elblasy.waha.group.form</field>
+        <field name="model">elblasy.waha.group</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_open_send_wizard" type="object" string="Send message" class="btn-primary"
+                            invisible="not allow_send"/>
+                    <button name="action_refresh_picture" type="object" string="Refresh Picture"
+                            groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_sync_members" type="object" string="Sync Members"
+                            groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_open_add_members" type="object" string="Add Members"
+                            groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_get_invite_link" type="object" string="Invite Link"
+                            groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_revoke_invite_link" type="object" string="Revoke Link"
+                            invisible="not invite_link" confirm="Revoke the current invite link and create a new one?"
+                            groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_leave" type="object" string="Leave Group" invisible="not active"
+                            confirm="Leave this WhatsApp group? Odoo will no longer post to it."
+                            groups="elblasy_waha_connector.group_waha_admin"/>
+                </header>
+                <sheet>
+                    <field name="image_128" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}"/>
+                    <group>
+                        <group>
+                            <field name="name"/><field name="session_id"/><field name="chat_id"/>
+                            <field name="messages_admin_only"/><field name="info_admin_only"/>
+                            <field name="participants_count" invisible="not participants_count"/>
+                        </group>
+                        <group>
+                            <field name="allow_send" groups="elblasy_waha_connector.group_waha_manager"/>
+                            <field name="log_messages" groups="elblasy_waha_connector.group_waha_manager"/>
+                            <field name="invite_link" widget="CopyClipboardChar" groups="elblasy_waha_connector.group_waha_manager"/>
+                            <field name="active" invisible="1"/>
+                            <field name="last_sync_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Posts" name="posts">
+                            <field name="description" placeholder="Description"/>
+                            <field name="post_ids" readonly="1">
+                                <list><field name="create_date"/><field name="user_id"/><field name="body"/><field name="state"/></list>
+                            </field>
+                        </page>
+                        <page string="Members" name="members" groups="elblasy_waha_connector.group_waha_manager">
+                            <field name="member_ids" readonly="1">
+                                <list>
+                                    <field name="wa_id"/><field name="phone"/><field name="role"/><field name="partner_id"/>
+                                    <button name="action_promote" type="object" string="Promote" invisible="role != 'participant'"/>
+                                    <button name="action_demote" type="object" string="Demote" invisible="role != 'admin'"/>
+                                    <button name="action_remove" type="object" string="Remove" invisible="role == 'superadmin'"
+                                            confirm="Remove this member from the group?"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Messages" name="messages" invisible="not log_messages" groups="elblasy_waha_connector.group_waha_manager">
+                            <field name="message_ids" readonly="1" context="{'list_view_ref': 'elblasy_waha_connector.waha_group_message_view_list'}"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="waha_group_view_search" model="ir.ui.view">
+        <field name="name">elblasy.waha.group.search</field>
+        <field name="model">elblasy.waha.group</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="allowed" string="Allowed to post" domain="[('allow_send', '=', True)]"/>
+            </search>
+        </field>
+    </record>
+    <record id="waha_group_action" model="ir.actions.act_window">
+        <field name="name">WhatsApp Groups</field>
+        <field name="res_model">elblasy.waha.group</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

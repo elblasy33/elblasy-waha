@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="waha_message_view_search" model="ir.ui.view">
+        <field name="name">elblasy.waha.message.search</field>
+        <field name="model">elblasy.waha.message</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="body"/><field name="conversation_id"/><field name="user_id"/>
+                <filter name="incoming" string="Incoming" domain="[('direction', '=', 'in')]"/>
+                <filter name="outgoing" string="Outgoing" domain="[('direction', '=', 'out')]"/>
+                <filter name="human" string="Human replies" domain="[('direction', '=', 'out'), ('is_auto', '=', False)]"/>
+                <filter name="auto" string="Automatic" domain="[('is_auto', '=', True)]"/>
+                <separator/>
+                <filter name="last30" string="Last 30 days" domain="[('date', '&gt;=', (context_today() - relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <group>
+                    <filter name="g_day" string="Day" context="{'group_by': 'date:day'}"/>
+                    <filter name="g_session" string="Session" context="{'group_by': 'session_id'}"/>
+                    <filter name="g_user" string="Agent" context="{'group_by': 'user_id'}"/>
+                    <filter name="g_direction" string="Direction" context="{'group_by': 'direction'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="waha_message_view_pivot" model="ir.ui.view">
+        <field name="name">elblasy.waha.message.pivot</field>
+        <field name="model">elblasy.waha.message</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="session_id" type="row"/>
+                <field name="direction" type="col"/>
+                <field name="response_seconds" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="waha_message_view_graph" model="ir.ui.view">
+        <field name="name">elblasy.waha.message.graph</field>
+        <field name="model">elblasy.waha.message</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="date" interval="day"/>
+                <field name="direction"/>
+            </graph>
+        </field>
+    </record>
+    <record id="waha_report_action" model="ir.actions.act_window">
+        <field name="name">WhatsApp Activity</field>
+        <field name="res_model">elblasy.waha.message</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="context">{'search_default_last30': 1}</field>
+    </record>
+
+    <record id="waha_optout_view_list" model="ir.ui.view">
+        <field name="name">elblasy.waha.optout.list</field>
+        <field name="model">elblasy.waha.optout</field>
+        <field name="arch" type="xml">
+            <list editable="top"><field name="phone"/><field name="source"/><field name="date"/>
+                <field name="company_id" groups="base.group_multi_company"/></list>
+        </field>
+    </record>
+    <record id="waha_optout_action" model="ir.actions.act_window">
+        <field name="name">Opt-outs</field>
+        <field name="res_model">elblasy.waha.optout</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="waha_autoreply_view_list" model="ir.ui.view">
+        <field name="name">elblasy.waha.autoreply.list</field>
+        <field name="model">elblasy.waha.autoreply</field>
+        <field name="arch" type="xml">
+            <list><field name="sequence" widget="handle"/><field name="name"/><field name="trigger"/>
+                <field name="session_id"/><field name="active" widget="boolean_toggle"/></list>
+        </field>
+    </record>
+    <record id="waha_autoreply_view_form" model="ir.ui.view">
+        <field name="name">elblasy.waha.autoreply.form</field>
+        <field name="model">elblasy.waha.autoreply</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/><field name="trigger"/><field name="session_id"/>
+                            <field name="cooldown_minutes"/><field name="active"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group invisible="trigger != 'outside_hours'">
+                            <field name="work_from" widget="float_time"/><field name="work_to" widget="float_time"/>
+                            <field name="work_days"/><field name="tz"/>
+                        </group>
+                    </group>
+                    <field name="keywords" placeholder="price, ثمن, تكلفة" invisible="trigger != 'keyword'"/>
+                    <field name="reply_text" placeholder="Hello {name}, thanks for contacting us..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="waha_autoreply_action" model="ir.actions.act_window">
+        <field name="name">Auto-replies</field>
+        <field name="res_model">elblasy.waha.autoreply</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

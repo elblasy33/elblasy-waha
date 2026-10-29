@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="waha_group_post_view_list" model="ir.ui.view">
+        <field name="name">elblasy.waha.group.post.list</field>
+        <field name="model">elblasy.waha.group.post</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" decoration-danger="state == 'failed'" decoration-warning="state == 'unknown'">
+                <field name="create_date"/><field name="target_name"/><field name="user_id"/>
+                <field name="res_model"/><field name="body"/><field name="state"/><field name="error"/>
+            </list>
+        </field>
+    </record>
+    <record id="waha_group_post_action" model="ir.actions.act_window">
+        <field name="name">Group Posts</field>
+        <field name="res_model">elblasy.waha.group.post</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

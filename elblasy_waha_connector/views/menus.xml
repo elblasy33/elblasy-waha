@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="waha_inbox_action" model="ir.actions.client">
+        <field name="name">WhatsApp Inbox</field>
+        <field name="tag">elblasy_waha_inbox</field>
+    </record>
+
+    <menuitem id="menu_waha_root" name="WhatsApp" sequence="60" web_icon="elblasy_waha_connector,static/description/icon.png"
+              groups="group_waha_user"/>
+    <menuitem id="menu_waha_inbox" name="Inbox" parent="menu_waha_root" action="waha_inbox_action" sequence="10"/>
+    <menuitem id="menu_waha_conversations" name="Conversations" parent="menu_waha_root" action="waha_conversation_action" sequence="20"/>
+    <menuitem id="menu_waha_config" name="Configuration" parent="menu_waha_root" sequence="90" groups="group_waha_manager"/>
+    <menuitem id="menu_waha_sessions" name="Sessions" parent="menu_waha_config" action="waha_session_action" sequence="10"/>
+    <menuitem id="menu_waha_servers" name="Servers" parent="menu_waha_config" action="waha_server_action" sequence="20"/>
+    <menuitem id="menu_waha_events" name="Webhook Events" parent="menu_waha_config" action="waha_webhook_event_action"
+              sequence="30" groups="group_waha_admin"/>
+
+    <menuitem id="menu_waha_groups" name="Groups" parent="menu_waha_root" action="waha_group_action" sequence="30"/>
+    <menuitem id="menu_waha_group_posts" name="Group Posts" parent="menu_waha_config"
+              action="waha_group_post_action" sequence="40" groups="group_waha_manager"/>
+    <menuitem id="menu_waha_queue" name="Automation Queue" parent="menu_waha_config"
+              action="waha_queue_action" sequence="50" groups="group_waha_manager"/>
+    <record id="waha_group_create_menu_action" model="ir.actions.act_window">
+        <field name="name">Create WhatsApp group</field>
+        <field name="res_model">elblasy.waha.group.create</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    <menuitem id="menu_waha_group_create" name="Create Group" parent="menu_waha_root"
+              action="waha_group_create_action" sequence="35" groups="group_waha_manager"/>
+    <menuitem id="menu_waha_reporting" name="Reporting" parent="menu_waha_root" sequence="80" groups="group_waha_manager"/>
+    <menuitem id="menu_waha_report_activity" name="Activity &amp; Response Time" parent="menu_waha_reporting"
+              action="waha_report_action" sequence="10"/>
+    <menuitem id="menu_waha_autoreply" name="Auto-replies" parent="menu_waha_config" action="waha_autoreply_action"
+              sequence="60" groups="group_waha_manager"/>
+    <menuitem id="menu_waha_optout" name="Opt-outs" parent="menu_waha_config" action="waha_optout_action"
+              sequence="70" groups="group_waha_manager"/>
+</odoo>

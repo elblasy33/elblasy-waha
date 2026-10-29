@@ -1,0 +1,50 @@
+id,name,model_id,group_id/id,operation,domain
+access_waha_server_user,waha.server.user,elblasy.waha.server,group_waha_user,r,
+access_waha_server_manager,waha.server.manager,elblasy.waha.server,group_waha_manager,cru,
+access_waha_server_admin,waha.server.admin,elblasy.waha.server,group_waha_admin,crud,
+access_waha_session_user,waha.session.user,elblasy.waha.session,group_waha_user,r,
+access_waha_session_manager,waha.session.manager,elblasy.waha.session,group_waha_manager,cru,
+access_waha_session_admin,waha.session.admin,elblasy.waha.session,group_waha_admin,crud,
+access_waha_conversation_user,waha.conversation.user,elblasy.waha.conversation,group_waha_user,ru,
+access_waha_conversation_manager,waha.conversation.manager,elblasy.waha.conversation,group_waha_manager,cru,
+access_waha_conversation_admin,waha.conversation.admin,elblasy.waha.conversation,group_waha_admin,crud,
+access_waha_message_user,waha.message.user,elblasy.waha.message,group_waha_user,cr,
+access_waha_message_manager,waha.message.manager,elblasy.waha.message,group_waha_manager,cru,
+access_waha_message_admin,waha.message.admin,elblasy.waha.message,group_waha_admin,crud,
+access_waha_event_manager,waha.event.manager,elblasy.waha.webhook.event,group_waha_manager,r,
+access_waha_event_admin,waha.event.admin,elblasy.waha.webhook.event,group_waha_admin,rud,
+rule_elblasy_waha_server_company,elblasy.waha.server multi-company,elblasy.waha.server,,crud,"[('company_id', 'in', company_ids)]"
+rule_elblasy_waha_session_company,elblasy.waha.session multi-company,elblasy.waha.session,,crud,"[('company_id', 'in', company_ids)]"
+rule_elblasy_waha_conversation_company,elblasy.waha.conversation multi-company,elblasy.waha.conversation,,crud,"[('company_id', 'in', company_ids)]"
+rule_elblasy_waha_message_company,elblasy.waha.message multi-company,elblasy.waha.message,,crud,"[('company_id', 'in', company_ids)]"
+access_waha_group_user,waha.group.user,elblasy.waha.group,elblasy_waha_connector.group_waha_user,r,
+access_waha_group_manager,waha.group.manager,elblasy.waha.group,elblasy_waha_connector.group_waha_manager,cru,
+access_waha_group_admin,waha.group.admin,elblasy.waha.group,elblasy_waha_connector.group_waha_admin,crud,
+access_waha_group_post_user,waha.group.post.user,elblasy.waha.group.post,elblasy_waha_connector.group_waha_user,cr,"[('user_id', '=', user.id)]"
+access_waha_group_post_manager,waha.group.post.manager,elblasy.waha.group.post,elblasy_waha_connector.group_waha_manager,r,
+access_waha_group_post_admin,waha.group.post.admin,elblasy.waha.group.post,elblasy_waha_connector.group_waha_admin,crud,
+access_waha_group_send_user,waha.group.send.user,elblasy.waha.group.send,elblasy_waha_connector.group_waha_user,crud,
+rule_waha_group_company,waha.group multi-company,elblasy.waha.group,,crud,"[('company_id', 'in', company_ids)]"
+rule_waha_group_post_company,waha.group.post multi-company,elblasy.waha.group.post,,crud,"[('company_id', 'in', company_ids)]"
+access_waha_queue_manager,waha.queue.manager,elblasy.waha.queue,elblasy_waha_connector.group_waha_manager,ru,
+access_waha_queue_admin,waha.queue.admin,elblasy.waha.queue,elblasy_waha_connector.group_waha_admin,crud,
+rule_waha_queue_company,waha.queue multi-company,elblasy.waha.queue,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_waha_group_member_manager,waha.group.member.manager,elblasy.waha.group.member,elblasy_waha_connector.group_waha_manager,r,
+access_waha_group_member_admin,waha.group.member.admin,elblasy.waha.group.member,elblasy_waha_connector.group_waha_admin,crud,
+access_waha_group_message_manager,waha.group.message.manager,elblasy.waha.group.message,elblasy_waha_connector.group_waha_manager,r,
+access_waha_group_message_admin,waha.group.message.admin,elblasy.waha.group.message,elblasy_waha_connector.group_waha_admin,crud,
+access_waha_group_create_manager,waha.group.create.manager,elblasy.waha.group.create,elblasy_waha_connector.group_waha_manager,crud,
+access_waha_group_members_manager,waha.group.members.manager,elblasy.waha.group.members,elblasy_waha_connector.group_waha_manager,crud,
+rule_waha_group_member_company,waha.group.member multi-company,elblasy.waha.group.member,,crud,"[('company_id', 'in', company_ids)]"
+rule_waha_group_message_company,waha.group.message multi-company,elblasy.waha.group.message,,crud,"[('company_id', 'in', company_ids)]"
+access_waha_optout_manager,waha.optout.manager,elblasy.waha.optout,elblasy_waha_connector.group_waha_manager,crud,
+access_waha_autoreply_manager,waha.autoreply.manager,elblasy.waha.autoreply,elblasy_waha_connector.group_waha_manager,crud,
+rule_waha_optout_company,waha.optout multi-company,elblasy.waha.optout,,crud,"[('company_id', 'in', company_ids)]"
+rule_waha_autoreply_company,waha.autoreply multi-company,elblasy.waha.autoreply,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_waha_label_user,waha.label.user,elblasy.waha.label,elblasy_waha_connector.group_waha_user,r,
+access_waha_label_manager,waha.label.manager,elblasy.waha.label,elblasy_waha_connector.group_waha_manager,ru,
+access_waha_label_admin,waha.label.admin,elblasy.waha.label,elblasy_waha_connector.group_waha_admin,crud,
+access_waha_call_manager,waha.call.manager,elblasy.waha.call,elblasy_waha_connector.group_waha_manager,r,
+access_waha_call_admin,waha.call.admin,elblasy.waha.call,elblasy_waha_connector.group_waha_admin,crud,
+rule_waha_label_company,waha.label multi-company,elblasy.waha.label,,crud,"[('company_id', 'in', company_ids)]"
+rule_waha_call_company,waha.call multi-company,elblasy.waha.call,,crud,"[('company_id', 'in', company_ids)]"
