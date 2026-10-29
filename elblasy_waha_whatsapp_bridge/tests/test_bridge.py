@@ -71,17 +71,17 @@ class TestBridge(TransactionCase):
                 self._api()._send_whatsapp('201001234567', 'text', {'body': 'hi'})
 
     def test_04_send_media(self):
-        attachment = self.env['ir.attachment'].create({'name': 'a.png', 'raw': b'PNGDATA', 'mimetype': 'image/png'})
+        attachment = self.env['ir.attachment'].create({'name': 'a.png', 'raw': b'PNGDATA-0123456789', 'mimetype': 'image/png'})
         media_id = self._api()._upload_whatsapp_document(attachment)
         with patch(f'{CLIENT}.post', return_value={'id': 'true_2010@c.us_M'}) as post:
             self._api()._send_whatsapp('201001234567', 'image', {'id': media_id, 'caption': 'cap'})
         path, payload = post.call_args.args
         self.assertEqual(path, '/api/sendImage')
-        self.assertEqual(base64.b64decode(payload['file']['data']), b'PNGDATA')
+        self.assertEqual(base64.b64decode(payload['file']['data']), b'PNGDATA-0123456789')
         self.assertEqual(payload['caption'], 'cap')
 
     def test_04b_template_header_document(self):
-        attachment = self.env['ir.attachment'].create({'name': 'o.pdf', 'raw': b'%PDF', 'mimetype': 'application/pdf'})
+        attachment = self.env['ir.attachment'].create({'name': 'o.pdf', 'raw': b'%PDF-1.4 sample', 'mimetype': 'application/pdf'})
         media_id = self._api()._upload_whatsapp_document(attachment)
         self.env['whatsapp.template'].create({
             'name': 'T', 'template_name': 'tplx', 'wa_account_id': self.account.id, 'body': 'Hi {{1}}',
@@ -94,7 +94,7 @@ class TestBridge(TransactionCase):
         path, payload = post.call_args.args
         self.assertEqual(path, '/api/sendFile')
         self.assertEqual(payload['caption'], 'Hi Ahmed')
-        self.assertEqual(base64.b64decode(payload['file']['data']), b'%PDF')
+        self.assertEqual(base64.b64decode(payload['file']['data']), b'%PDF-1.4 sample')
         self.assertEqual(payload['file']['filename'], 'o.pdf')
 
     def test_05_reaction_and_interactive(self):
@@ -238,3 +238,15 @@ class TestBridge(TransactionCase):
         self.account.waha_session_id = False
         with self.assertRaises((UserError, ValidationError)):
             Composer.default_get(['res_model', 'wa_template_id'])
+
+    def test_15_unresolved_lid_uses_odoo_bsuid_format_and_replies_to_the_lid(self):
+        from odoo.addons.elblasy_waha_whatsapp_bridge.tools import transport
+        with patch(f'{CLIENT}.lid_to_phone', return_value=False):
+            value = transport.meta_value_from_message(self.account, {
+                'id': 'false_x', 'timestamp': 1, 'from': '555777@lid', 'body': 'hi'}, lambda lid: False)
+        self.assertEqual(value['messages'][0]['from_user_id'], 'ZZ.555777')
+        self.assertEqual(value['contacts'][0]['user_id'], 'ZZ.555777')
+        with patch(f'{CLIENT}.post', return_value={'id': 'true_lid'}) as post:
+            self._api()._send_whatsapp_to_identifier('ZZ.555777', None, 'text', {'body': 'reply'})
+            self._api()._send_whatsapp_to_identifier('555777', None, 'text', {'body': 'old format still works'})
+        self.assertEqual([c.args[1]['chatId'] for c in post.call_args_list], ['555777@lid', '555777@lid'])

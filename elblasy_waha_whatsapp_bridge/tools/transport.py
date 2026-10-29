@@ -16,6 +16,11 @@ def waha_session_of(api):
     return account.sudo().waha_session_id if account and 'waha_session_id' in account._fields else None
 
 
+def bsuid_of(lid):
+    """Odoo's BSUID format is ``<country>.<id>``; the country of a LID is unknown (ZZ)."""
+    return f"ZZ.{lid}"
+
+
 def digits(number):
     return re.sub(r'\D', '', number or '')
 
@@ -101,7 +106,7 @@ def send(api, bsuid, number, message_type, send_vals, parent_message_id=False):
     session = waha_session_of(api)
     env = api.wa_account_id.env
     client = session.server_id._get_client()
-    chat_id = f"{digits(number)}@c.us" if number else (f"{bsuid}@lid" if bsuid else False)
+    chat_id = f"{digits(number)}@c.us" if number else (f"{bsuid.rsplit('.', 1)[-1]}@lid" if bsuid else False)
     if not chat_id or chat_id == '@c.us':
         raise WhatsAppError("Missing recipient.", failure_type='unknown')
     base = {'session': session.session_name, 'chatId': chat_id}
@@ -177,7 +182,7 @@ def _contact(number, lid, name):
     if number:
         contact['wa_id'] = number
     if lid:
-        contact['user_id'] = lid
+        contact['user_id'] = bsuid_of(lid)
     return contact
 
 
@@ -191,7 +196,7 @@ def meta_value_from_message(account, payload, resolve_lid=None):
     if number:
         message['from'] = number
     else:
-        message['from_user_id'] = lid
+        message['from_user_id'] = bsuid_of(lid)
     reply = payload.get('replyTo')
     reply_id = reply.get('id') if isinstance(reply, dict) else reply
     if isinstance(reply_id, str) and reply_id:
@@ -233,7 +238,7 @@ def meta_value_from_reaction(account, payload, resolve_lid=None):
     message = {'id': payload.get('id') or '', 'timestamp': str(int(payload.get('timestamp') or 0)),
                'type': 'reaction',
                'reaction': {'message_id': reaction['messageId'], 'emoji': reaction.get('text') or ''}}
-    message['from' if number else 'from_user_id'] = number or lid
+    message['from' if number else 'from_user_id'] = number or bsuid_of(lid)
     return {
         'messaging_product': 'whatsapp',
         'metadata': {'phone_number_id': account.phone_uid},

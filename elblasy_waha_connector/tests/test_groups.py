@@ -66,7 +66,7 @@ class TestGroups(TransactionCase):
     def test_04_send_document_with_caption_and_chatter(self):
         group = self._group()
         partner = self.env['res.partner'].create({'name': 'Doc owner'})
-        att = self.env['ir.attachment'].with_user(self.user).create({'name': 'inv.pdf', 'raw': b'%PDF', 'mimetype': 'application/pdf'})
+        att = self.env['ir.attachment'].with_user(self.user).create({'name': 'inv.pdf', 'raw': b'%PDF-1.4 sample', 'mimetype': 'application/pdf'})
         with patch(f'{CLIENT}.post', return_value={'id': 'true_B'}) as post:
             rec = self.env['elblasy.waha.group.post'].with_user(self.user).send_to_group(
                 group, 'Invoice attached', att, 'res.partner', partner.id)
@@ -300,14 +300,14 @@ class TestGroups(TransactionCase):
                    'fromMe': False, 'body': 'my photo', 'hasMedia': True,
                    'media': {'url': 'http://internal:3000/api/files/p.jpg', 'mimetype': 'image/jpeg', 'filename': 'p.jpg'}}
         data = {'id': 'e_media', 'event': 'message.any', 'session': 'main', 'payload': payload}
-        with patch(f'{CLIENT}.download', return_value=b'JPEGDATA') as dl:
+        with patch(f'{CLIENT}.download', return_value=b'JPEGDATA-0123456789') as dl:
             ev = self.env['elblasy.waha.webhook.event']._store_event(self.session, json.dumps(data).encode(), data)
             ev._process_event()
         self.assertEqual(ev.state, 'done')
         self.assertEqual(dl.call_args.args[0], 'http://internal:3000/api/files/p.jpg')
         message = self.env['elblasy.waha.message'].search([('remote_message_id', '=', payload['id'])])
         self.assertEqual((message.message_type, len(message.attachment_ids)), ('image', 1))
-        self.assertEqual(bytes(message.attachment_ids.raw), b'JPEGDATA')
+        self.assertEqual(bytes(message.attachment_ids.raw), b'JPEGDATA-0123456789')
         ui = message._to_ui()
         self.assertEqual(ui['attachments'], [{'id': message.attachment_ids.id, 'name': 'p.jpg', 'image': True}])
         # users of the inbox can open it, others cannot

@@ -56,9 +56,13 @@ class WahaWebhookEvent(models.Model):
                     data = json.loads(event.sudo().payload)
                     state = event._dispatch(data)
                 event.write({'state': state, 'error': False, 'attempts': event.attempts + 1})
-            except Exception as e:  # noqa: BLE001 - one bad event must not block the others
-                _logger.warning("WAHA event %s failed: %s", event.id, type(e).__name__, exc_info=True)
-                event.write({'state': 'failed', 'attempts': event.attempts + 1, 'error': f"{type(e).__name__}"})
+            except (ValueError, LookupError) as e:
+                # expected: malformed payload, or an ack that overtook its message (the cron retries it)
+                _logger.info("WAHA event %s will be retried or needs a look: %s (%s)", event.id, type(e).__name__, e)
+                event.write({'state': 'failed', 'attempts': event.attempts + 1, 'error': type(e).__name__})
+            except Exception as e:  # noqa: BLE001 - one bad event must not block the others; the traceback is logged
+                _logger.warning("WAHA event %s failed unexpectedly: %s", event.id, type(e).__name__, exc_info=True)
+                event.write({'state': 'failed', 'attempts': event.attempts + 1, 'error': type(e).__name__})
 
     def _dispatch(self, data):
         session = self.session_id.sudo()
