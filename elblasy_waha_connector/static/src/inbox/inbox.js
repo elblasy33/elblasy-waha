@@ -6,6 +6,16 @@ import { standardActionServiceProps } from "@web/webclient/actions/action_plugin
 
 const MODEL = "elblasy.waha.conversation";
 
+/** Unique per click. crypto.randomUUID only exists on HTTPS/localhost, plain-HTTP installs need a fallback. */
+function newClientToken() {
+    if (globalThis.crypto?.randomUUID) {
+        return globalThis.crypto.randomUUID();
+    }
+    const random = new Uint32Array(4);
+    globalThis.crypto.getRandomValues(random);
+    return Array.from(random, (n) => n.toString(16).padStart(8, "0")).join("-");
+}
+
 export class WahaInbox extends Component {
     static template = "elblasy_waha_connector.Inbox";
     props = useProps(standardActionServiceProps);
@@ -185,7 +195,7 @@ export class WahaInbox extends Component {
                 mimetype: file.type || "",
                 data_b64: data,
                 caption: this.state.draft.trim() || null,
-                client_token: crypto.randomUUID(),
+                client_token: newClientToken(),
             });
             this.state.draft = "";
             await this.loadMessages();
@@ -217,7 +227,7 @@ export class WahaInbox extends Component {
         }
         this.state.sending = true;
         // one token per click: a retried/duplicated request cannot create two messages
-        const token = crypto.randomUUID();
+        const token = newClientToken();
         try {
             await this.orm.call(MODEL, "inbox_send_text", [[this.state.current.id]], {
                 text,

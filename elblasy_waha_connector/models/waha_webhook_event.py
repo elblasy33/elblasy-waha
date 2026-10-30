@@ -4,6 +4,8 @@ import logging
 import mimetypes
 from datetime import timedelta
 
+import psycopg2
+
 from odoo import api, fields, models
 
 from .waha_client import WahaError
@@ -44,8 +46,8 @@ class WahaWebhookEvent(models.Model):
                     'session_id': session.id, 'dedupe_key': key, 'event_type': str(data.get('event'))[:64],
                     'payload': raw_body.decode('utf-8', 'replace'),
                 })
-        except Exception:  # noqa: BLE001 - concurrent duplicate hit the unique constraint
-            return self.browse()
+        except psycopg2.errors.UniqueViolation:
+            return self.browse()  # the same event arrived twice at the same time; any other error must surface
 
     def _process_event(self):
         for event in self:
@@ -56,10 +58,17 @@ class WahaWebhookEvent(models.Model):
                     data = json.loads(event.sudo().payload)
                     state = event._dispatch(data)
                 event.write({'state': state, 'error': False, 'attempts': event.attempts + 1})
-            except (ValueError, LookupError) as e:
-                # expected: malformed payload, or an ack that overtook its message (the cron retries it)
-                _logger.info("WAHA event %s will be retried or needs a look: %s (%s)", event.id, type(e).__name__, e)
-                event.write({'state': 'failed', 'attempts': event.attempts + 1, 'error': type(e).__name__})
+            except ValueError as e:
+                # malformed payload: retrying cannot help, keep it visible for an administrator
+                _logger.info("WAHA event %s is malformed: %s", event.id, e)
+                event.write({'state': 'failed', 'attempts': MAX_ATTEMPTS, 'error': f"ValueError: {e}"[:250]})
+            except LookupError as e:
+                # an ack that overtook its message is retried by the cron; acks of messages Odoo never had
+                # (typed on the phone before the sync, older than Odoo...) are dropped after the last attempt
+                attempts = event.attempts + 1
+                _logger.info("WAHA event %s: %s (attempt %s/%s)", event.id, e, attempts, MAX_ATTEMPTS)
+                event.write({'state': 'ignored' if attempts >= MAX_ATTEMPTS else 'failed', 'attempts': attempts,
+                             'error': f"LookupError: {e}"[:250]})
             except Exception as e:  # noqa: BLE001 - one bad event must not block the others; the traceback is logged
                 _logger.warning("WAHA event %s failed unexpectedly: %s", event.id, type(e).__name__, exc_info=True)
                 event.write({'state': 'failed', 'attempts': event.attempts + 1, 'error': type(e).__name__})
@@ -245,5 +254,8 @@ class WahaWebhookEvent(models.Model):
         events = self.search([('state', 'in', ('failed', 'pending')), ('attempts', '<', MAX_ATTEMPTS)],
                              order='id', limit=200)
         events._process_event()
-        old = fields.Datetime.now() - timedelta(days=14)
-        self.search([('state', 'in', ('done', 'ignored')), ('create_date', '<', old)], limit=1000).unlink()
+        now = fields.Datetime.now()
+        self.search([('state', 'in', ('done', 'ignored')), ('create_date', '<', now - timedelta(days=14))],
+                    limit=1000).unlink()
+        # failed events stay a month for investigation, then go (raw payloads may contain message content)
+        self.search([('state', '=', 'failed'), ('create_date', '<', now - timedelta(days=30))], limit=1000).unlink()

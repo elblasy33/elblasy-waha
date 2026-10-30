@@ -1,6 +1,6 @@
 {
     'name': 'Elblasy WAHA - Odoo WhatsApp Bridge',
-    'version': '20.0.1.1.0',
+    'version': '20.0.1.2.0',
     'author': 'Elblasy.app',
     'website': 'https://elblasy.app',
     'category': 'Productivity/Discuss',

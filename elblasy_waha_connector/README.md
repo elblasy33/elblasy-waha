@@ -1,4 +1,4 @@
-# Elblasy WhatsApp (WAHA) - `elblasy_waha_connector` 20.0.3.0.0
+# Elblasy WhatsApp (WAHA) - `elblasy_waha_connector` 20.0.3.1.0
 
 Unified module (it replaces the former `elblasy_waha_connector`, `elblasy_waha_groups`, `elblasy_waha_automation` and `elblasy_waha_groups_hr`).
 Target: **Odoo 20.0**. WhatsApp through your own [WAHA](https://waha.devlike.pro) server.
@@ -34,6 +34,11 @@ Groups User / Manager / Administrator (`security/`), multi-company rules on ever
 plain database fields readable only by managers (not encrypted at rest). Raw webhook payloads: administrators only,
 purged after 14 days; group messages are stored only for opted-in groups and purged after 90 days.
 Automatic messages respect opt-out keywords; sends are rate-limited (10/min per chat) and the queue sends slowly.
+
+## Automation queue
+Items are sent at most once: an item is committed as *Interrupted while sending* before its messages go out and
+gets its final state afterwards. If the server stops in between, the item stays *Interrupted*: check the chat, then
+use **Retry** if needed. *Send now* only triggers the queue cron; sending never runs inside a user request.
 
 ## Limits
 Inbox sends text and files (max 15 MB); inbound media is stored and displayed. Auto-sync is a polling fallback (about 1 minute delay), not a replacement for the webhook. WEBJS is unofficial:

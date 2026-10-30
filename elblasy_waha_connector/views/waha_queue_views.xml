@@ -4,7 +4,7 @@
         <field name="name">elblasy.waha.queue.list</field>
         <field name="model">elblasy.waha.queue</field>
         <field name="arch" type="xml">
-            <list create="0" decoration-danger="state == 'failed'" decoration-warning="state == 'unknown'"
+            <list create="0" decoration-danger="state == 'failed'" decoration-warning="state in ('unknown', 'sending')"
                   decoration-muted="state in ('done', 'skipped')">
                 <header>
                     <button name="action_run_now" type="object" string="Send now"/>

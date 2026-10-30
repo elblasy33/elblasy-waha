@@ -43,6 +43,9 @@ class TestGroups(TransactionCase):
         self.assertEqual(sorted(groups.mapped('name')), ['Ops', 'Sales team'])
         self.assertEqual(groups.filtered(lambda g: g.name == 'Sales team').participants_count, 3)
         self.assertFalse(any(groups.mapped('allow_send')))  # whitelist is opt-in
+        with self.assertRaises(UserError):  # WAHA rate-limits group listing: one sync per minute
+            self._sync([{'id': '1203@g.us', 'subject': 'Sales renamed'}])
+        self.session.groups_synced_at = False
         self._sync([{'id': '1203@g.us', 'subject': 'Sales renamed'}])  # idempotent, updates
         self.assertEqual(len(self.env['elblasy.waha.group'].search([('session_id', '=', self.session.id)])), 2)
         self.assertIn('Sales renamed', self.env['elblasy.waha.group'].search([]).mapped('name'))
@@ -691,6 +694,73 @@ class TestGroups(TransactionCase):
         with patch(f'{CLIENT}.get') as get:
             self.env['elblasy.waha.session']._cron_sync_messages()
         get.assert_not_called()
+
+    # ------------------------------------------------------------------ review fixes
+    def test_38_users_read_only_on_conversations_and_messages(self):
+        from odoo.exceptions import AccessError as AE
+        conv = self.env['elblasy.waha.conversation'].create({
+            'session_id': self.session.id, 'remote_chat_id': '201001239100@c.us'})
+        with self.assertRaises(AE):  # no fake "incoming" messages through RPC
+            self.env['elblasy.waha.message'].with_user(self.user).create({
+                'conversation_id': conv.id, 'direction': 'in', 'body': 'fake'})
+        with self.assertRaises(AE):  # cannot redirect a chat to another number
+            conv.with_user(self.user).write({'remote_chat_id': '999@c.us'})
+        # ...but every inbox action still works for them
+        with patch(f'{CLIENT}.send_text', return_value={'id': 'true_ro'}):
+            ui = conv.with_user(self.user).inbox_send_text('allowed', 'tok-ro')
+        self.assertEqual(ui['status'], 'sent')
+        self.user.group_ids = [(4, self.env.ref('base.group_partner_manager').id)]  # creating contacts needs contact rights
+        pid = conv.with_user(self.user).action_create_partner()
+        self.assertEqual(conv.partner_id.id, pid)
+
+    def test_39_unknown_acks_are_dropped_and_malformed_events_not_retried(self):
+        from odoo.addons.elblasy_waha_connector.models.waha_webhook_event import MAX_ATTEMPTS
+        ack = self._event('message.ack', {'id': 'true_never_seen', 'ack': 2}, 'ack-x')
+        self.assertEqual(ack.state, 'failed')  # may still be overtaking its message
+        for _i in range(MAX_ATTEMPTS):
+            ack._process_event()
+        self.assertEqual(ack.state, 'ignored')  # gave up: not retried forever, purged with the done ones
+        bad = self._event('message.any', {'nothing': 'useful'}, 'bad-x')
+        self.assertEqual((bad.state, bad.attempts), ('failed', MAX_ATTEMPTS))
+        self.assertFalse(self.env['elblasy.waha.webhook.event'].search(
+            [('id', '=', bad.id), ('state', 'in', ('failed', 'pending')), ('attempts', '<', MAX_ATTEMPTS)]))
+        self.env.cr.execute("UPDATE elblasy_waha_webhook_event SET create_date = now() - interval '31 days' WHERE id = %s",
+                            [bad.id])
+        bad.invalidate_recordset()
+        self.env['elblasy.waha.webhook.event']._cron_retry_failed()
+        self.assertFalse(bad.exists())  # failed events do not pile up forever
+
+    def test_40_store_event_only_swallows_real_duplicates(self):
+        import json
+        data = {'id': 'evt-dup', 'event': 'message.any', 'session': 'main', 'payload': {}}
+        Event = self.env['elblasy.waha.webhook.event']
+        self.assertTrue(Event._store_event(self.session, json.dumps(data).encode(), data))
+        self.assertFalse(Event._store_event(self.session, json.dumps(data).encode(), data))
+        with patch.object(type(Event), 'create', side_effect=RuntimeError('database is broken')):
+            with self.assertRaises(RuntimeError):
+                Event._store_event(self.session, b'{}', dict(data, id='evt-other'))
+
+    def test_41_waha_error_message_is_shown_and_last_error_kept(self):
+        from odoo.addons.elblasy_waha_connector.models.waha_client import WahaClient
+
+        class Resp:
+            status_code = 422
+            content = b'x'
+
+            def json(self):
+                return {'error': 'Session status is not as expected', 'status': 'FAILED'}
+        with patch('requests.request', return_value=Resp()):
+            with self.assertRaises(WahaError) as cm:
+                WahaClient('http://waha.test', 'K').get_session('main')
+        self.assertIn('Session status is not as expected', str(cm.exception))
+        # stored through its own short transaction so the rollback of the failed action does not erase it
+        # (checked against a real database: the separate cursor cannot see a test's uncommitted records)
+        Session = type(self.env['elblasy.waha.session'])
+        with patch(f'{CLIENT}.get_session', side_effect=WahaError('http', 'HTTP 422: Session status is not as expected', 422)), \
+                patch.object(Session, '_store_last_error', autospec=True) as store:
+            with self.assertRaises(UserError):
+                self.session.with_user(self.manager).action_refresh_status()
+        self.assertIn('Session status', store.call_args.args[1])
 
 
 def fields_dt_sub_minutes(minutes):

@@ -4,7 +4,6 @@ import re
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import BinaryBytes
-from odoo.tools import config
 
 from odoo.addons.elblasy_waha_connector.models.waha_client import WahaError
 
@@ -55,7 +54,7 @@ class WahaGroup(models.Model):
         session.ensure_one()
         now = fields.Datetime.now()
         last = session.sudo().groups_synced_at
-        if last and (now - last).total_seconds() < SYNC_MIN_INTERVAL and not config['test_enable']:
+        if last and (now - last).total_seconds() < SYNC_MIN_INTERVAL:
             raise UserError(self.env._("Groups were synced less than a minute ago, please wait."))
         try:
             data = session.server_id._get_client().get(

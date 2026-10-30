@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from odoo import fields
 from odoo.tests import TransactionCase, tagged
 
 CLIENT = 'odoo.addons.elblasy_waha_connector.models.waha_client.WahaClient'
@@ -28,9 +29,20 @@ class TestAutomation(TransactionCase):
 
     def setUp(self):
         super().setUp()
-        patcher = patch(f'{CLIENT}.check_exists', return_value=(True, None))
+        for target, kwargs in ((f'{CLIENT}.check_exists', {'return_value': (True, None)}),
+                               ('odoo.addons.elblasy_waha_connector.models.waha_queue.time.sleep', {})):
+            patcher = patch(target, **kwargs)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        self.commits = []
+        cron = type(self.env['ir.cron'])
+        patcher = patch.object(cron, '_commit_progress', autospec=True,
+                               side_effect=lambda self_, processed=0, **kw: self.commits.append(self._queue_states()))
         patcher.start()
         self.addCleanup(patcher.stop)
+
+    def _queue_states(self):
+        return dict(self.env['elblasy.waha.queue'].search([]).mapped(lambda q: (q.id, q.state)))
 
     def _run(self, partner):
         with patch(f'{CLIENT}.post', return_value={'id': 'true_q'}) as post:
@@ -93,3 +105,35 @@ class TestAutomation(TransactionCase):
         self._run(partner)
         self.assertEqual(failed.state, 'done')
         self.assertEqual(failed.attempts, 2)
+
+    def test_05_at_most_once_item_is_committed_as_sending_before_any_message(self):
+        partner = self.env['res.partner'].create({'name': 'Once only', 'phone': '+20 100 123 4580'})
+        self.action.with_context(active_model='res.partner', active_id=partner.id, active_ids=partner.ids).run()
+        item = self.env['elblasy.waha.queue'].search([('res_id', '=', partner.id)])
+        sent_states = []
+
+        def fake_post(self_, path, payload):
+            sent_states.append(item.state)
+            return {'id': 'true_once'}
+        with patch(f'{CLIENT}.post', fake_post):
+            self.env['elblasy.waha.queue']._cron_process()
+        self.assertEqual(self.commits[0][item.id], 'sending')  # committed before the message went out
+        self.assertEqual(sent_states, ['sending'])
+        self.assertEqual((item.state, item.attempts), ('done', 1))
+        # a run interrupted after the commit leaves the item "sending": never picked up again automatically
+        item.state = 'sending'
+        with patch(f'{CLIENT}.post') as post:
+            self.env['elblasy.waha.queue']._cron_process()
+        post.assert_not_called()
+        item.action_retry()
+        self.assertEqual(item.state, 'pending')
+
+    def test_06_run_now_only_triggers_the_cron(self):
+        partner = self.env['res.partner'].create({'name': 'Now', 'phone': '+20 100 123 4581'})
+        self.action.waha_delay_minutes = 60
+        self.action.with_context(active_model='res.partner', active_id=partner.id, active_ids=partner.ids).run()
+        item = self.env['elblasy.waha.queue'].search([('res_id', '=', partner.id)])
+        with patch(f'{CLIENT}.post') as post:
+            item.action_run_now()
+        post.assert_not_called()  # sending happens in the cron, never inside the user's request
+        self.assertLessEqual(item.scheduled_for, fields.Datetime.now())

@@ -50,13 +50,27 @@ class WahaClient:
         if resp.status_code == 404:
             raise WahaError('not_found', "Resource not found on the WAHA server.", 404)
         if resp.status_code >= 400:
-            raise WahaError('http', f"WAHA answered with HTTP {resp.status_code}.", resp.status_code)
+            detail = self._error_detail(resp)
+            raise WahaError('http', f"WAHA answered with HTTP {resp.status_code}" + (f": {detail}" if detail else "."),
+                            resp.status_code)
         if not resp.content:
             return {}
         try:
             return resp.json()
         except ValueError:
             raise WahaError('response', "Unexpected (non-JSON) answer from WAHA.", resp.status_code)
+
+    @staticmethod
+    def _error_detail(resp):
+        """WAHA's short explanation (e.g. "Session status is not as expected"). It never echoes the API key."""
+        try:
+            data = resp.json()
+        except ValueError:
+            return ''
+        detail = data.get('message') or data.get('error') if isinstance(data, dict) else None
+        if isinstance(detail, list):
+            detail = '; '.join(str(d) for d in detail)
+        return ' '.join(str(detail).split())[:200] if detail else ''
 
     # -- server
     def list_sessions(self):

@@ -144,10 +144,11 @@ class WahaConversation(models.Model):
     def action_resolve_lid(self):
         """Manual retry from the conversation form."""
         self.ensure_one()
+        self._check_user()
         if self._resolve_lid_phone():
             partner = self._match_partner()
             if partner and not self.partner_id:
-                self.partner_id = partner
+                self.sudo().partner_id = partner
         return True
 
     def _match_partner(self):
@@ -165,17 +166,22 @@ class WahaConversation(models.Model):
 
     def action_create_partner(self):
         self.ensure_one()
+        self._check_user()
         if self.partner_id:
             raise UserError(self.env._("This conversation is already linked to a contact."))
-        self.partner_id = self.env['res.partner'].create({
+        partner = self.env['res.partner'].create({
             'name': self.display_name_remote or self.remote_phone or self.remote_chat_id,
             'phone': f"+{self.remote_phone}" if self.remote_phone else False,
         })
-        return self.partner_id.id
+        self.sudo().partner_id = partner
+        return partner.id
 
     def action_link_partner(self, partner_id):
         self.ensure_one()
-        self.partner_id = self.env['res.partner'].browse(partner_id).exists()
+        self._check_user()
+        partner = self.env['res.partner'].browse(partner_id).exists()
+        partner.check_access('read')
+        self.sudo().partner_id = partner
         return True
 
     def action_open_partner(self):
@@ -187,8 +193,11 @@ class WahaConversation(models.Model):
     # inbox API (used by the OWL client action, ORM rules apply)
     # ------------------------------------------------------------------
     def _check_user(self):
+        """Users only read conversations (security): entry points check the user and the record rules, then
+        write as the system."""
         if not self.env.user.has_group(USER):
             raise AccessError(self.env._("You are not allowed to use WhatsApp."))
+        self.check_access('read')
 
     @api.model
     def inbox_conversations(self, session_id=None, search=None, limit=40, offset=0, label_id=None):
@@ -235,7 +244,7 @@ class WahaConversation(models.Model):
         self.ensure_one()
         self._check_user()
         if self.unread_count:
-            self.unread_count = 0
+            self.sudo().unread_count = 0
             self._mark_read_on_phone()
         return True
 
@@ -295,15 +304,13 @@ class WahaConversation(models.Model):
         session = self.session_id
         if session.status != 'WORKING':
             raise UserError(self.env._("The WhatsApp session is not connected (status: %s).", session.status or '?'))
-        # users may create but not modify messages: the status updates below are done by the system
-        message = Message.create({
+        # messages are written by the system only: users read them (see security), access was checked by the caller
+        message = Message.sudo().create({
             'conversation_id': self.id, 'direction': 'out', 'message_type': 'text', 'body': text,
             'date': fields.Datetime.now(), 'delivery_status': 'pending', 'client_token': client_token,
             'sender_identifier': user.name if user else self.env._("Auto-reply"),
             'user_id': user.id if user else False, 'is_auto': is_auto,
-        }).sudo()
-        # Do not keep a transaction open while waiting for the network.
-        message._commit()
+        })
         client = session.sudo().server_id._get_client()
         message._deliver(lambda: client.send_text(session.session_name, self.remote_chat_id, text))
         return message
@@ -333,16 +340,15 @@ class WahaConversation(models.Model):
         filename = (filename or 'file').strip()[:128] or 'file'
         mimetype = (mimetype or mimetypes.guess_type(filename)[0] or 'application/octet-stream').split(';')[0]
         kind = mimetype.split('/')[0]
-        message = Message.create({
+        message = Message.sudo().create({
             'conversation_id': self.id, 'direction': 'out', 'body': (caption or '').strip() or False,
             'message_type': kind if kind in ('image', 'video', 'audio') else 'document',
             'date': fields.Datetime.now(), 'delivery_status': 'pending', 'client_token': client_token,
             'sender_identifier': self.env.user.name, 'user_id': self.env.user.id,
-        }).sudo()
+        })
         attachment = self.env['ir.attachment'].sudo().create({
             'name': filename, 'raw': raw, 'mimetype': mimetype,
             'res_model': 'elblasy.waha.message', 'res_id': message.id})
-        message._commit()
         path, file = self.env['elblasy.waha.group.post']._attachment_payload(attachment)
         payload = {'session': session.session_name, 'chatId': self.remote_chat_id, 'file': file}
         if message.body:

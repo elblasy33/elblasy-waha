@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 
 from odoo import api, fields, models
-from odoo.tools import config
 
 from .waha_client import WahaError
 
@@ -64,11 +63,6 @@ class WahaMessage(models.Model):
             message._touch_conversation()
         return messages
 
-    def _commit(self):
-        """Release the transaction before/after network calls (not possible inside tests)."""
-        if not config['test_enable']:
-            self.env.cr.commit()
-
     def _preview(self):
         self.ensure_one()
         return (self.body or f"[{self.message_type}]")[:120]
@@ -127,7 +121,6 @@ class WahaMessage(models.Model):
         except WahaError as e:
             status = 'unknown' if e.kind in ('network', 'response') else 'failed'
             self.write({'delivery_status': status, 'failure_reason': str(e)})
-            self._commit()
             return self
         self._apply_send_response(response)
         return self
@@ -138,7 +131,6 @@ class WahaMessage(models.Model):
         remote_id = extract_message_id(response)
         if not remote_id:
             self.write({'delivery_status': 'unknown', 'failure_reason': self.env._("WAHA did not return a message id.")})
-            self._commit()
             return
         twin = self.search([('session_id', '=', self.session_id.id), ('remote_message_id', '=', remote_id),
                             ('id', '!=', self.id)], limit=1)
@@ -149,7 +141,6 @@ class WahaMessage(models.Model):
             self.write({'remote_message_id': remote_id, 'delivery_status': status or 'sent'})
         else:
             self.write({'remote_message_id': remote_id, 'delivery_status': 'sent', 'failure_reason': False})
-        self._commit()
 
 
 def ts_to_datetime(ts):

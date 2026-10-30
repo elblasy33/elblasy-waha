@@ -33,7 +33,7 @@ class WahaSession(models.Model):
         self.ensure_one()
         if not self.env.user.has_group(ADMIN):
             raise AccessError(self.env._("Only WhatsApp administrators can enable this."))
-        account = self._get_whatsapp_account()
+        account = self._get_whatsapp_account() or self._reactivate_whatsapp_account()
         if not account:
             account = self.env['whatsapp.account'].sudo().create({
                 'name': f"{self.name} (WAHA)",
@@ -56,11 +56,22 @@ class WahaSession(models.Model):
                 pass
         return self.action_open_whatsapp_account()
 
+    def _reactivate_whatsapp_account(self):
+        """Bring back the account archived by "Disable", so its templates and history stay attached to it."""
+        self.ensure_one()
+        Account = self.env['whatsapp.account'].sudo().with_context(active_test=False)
+        account = Account.search([('waha_session_id', '=', self.id), ('active', '=', False)], limit=1) or \
+            Account.search([('phone_uid', '=', f"waha-{self.id}"), ('active', '=', False)], limit=1)  # older versions
+        if account:
+            account.write({'active': True, 'waha_session_id': self.id})
+        return account
+
     def action_disable_odoo_whatsapp(self):
+        """Archive the linked account (kept bound to the session, see _reactivate_whatsapp_account)."""
         self.ensure_one()
         if not self.env.user.has_group(ADMIN):
             raise AccessError(self.env._("Only WhatsApp administrators can disable this."))
-        self.sudo().whatsapp_account_ids.write({'active': False, 'waha_session_id': False})
+        self.sudo().whatsapp_account_ids.write({'active': False})
         return True
 
     def action_open_whatsapp_account(self):

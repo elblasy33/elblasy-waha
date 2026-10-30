@@ -3,8 +3,14 @@
 Accounts without a WAHA session keep the original (Meta) behaviour untouched.
 """
 import functools
+import logging
 
 from odoo.addons.elblasy_waha_connector.models.waha_client import WahaError
+
+_logger = logging.getLogger(__name__)
+PATCHED = ('_send_whatsapp_to_identifier', '_upload_whatsapp_document', '_get_whatsapp_document', '_test_connection',
+           '_get_phone_number', '_get_all_template', '_submit_template_new', '_submit_template_update',
+           '_get_template_data', '_upload_demo_document', '_update_block_status')
 
 
 def post_load():
@@ -13,7 +19,12 @@ def post_load():
     from .tools import transport
 
     def waha_only(name, replacement):
-        original = getattr(WhatsAppApi, name)
+        original = getattr(WhatsAppApi, name, None)
+        if original is None:
+            # Odoo changed its WhatsApp API: say it loudly instead of silently sending through Meta
+            _logger.error("elblasy_waha_whatsapp_bridge: WhatsAppApi.%s no longer exists, it is not redirected to "
+                          "WAHA. Update the bridge for this Odoo version.", name)
+            return
 
         @functools.wraps(original)
         def wrapper(self, *args, **kwargs):

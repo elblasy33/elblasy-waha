@@ -4,6 +4,8 @@ import secrets
 import time
 from datetime import datetime, timezone
 
+import psycopg2
+
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import BinaryBytes
@@ -145,8 +147,21 @@ class WahaSession(models.Model):
 
     def _fail(self, error):
         """Record an error (without secrets) and raise a user-friendly message."""
-        self.sudo().write({'last_error': str(error)})
+        self._store_last_error(str(error))
         raise UserError(self.env._("WAHA error (%(kind)s): %(msg)s", kind=error.kind, msg=error))
+
+    def _store_last_error(self, message):
+        """The UserError raised next rolls the transaction back: write the error in its own short transaction.
+        Never waits: if the row is locked by the current request, the error is only shown, not stored."""
+        if not self.ids:
+            return
+        try:
+            with self.env.registry.cursor() as cr:
+                cr.execute("SET LOCAL lock_timeout = '200ms'")
+                cr.execute("UPDATE elblasy_waha_session SET last_error = %s WHERE id IN %s", [message, tuple(self.ids)])
+        except psycopg2.Error as e:
+            _logger.info("Could not store the last error of session(s) %s: %s", self.ids, type(e).__name__)
+        self.invalidate_recordset(['last_error'])
 
     def _apply_remote(self, data):
         """Update local fields from a WAHA session object / status payload."""

@@ -3,7 +3,6 @@ import time
 
 from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError
-from odoo.tools import config
 
 _logger = logging.getLogger(__name__)
 BATCH = 10  # items per cron run
@@ -22,8 +21,10 @@ class WahaQueue(models.Model):
     record_name = fields.Char()
     scheduled_for = fields.Datetime(default=fields.Datetime.now, index=True)
     state = fields.Selection(
-        [('pending', "Pending"), ('done', "Done"), ('failed', "Failed"), ('unknown', "Not confirmed"),
-         ('skipped', "Skipped")], default='pending', index=True)
+        [('pending', "Pending"), ('sending', "Interrupted while sending"), ('done', "Done"), ('failed', "Failed"),
+         ('unknown', "Not confirmed"), ('skipped', "Skipped")], default='pending', index=True,
+        help="An item stays 'Interrupted while sending' if the server stopped during its run: check the chat "
+             "before retrying it, it may already have been delivered.")
     attempts = fields.Integer(default=0)
     error = fields.Char()
     post_ids = fields.Many2many('elblasy.waha.group.post', string="Messages")
@@ -59,7 +60,6 @@ class WahaQueue(models.Model):
             attachments = attachments.create({
                 'name': f"{record.display_name or action.waha_report_id.name}.pdf", 'raw': pdf,
                 'mimetype': 'application/pdf'})
-        self.attempts += 1
         prefix = f"q{self.id}-{self.attempts}"
         posts = env_user['elblasy.waha.group.post']
         errors = []
@@ -86,16 +86,24 @@ class WahaQueue(models.Model):
         self.write({'state': state, 'error': '; '.join(errors)[:250] or False, 'post_ids': [(6, 0, posts.ids)]})
 
     def action_retry(self):
-        # explicit user action; ambiguous ('unknown') items must be checked by a human first
-        self.filtered(lambda i: i.state in ('failed', 'unknown')).write({'state': 'pending', 'error': False})
+        # explicit user action; ambiguous items ('unknown', interrupted) must be checked by a human first
+        self.filtered(lambda i: i.state in ('failed', 'unknown', 'sending')).write({'state': 'pending', 'error': False})
 
     def action_run_now(self):
-        self.filtered(lambda i: i.state == 'pending')._run_batch(pause=False)
+        """Ask the queue cron to run now (sending stays in the cron, which commits between messages)."""
+        self.filtered(lambda i: i.state == 'pending').write({'scheduled_for': fields.Datetime.now()})
+        self.env.ref('elblasy_waha_connector.cron_waha_queue')._trigger()
+        return True
 
-    def _run_batch(self, pause=True):
+    def _run_batch(self):
+        """Send queued items one by one. At-most-once: an item leaves 'pending' and that is committed *before*
+        anything is sent, so an interrupted run can never send the same message twice."""
+        Cron = self.env['ir.cron']
         for index, item in enumerate(self):
-            if index and pause and not config['test_enable']:
+            if index:
                 time.sleep(PAUSE)
+            item.write({'state': 'sending', 'attempts': item.attempts + 1})
+            Cron._commit_progress()
             try:
                 with self.env.cr.savepoint():
                     item._run_item()
@@ -104,8 +112,7 @@ class WahaQueue(models.Model):
             except Exception:  # noqa: BLE001 - one bad item must not block the queue; the traceback is logged
                 _logger.exception("WAHA queue item %s failed unexpectedly", item.id)
                 item.write({'state': 'failed', 'error': "Unexpected error, see the server log."})
-            if not config['test_enable']:
-                self.env.cr.commit()
+            Cron._commit_progress(1)
 
     @api.model
     def _cron_process(self):

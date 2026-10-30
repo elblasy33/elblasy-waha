@@ -13,7 +13,9 @@ ATT_PREFIX = 'waha-att:'
 def waha_session_of(api):
     """The WAHA session bound to the account of this WhatsAppApi, or empty."""
     account = api.wa_account_id
-    return account.sudo().waha_session_id if account and 'waha_session_id' in account._fields else None
+    if not account or 'waha_session_id' not in account._fields or not account.sudo().active:
+        return None
+    return account.sudo().waha_session_id
 
 
 def bsuid_of(lid):

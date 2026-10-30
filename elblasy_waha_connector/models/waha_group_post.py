@@ -147,15 +147,9 @@ class WahaGroupPost(models.Model):
             'body': body, 'attachment_ids': [(6, 0, attachments.ids)],
             'res_model': res_model or False, 'res_id': res_id or False, 'client_token': client_token,
         }).sudo()
-        post._commit()  # do not hold the transaction during the network calls
         post._deliver()
         post._log_on_record()
         return post
-
-    def _commit(self):
-        from odoo.tools import config
-        if not config['test_enable']:
-            self.env.cr.commit()
 
     def _deliver(self):
         self.ensure_one()
@@ -178,7 +172,6 @@ class WahaGroupPost(models.Model):
             self.write({'state': state, 'error': str(e), 'wa_message_ids': ','.join(i for i in ids if i)})
         else:
             self.write({'state': 'sent', 'error': False, 'wa_message_ids': ','.join(i for i in ids if i)})
-        self._commit()
 
     def _log_on_record(self):
         """Leave a trace in the chatter of the source document."""

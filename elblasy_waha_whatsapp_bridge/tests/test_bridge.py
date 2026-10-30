@@ -250,3 +250,21 @@ class TestBridge(TransactionCase):
             self._api()._send_whatsapp_to_identifier('ZZ.555777', None, 'text', {'body': 'reply'})
             self._api()._send_whatsapp_to_identifier('555777', None, 'text', {'body': 'old format still works'})
         self.assertEqual([c.args[1]['chatId'] for c in post.call_args_list], ['555777@lid', '555777@lid'])
+
+    def test_16_disable_then_enable_keeps_the_same_account(self):
+        template_account = self.account
+        self.session.with_user(self.admin).action_disable_odoo_whatsapp()
+        self.assertFalse(self.session.odoo_whatsapp_enabled)
+        with patch(f'{CLIENT}.post') as post:  # an archived account no longer goes through WAHA
+            with self.assertRaises(WhatsAppError):
+                WhatsAppApi(template_account)._send_whatsapp('201001234567', 'text', {'body': 'x'})
+        post.assert_not_called()
+        with patch(f'{CLIENT}.get_session', side_effect=WahaError('not_found', 'x', 404)):
+            self.session.with_user(self.admin).action_enable_odoo_whatsapp()  # used to hit unique(phone_uid)
+        self.assertEqual(self.session._get_whatsapp_account(), template_account)
+        self.assertTrue(template_account.active)
+
+    def test_17_every_redirected_method_is_patched(self):
+        from odoo.addons.elblasy_waha_whatsapp_bridge.patch import PATCHED
+        for name in PATCHED:
+            self.assertTrue(hasattr(getattr(WhatsAppApi, name), '__wrapped__'), name)
