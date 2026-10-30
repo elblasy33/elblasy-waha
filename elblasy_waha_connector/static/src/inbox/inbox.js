@@ -11,6 +11,7 @@ const { DateTime } = luxon;
 const MODEL = "elblasy.waha.conversation";
 const READ_MORE_CHARS = 700;
 const RTL_FIRST_STRONG = /^[^A-Za-z\u00C0-\u024F\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]*[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
+const AUTHOR_COLORS = ["#06cf9c", "#e542a3", "#53bdeb", "#ffd279", "#a5b337", "#fc9775", "#7f66ff", "#1f7aec"];
 const AVATAR_COLORS = ["#25d366", "#00a884", "#53bdeb", "#7f66ff", "#ff7a59", "#f15c6d", "#ffbc38", "#009de2"];
 
 /** Unique per click. crypto.randomUUID only exists on HTTPS/localhost, plain-HTTP installs need a fallback. */
@@ -77,7 +78,10 @@ export class WahaInbox extends Component {
             sessions: [],
             sessionId: 0,
             search: "",
-            filter: "all", // all | unread | label
+            filter: "all", // all | unread | groups | archived | label
+            archivedCount: 0,
+            historyDone: false,
+            downloading: {},
             conversations: [],
             current: null,
             messages: [],
@@ -100,6 +104,11 @@ export class WahaInbox extends Component {
             await this.loadLabels();
             await this.loadConversations();
         });
+        onMounted(() => {
+            // mirror the phone's chat list in the background, then every minute while the inbox is open
+            this.refresh();
+            this._refreshTimer = setInterval(() => this.refresh(), 60000);
+        });
         const onMessage = (payload) => this.onBusMessage(payload);
         const onSession = async () => {
             this.state.sessions = await this.orm.call(MODEL, "inbox_sessions", []);
@@ -113,6 +122,7 @@ export class WahaInbox extends Component {
             this.bus.unsubscribe?.("elblasy_waha/message", onMessage);
             this.bus.unsubscribe?.("elblasy_waha/session", onSession);
             clearTimeout(this._searchTimer);
+            clearInterval(this._refreshTimer);
         });
     }
 
@@ -123,6 +133,10 @@ export class WahaInbox extends Component {
             search: this.state.search || null,
             label_id: (this.state.filter === "label" && this.state.labelFilter) || null,
             unread: this.state.filter === "unread",
+            kind: ["groups", "archived"].includes(this.state.filter) ? this.state.filter : null,
+        });
+        this.state.archivedCount = await this.orm.call(MODEL, "inbox_archived_count", [], {
+            session_id: this.state.sessionId || null,
         });
         const current = this.state.current;
         if (current) {
@@ -130,6 +144,16 @@ export class WahaInbox extends Component {
             if (fresh) {
                 Object.assign(current, fresh, { unread: 0 });
             }
+        }
+    }
+
+    async refresh() {
+        try {
+            if (await this.orm.silent.call(MODEL, "inbox_refresh", [], { session_id: this.state.sessionId || null })) {
+                await this.loadConversations();
+            }
+        } catch {
+            // WAHA unreachable: the list keeps what Odoo has
         }
     }
 
@@ -215,12 +239,61 @@ export class WahaInbox extends Component {
         this.state.messages = [];
         this.state.labelsOpen = false;
         this.state.expanded = {};
+        this.state.historyDone = false;
         await this.loadMessages();
         if (conv.unread) {
             await this.orm.call(MODEL, "inbox_mark_read", [[conv.id]]);
             conv.unread = 0;
         }
         this.composerRef()?.focus();
+        // messages that never reached Odoo (sent before the webhook, or while it was down) come from WhatsApp
+        const imported = await this.orm.silent.call(MODEL, "inbox_fetch_history", [[conv.id]]).catch(() => 0);
+        if (imported && this.state.current?.id === conv.id) {
+            await this.loadMessages({ keepScroll: true });
+        }
+    }
+
+    /** Scrolled to the top of what Odoo has: ask WhatsApp for older messages, like WhatsApp Web. */
+    async loadOlderFromWhatsapp() {
+        const conv = this.state.current;
+        const first = this.state.messages[0];
+        if (!conv || !first || this.state.historyDone || this.state.loadingOlder) {
+            return;
+        }
+        this.state.loadingOlder = true;
+        let imported = 0;
+        try {
+            imported = await this.orm.silent.call(MODEL, "inbox_fetch_history", [[conv.id]], { before: first.date });
+        } catch {
+            imported = 0;
+        } finally {
+            this.state.loadingOlder = false;
+        }
+        if (imported) {
+            this.state.hasMore = true;
+            await this.loadOlder();
+        } else {
+            this.state.historyDone = true;
+        }
+    }
+
+    async downloadMedia(m) {
+        if (this.state.downloading[m.id]) {
+            return;
+        }
+        this.state.downloading[m.id] = true;
+        try {
+            const fresh = await this.orm.call(MODEL, "inbox_download_media", [[this.state.current.id]], {
+                message_id: m.id,
+            });
+            Object.assign(m, fresh);
+        } catch (error) {
+            this.notification.add(error?.data?.message || _t("The file could not be downloaded."), {
+                type: "danger",
+            });
+        } finally {
+            delete this.state.downloading[m.id];
+        }
     }
 
     closeConversation() {
@@ -229,8 +302,13 @@ export class WahaInbox extends Component {
     }
 
     onThreadScroll(ev) {
-        if (ev.target.scrollTop < 80 && this.state.hasMore && !this.state.loadingOlder) {
+        if (ev.target.scrollTop >= 80 || this.state.loadingOlder) {
+            return;
+        }
+        if (this.state.hasMore) {
             this.loadOlder();
+        } else {
+            this.loadOlderFromWhatsapp();
         }
     }
 
@@ -399,6 +477,27 @@ export class WahaInbox extends Component {
     }
 
     // ------------------------------------------------------------------ display helpers
+    displayName(conv) {
+        const name = conv.name || "";
+        return /^\d{7,}$/.test(name) ? "+" + name : name;
+    }
+
+    authorColor(sender) {
+        let hash = 0;
+        for (const char of sender || "") {
+            hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+        }
+        return AUTHOR_COLORS[hash % AUTHOR_COLORS.length];
+    }
+
+    pendingIcon(m) {
+        return (PREVIEW[m.type] || PREVIEW.document)[0];
+    }
+
+    pendingLabel(m) {
+        return (PREVIEW[m.type] || PREVIEW.document)[1];
+    }
+
     initials(name) {
         const words = (name || "?").replace(/[^\p{L}\p{N} ]/gu, " ").trim().split(/\s+/);
         return ((words[0]?.[0] || "?") + (words.length > 1 ? words[words.length - 1][0] : "")).toUpperCase();
@@ -464,7 +563,8 @@ export class WahaInbox extends Component {
                 previousDay = day;
                 previous = null;
             }
-            rows.push({ key: m.id, message: m, first: !previous || previous.direction !== m.direction });
+            const first = !previous || previous.direction !== m.direction || previous.sender !== m.sender;
+            rows.push({ key: m.id, message: m, first });
             previous = m;
         }
         return rows;
@@ -560,7 +660,7 @@ export class WahaInbox extends Component {
         if (m.revoked || this.isBareMedia(m)) {
             return false;
         }
-        if (["location", "contact", "poll", "sticker"].includes(m.type)) {
+        if (["location", "contact", "poll", "sticker"].includes(m.type) || (m.media_pending && !m.body)) {
             return true;
         }
         return !m.body && m.attachments.length > 0;
@@ -629,6 +729,7 @@ export class WahaInbox extends Component {
     isBareMedia(m) {
         return (
             !m.body &&
+            !m.media_pending &&
             !m.revoked &&
             m.attachments.length > 0 &&
             m.attachments.every((a) => ["image", "video"].includes(this.kindOf(a)))

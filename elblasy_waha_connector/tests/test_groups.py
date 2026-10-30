@@ -210,6 +210,7 @@ class TestGroups(TransactionCase):
             return ev
         msg = {'id': 'false_1203@g.us_X1', 'timestamp': 1700000000, 'from': '1203@g.us', 'fromMe': False,
                'participant': '2010@c.us', 'body': 'hello group', '_data': {'notifyName': 'Sara'}}
+        self.session.inbox_groups = False  # this test is about the separate opt-in group log
         self.assertEqual(feed('1', payload=msg).state, 'ignored')  # privacy: off by default
         group.log_messages = True
         self.assertEqual(feed('2', payload=msg).state, 'done')
@@ -905,6 +906,110 @@ class TestGroups(TransactionCase):
         self.assertEqual([r['id'] for r in unread], [photo.conversation_id.id])
 
 
+    def test_50_chat_list_mirrors_the_phone(self):
+        Conv = self.env['elblasy.waha.conversation']
+        self.session.status = 'WORKING'
+        overview = [
+            {'id': '99001@lid', 'name': 'Pinned Friend', 'picture': None,
+             'lastMessage': {'id': 'false_99001@lid_A', 'from': '99001@lid', 'fromMe': False, 'body': 'hi',
+                             'timestamp': 1700000100, '_data': {'type': 'chat'}},
+             '_chat': {'pinned': True, 'archived': False, 'isMuted': True, 'unreadCount': 3}},
+            {'id': '1203555@g.us', 'name': 'Family', 'picture': None,
+             'lastMessage': {'id': 'false_1203555@g.us_B', 'from': '1203555@g.us', 'participant': '2011@c.us',
+                             'fromMe': False, 'body': 'dinner?', 'timestamp': 1700000200,
+                             '_data': {'type': 'chat', 'notifyName': 'Mum'}},
+             '_chat': {'pinned': False, 'archived': False, 'unreadCount': 1}},
+            {'id': '201001239700@c.us', 'name': '+20 100 123 9700', 'picture': None, 'lastMessage': None,
+             '_chat': {'archived': True, 'unreadCount': 0}},
+            {'id': 'status@broadcast', 'name': 'x', '_chat': {}},
+        ]
+        with patch(f'{CLIENT}.get', return_value=overview), patch(f'{CLIENT}.lid_to_phone', return_value=False):
+            self.assertEqual(self.session._sync_chat_list(), 3)
+        friend = Conv.search([('remote_chat_id', '=', '99001@lid')])
+        self.assertEqual((friend.name, friend.wa_pinned, friend.wa_muted, friend.unread_count),
+                         ('Pinned Friend', True, True, 3))  # phone's unread count, not +1 for the imported message
+        self.assertEqual(friend.last_message_preview, 'hi')
+        family = Conv.search([('remote_chat_id', '=', '1203555@g.us')])
+        self.assertEqual((family.chat_type, family.name, family.message_ids.author_name), ('group', 'Family', 'Mum'))
+        archived = Conv.search([('remote_chat_id', '=', '201001239700@c.us')])
+        self.assertTrue(archived.wa_archived)
+        self.assertFalse(archived.display_name_remote)  # a bare number is not a name
+        rows = Conv.with_user(self.user).inbox_conversations(session_id=self.session.id)
+        self.assertEqual(rows[0]['id'], friend.id)  # pinned first, like WhatsApp
+        self.assertNotIn(archived.id, [r['id'] for r in rows])
+        self.assertEqual([r['id'] for r in Conv.with_user(self.user).inbox_conversations(
+            session_id=self.session.id, kind='archived')], [archived.id])
+        self.assertEqual([r['id'] for r in Conv.with_user(self.user).inbox_conversations(
+            session_id=self.session.id, kind='groups')], [family.id])
+        self.assertEqual(rows[1]['last_author'], 'Mum')
+        # throttled: a second refresh within 30 s does not call WAHA
+        with patch(f'{CLIENT}.get') as get:
+            self.assertFalse(Conv.with_user(self.user).inbox_refresh(self.session.id))
+        get.assert_not_called()
+
+    def test_51_group_messages_never_trigger_auto_replies(self):
+        self.env['elblasy.waha.autoreply'].create({'name': 'Hi', 'session_id': self.session.id,
+                                                   'reply_text': 'Hello!', 'trigger': 'keyword', 'keywords': 'stop, hi'})
+        self.session.status = 'WORKING'
+        with patch(f'{CLIENT}.send_text') as send:
+            self._event('message.any', {'id': 'false_1203666@g.us_C', 'from': '1203666@g.us', 'participant': '2012@c.us',
+                                        'fromMe': False, 'body': 'stop', 'timestamp': 1700000000,
+                                        '_data': {'type': 'chat', 'notifyName': 'Ali'}}, 'grp-c')
+        send.assert_not_called()  # neither auto-reply nor the opt-out confirmation in a group
+        self.assertFalse(self.env['elblasy.waha.optout'].search([]))
+
+    def test_52_media_policy_and_download_on_demand(self):
+        self.session.write({'status': 'WORKING', 'media_download': 'limit', 'media_max_mb': 1})
+        payload = {'hasMedia': True, '_data': {'type': 'document', 'size': 5 * 1024 * 1024},
+                   'media': {'url': 'http://waha.test/api/files/big.pdf', 'mimetype': 'application/pdf',
+                             'filename': 'big.pdf'}}
+        with patch(f'{CLIENT}.download') as download:
+            big = self._msg('big', **payload)
+        download.assert_not_called()
+        self.assertTrue(big.media_pending)
+        self.assertTrue(big._to_ui()['media_pending'])
+        conv = big.conversation_id
+        with patch(f'{CLIENT}.get', return_value={'media': payload['media']}) as get, \
+                patch(f'{CLIENT}.download', return_value=b'%PDF-1.4'):
+            ui = conv.with_user(self.user).inbox_download_media(big.id)
+        self.assertIn('downloadMedia', get.call_args.args[1])
+        self.assertEqual(ui['attachments'][0]['name'], 'big.pdf')
+        self.assertFalse(big.media_pending)
+        with patch(f'{CLIENT}.download', return_value=b'img') as download:
+            small = self._msg('small', hasMedia=True, _data={'type': 'image', 'size': 2000},
+                              media={'url': 'http://waha.test/api/files/s.jpg', 'mimetype': 'image/jpeg'})
+        download.assert_called_once()
+        self.assertFalse(small.media_pending)
+        # retention: old files go, the message stays and can be downloaded again
+        self.session.media_retention_days = 30
+        self.env.cr.execute("UPDATE elblasy_waha_message SET date = now() - interval '40 days' WHERE id = %s", [small.id])
+        small.invalidate_recordset()
+        self.env['elblasy.waha.session']._cron_purge_media()
+        self.assertFalse(small.attachment_ids)
+        self.assertTrue(small.exists() and small.media_pending)
+
+    def test_53_history_import_and_paging_by_date(self):
+        self.session.status = 'WORKING'
+        newest = self._msg('new1', body='newest', timestamp=1700000500)
+        conv = newest.conversation_id
+        conv.unread_count = 0
+        older = [{'id': f'false_201001239000@c.us_old{i}', 'from': '201001239000@c.us', 'fromMe': False,
+                  'body': f'old {i}', 'timestamp': 1700000000 + i, '_data': {'type': 'chat'}} for i in range(3)]
+        with patch(f'{CLIENT}.get', return_value=older) as get:
+            self.assertEqual(conv.with_user(self.user).inbox_fetch_history(before=fields_dt_from_ts(1700000500)), 3)
+        self.assertIn('filter.timestamp.lte', get.call_args.args[1])
+        self.assertEqual(conv.unread_count, 0)  # history is not unread
+        page = conv.with_user(self.user).inbox_messages(before_id=newest.id)
+        self.assertEqual([m['body'] for m in page['messages']], ['old 0', 'old 1', 'old 2'])
+        with patch(f'{CLIENT}.get', return_value=older):
+            self.assertEqual(conv.with_user(self.user).inbox_fetch_history(), 0)  # nothing twice
+
+
 def fields_dt_sub_minutes(minutes):
     from odoo import fields
     return fields.Datetime.subtract(fields.Datetime.now(), minutes=minutes)
+
+
+def fields_dt_from_ts(ts):
+    from datetime import datetime, timezone
+    return datetime.fromtimestamp(ts, tz=timezone.utc).replace(tzinfo=None)

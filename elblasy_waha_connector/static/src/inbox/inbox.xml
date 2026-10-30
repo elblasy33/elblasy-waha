@@ -19,6 +19,9 @@
                 <div class="o_waha_chips">
                     <button class="o_waha_chip" t-att-class="{ active: this.isFilter('all') }" t-on-click="() => this.setFilter('all')">All</button>
                     <button class="o_waha_chip" t-att-class="{ active: this.isFilter('unread') }" t-on-click="() => this.setFilter('unread')">Unread</button>
+                    <button class="o_waha_chip" t-att-class="{ active: this.isFilter('groups') }" t-on-click="() => this.setFilter('groups')">
+                        <i class="oi me-1" data-icon="group"/>Groups
+                    </button>
                     <button t-foreach="this.state.labels" t-as="l" t-key="l.id" class="o_waha_chip"
                             t-att-class="{ active: this.isFilter('label', l.id) }" t-on-click="() => this.setFilter('label', l.id)">
                         <span class="o_waha_chip_dot" t-att-style="'background-color:' + l.color"/>
@@ -26,17 +29,26 @@
                     </button>
                 </div>
                 <div class="o_waha_conv_list">
+                    <div t-if="this.state.filter === 'archived'" class="o_waha_archived_row" t-on-click="() => this.setFilter('all')">
+                        <i class="oi" data-icon="arrow_back"/><span>Archived</span>
+                    </div>
+                    <div t-elif="this.state.archivedCount and this.state.filter === 'all'" class="o_waha_archived_row"
+                         t-on-click="() => this.setFilter('archived')">
+                        <i class="oi" data-icon="archive"/><span>Archived</span>
+                        <span class="o_waha_archived_count" t-out="this.state.archivedCount"/>
+                    </div>
                     <div t-foreach="this.state.conversations" t-as="c" t-key="c.id" class="o_waha_conv"
                          t-att-class="{ active: this.state.current and this.state.current.id === c.id }"
                          t-on-click="() => this.openConversation(c)">
                         <img t-if="c.has_image" class="o_waha_avatar" alt=""
                              t-att-src="'/web/image/elblasy.waha.conversation/' + c.id + '/image_128?unique=' + c.image_ts"/>
+                        <span t-elif="c.is_group" class="o_waha_avatar o_waha_avatar_initials o_waha_avatar_group"><i class="oi" data-icon="group"/></span>
                         <span t-else="" class="o_waha_avatar o_waha_avatar_initials" t-att-style="'background-color:' + this.avatarColor(c.id)"
                               t-out="this.initials(c.name)"/>
                         <div class="o_waha_conv_body">
                             <div class="o_waha_conv_top">
                                 <span class="o_waha_conv_name">
-                                    <span dir="auto" t-out="c.name"/><t t-if="c.is_me"> (You)</t>
+                                    <span dir="auto" t-out="this.displayName(c)"/><t t-if="c.is_me"> (You)</t>
                                 </span>
                                 <span class="o_waha_conv_time" t-att-class="{ o_waha_unread_time: c.unread }" t-out="this.listDate(c.last_date)"/>
                             </div>
@@ -44,10 +56,13 @@
                                 <span class="o_waha_conv_preview" dir="auto">
                                     <i t-if="c.last_direction === 'out' and !c.last_revoked" t-att-class="this.tickClass(c.last_status)" t-att-data-icon="this.tickIcon(c.last_status)"/>
                                     <t t-set="pv" t-value="this.preview(c)"/>
+                                    <t t-if="c.is_group and c.last_author"><span dir="auto" t-out="c.last_author"/>: </t>
                                     <i t-if="pv.icon" class="oi me-1" t-att-data-icon="pv.icon"/>
                                     <t t-out="pv.text"/>
                                 </span>
+                                <i t-if="c.muted" class="oi o_waha_list_icon" data-icon="volume_off" title="Muted"/>
                                 <span t-if="c.unread" class="o_waha_unread_badge" t-out="c.unread"/>
+                                <i t-if="c.pinned" class="oi o_waha_list_icon" data-icon="push_pin" title="Pinned"/>
                                 <i t-if="c.session_status !== 'WORKING'" class="oi text-warning ms-1" data-icon="link_off" title="Session offline"/>
                             </div>
                             <div t-if="c.labels.length" class="o_waha_conv_labels">
@@ -70,13 +85,15 @@
                         </button>
                         <img t-if="cur.has_image" class="o_waha_avatar" alt=""
                              t-att-src="'/web/image/elblasy.waha.conversation/' + cur.id + '/image_128?unique=' + cur.image_ts"/>
+                        <span t-elif="cur.is_group" class="o_waha_avatar o_waha_avatar_initials o_waha_avatar_group"><i class="oi" data-icon="group"/></span>
                         <span t-else="" class="o_waha_avatar o_waha_avatar_initials" t-att-style="'background-color:' + this.avatarColor(cur.id)"
                               t-out="this.initials(cur.name)"/>
                         <div class="o_waha_thread_title">
-                            <div class="o_waha_conv_name"><span dir="auto" t-out="cur.name"/><t t-if="cur.is_me"> (You)</t></div>
+                            <div class="o_waha_conv_name"><span dir="auto" t-out="this.displayName(cur)"/><t t-if="cur.is_me"> (You)</t></div>
                             <div class="o_waha_thread_sub">
                                 <t t-if="this.sessionDisconnected"><i class="oi text-warning" data-icon="link_off"/> WhatsApp number offline</t>
-                                <t t-elif="cur.phone" t-out="'+' + cur.phone"/>
+                                <t t-elif="cur.is_group">Group</t>
+                                <t t-elif="cur.phone and this.displayName(cur) !== '+' + cur.phone" t-out="'+' + cur.phone"/>
                                 <t t-if="this.state.sessions.length > 1"> · <t t-out="cur.session_name"/></t>
                             </div>
                         </div>
@@ -116,6 +133,10 @@
                                             o_out: m.direction === 'out', o_in: m.direction === 'in', o_tail: row.first,
                                             o_waha_sticker_bubble: m.type === 'sticker' and !m.revoked,
                                             o_waha_media_bubble: this.isBareMedia(m) }">
+                                        <div t-if="cur.is_group and m.direction === 'in' and row.first" class="o_waha_author"
+                                             t-att-style="'color:' + this.authorColor(m.sender)">
+                                            <span dir="auto" t-out="m.author or m.sender"/>
+                                        </div>
                                         <div t-if="m.forwarded" class="o_waha_meta_line"><i class="oi me-1" data-icon="forward"/>Forwarded</div>
                                         <span t-if="m.revoked" class="o_waha_revoked" t-att-title="m.body"><span t-if="this.spaceAtStart(this.deletedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/><i class="oi me-1" data-icon="block"/><t t-out="this.deletedLabel"/><span t-if="!this.spaceAtStart(this.deletedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/></span>
                                         <t t-else="">
@@ -142,6 +163,16 @@
                                                     <i class="oi o_waha_doc_dl" data-icon="download"/>
                                                 </a>
                                             </t>
+                                            <button t-if="m.media_pending and !m.attachments.length" class="o_waha_pending"
+                                                    t-on-click="() => this.downloadMedia(m)" t-att-disabled="this.state.downloading[m.id]">
+                                                <i class="oi o_waha_pending_type" t-att-data-icon="this.pendingIcon(m)"/>
+                                                <span class="o_waha_doc_info">
+                                                    <span class="o_waha_doc_name" t-out="this.pendingLabel(m)"/>
+                                                    <span class="o_waha_doc_meta">Kept on WhatsApp · click to download</span>
+                                                </span>
+                                                <i class="oi o_waha_doc_dl" t-att-class="{ 'oi-spin': this.state.downloading[m.id] }"
+                                                   t-att-data-icon="this.state.downloading[m.id] ? 'progress_activity' : 'download'"/>
+                                            </button>
                                             <a t-if="m.type === 'location' and m.location" class="o_waha_location" t-att-href="this.mapUrl(m)"
                                                target="_blank" rel="noopener noreferrer">
                                                 <i class="oi" data-icon="location_on"/>

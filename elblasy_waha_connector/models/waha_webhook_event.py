@@ -260,15 +260,22 @@ class WahaWebhookEvent(models.Model):
         })
         return 'done'
 
-    def _handle_message(self, session, p):
+    def _handle_message(self, session, p, history=False):
+        """Store one WhatsApp message (webhook, chat list mirror or history import).
+
+        ``history``: imported afterwards, so no auto-reply / opt-out handling and no unread increment.
+        """
         remote_id = p.get('id')
         from_me = bool(p.get('fromMe'))
         chat_id = p.get('to') if from_me else p.get('from')
         if not remote_id or not isinstance(chat_id, str):
             raise ValueError("invalid message payload")
-        if chat_id.endswith('@g.us'):
-            return self._handle_group_message(session, p, chat_id)  # stored only for opted-in groups
-        if chat_id.rpartition('@')[2] in IGNORED_SUFFIXES or chat_id.startswith('status@'):
+        is_group = chat_id.endswith('@g.us')
+        if is_group:
+            logged = 'ignored' if history else self._handle_group_message(session, p, chat_id)  # opt-in group log
+            if not session.inbox_groups:
+                return logged
+        elif chat_id.rpartition('@')[2] in IGNORED_SUFFIXES or chat_id.startswith('status@'):
             return 'ignored'  # status / channels
         Message = self.env['elblasy.waha.message'].sudo()
         existing = Message.search([('session_id', '=', session.id), ('remote_message_id', '=', remote_id)], limit=1)
@@ -280,8 +287,11 @@ class WahaWebhookEvent(models.Model):
         if content is None:
             return 'ignored'  # encryption banner, call log, group notice...
         data = p.get('_data') if isinstance(p.get('_data'), dict) else {}
+        push_name = data.get('notifyName') or data.get('pushName')
+        if history:
+            Message = Message.with_context(waha_history=True)
         conv = self.env['elblasy.waha.conversation'].sudo()._get_or_create(
-            session, chat_id, None if from_me else data.get('notifyName') or data.get('pushName'))
+            session, chat_id, None if from_me or is_group else push_name)
         media = p.get('media') if isinstance(p.get('media'), dict) else {}
         message = Message.create({
             **content,
@@ -290,11 +300,16 @@ class WahaWebhookEvent(models.Model):
             'date': ts_to_datetime(p.get('timestamp')),
             'delivery_status': ACK_MAP.get(p.get('ack'), 'sent') if from_me else False,
             'sender_identifier': (session.phone_number if from_me else (p.get('participant') or p.get('from'))),
+            'author_name': push_name if is_group and not from_me else False,
             'webhook_event_id': self.id,
         })
-        if p.get('hasMedia') and media.get('url'):
-            self._store_media(session, message, media, content['message_type'])
-        if not from_me:
+        if p.get('hasMedia'):
+            size = data.get('size') if isinstance(data.get('size'), int) else 0
+            if media.get('url') and session._auto_download(content['message_type'], size, is_group):
+                self._store_media(session, message, media, content['message_type'])
+            else:
+                message.media_pending = True  # downloaded when someone opens it
+        if not from_me and not is_group and not history:
             conv._after_incoming(message)
         return 'done'
 

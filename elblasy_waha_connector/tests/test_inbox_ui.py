@@ -1,4 +1,5 @@
 import base64
+from unittest.mock import patch
 
 from odoo.tests import HttpCase, tagged
 
@@ -25,9 +26,12 @@ const wait = async (selector, count = 1) => {
     await wait(".o_waha_bubble", 8);
     for (const selector of [".o_waha_day", ".o_waha_img", ".o_waha_doc .o_waha_pdf[data-icon=picture_as_pdf]", ".o_waha_location",
                             ".o_waha_vcard", ".o_waha_poll", ".o_waha_quote", ".o_waha_reactions",
-                            ".o_waha_revoked", ".o_waha_tick_read", ".o_waha_text b", ".o_waha_space", ".o_waha_meta", ".o_waha_composer textarea"]) {
+                            ".o_waha_revoked", ".o_waha_pending", ".o_waha_archived_row", ".o_waha_tick_read", ".o_waha_text b", ".o_waha_space", ".o_waha_meta", ".o_waha_composer textarea"]) {
         await wait(selector);
     }
+    document.querySelector(".o_waha_chip:nth-child(3)").click(); // "Groups"
+    (await wait(".o_waha_conv .o_waha_avatar_group"))[0].closest(".o_waha_conv").click();
+    await wait(".o_waha_author");
     document.querySelector(".o_waha_chip:nth-child(2)").click(); // "Unread": the chat was just read
     await new Promise((resolve) => setTimeout(resolve, 500));
     console.log("test successful");
@@ -66,6 +70,14 @@ class TestInboxUi(HttpCase):
         message('l1', message_type='location', body='Cairo', latitude=30.04, longitude=31.23)
         message('c1', message_type='contact', body='Ali\n+20 100 123 4567')
         message('q1', message_type='poll', body='Lunch?\n• Yes\n• No')
+        message('m1', message_type='video', media_pending=True)
         message('r1', body='oops', is_revoked=True, date='2026-10-30 08:00:00')
-        self.browser_js('/odoo/action-elblasy_waha_connector.waha_inbox_action', CHECK_INBOX, login='admin',
-                        timeout=90)
+        Conv = self.env['elblasy.waha.conversation']
+        group = Conv.create({'session_id': session.id, 'remote_chat_id': '120300@g.us', 'display_name_remote': 'Team'})
+        Message.create({'conversation_id': group.id, 'remote_message_id': 'g1', 'direction': 'in', 'body': 'hi all',
+                        'author_name': 'Sara', 'sender_identifier': '2010@c.us', 'date': '2026-10-28 09:00:00'})
+        Conv.create({'session_id': session.id, 'remote_chat_id': '201001230099@c.us', 'wa_archived': True})
+        client = 'odoo.addons.elblasy_waha_connector.models.waha_client.WahaClient'
+        with patch(f'{client}.get', return_value=[]):  # chat list mirror and history: nothing new on WhatsApp
+            self.browser_js('/odoo/action-elblasy_waha_connector.waha_inbox_action', CHECK_INBOX, login='admin',
+                            timeout=90)

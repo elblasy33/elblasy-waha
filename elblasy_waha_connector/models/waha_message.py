@@ -50,6 +50,10 @@ class WahaMessage(models.Model):
         [('pending', "Sending"), ('sent', "Sent"), ('delivered', "Delivered"), ('read', "Read"),
          ('failed', "Failed"), ('unknown', "Not confirmed")], copy=False)
     sender_identifier = fields.Char()
+    author_name = fields.Char("Author", help="Name of the group member who wrote the message.")
+    media_pending = fields.Boolean(
+        "Media not downloaded", readonly=True,
+        help="The file stays on WhatsApp until someone opens it (media policy of the session).")
     user_id = fields.Many2one('res.users', string="Sent by", readonly=True, index='btree_not_null')
     is_auto = fields.Boolean("Automatic reply", readonly=True)
     response_seconds = fields.Integer(
@@ -94,7 +98,10 @@ class WahaMessage(models.Model):
         if not conv.last_message_date or self.date >= conv.last_message_date:
             vals.update(last_message_id=self.id, last_message_date=self.date,
                         last_message_preview=self._preview())
-        if self.direction == 'in':
+        history = self.env.context.get('waha_history')
+        if history:
+            pass  # imported history: the unread count comes from the phone, nobody is waiting for an answer
+        elif self.direction == 'in':
             vals['unread_count'] = conv.unread_count + 1
             if not conv.awaiting_since:
                 vals['awaiting_since'] = self.date
@@ -103,7 +110,8 @@ class WahaMessage(models.Model):
             vals['awaiting_since'] = False
         if vals:
             conv.write(vals)
-        self._notify_bus()
+        if not history:
+            self._notify_bus()
 
     def _notify_bus(self):
         self.ensure_one()
@@ -125,6 +133,7 @@ class WahaMessage(models.Model):
             'id': self.id, 'direction': self.direction, 'type': self.message_type, 'body': self.body or '',
             'date': fields.Datetime.to_string(self.date), 'status': self.delivery_status,
             'failure': self.failure_reason, 'sender': self.sender_identifier, 'is_auto': self.is_auto,
+            'author': self.author_name or '', 'media_pending': self.media_pending,
             'quoted': self.quoted_body or '', 'forwarded': self.is_forwarded, 'edited': self.is_edited,
             'revoked': self.is_revoked, 'reactions': list(counts.values()),
             'location': {'lat': self.latitude, 'lng': self.longitude} if self.message_type == 'location' else False,

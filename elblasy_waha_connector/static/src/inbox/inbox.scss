@@ -26,6 +26,7 @@
     --waha-chip: #f0f2f5;
     --waha-chip-active: #d9fdd3;
     --waha-chip-active-text: #008069;
+    --waha-avatar-group: #dfe5e7;
 
     display: flex;
     height: 100%;
@@ -190,6 +191,37 @@
         font-weight: 600;
         line-height: 17px;
     }
+    .o_waha_archived_row {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 12px 22px;
+        cursor: pointer;
+        color: var(--waha-text);
+        border-bottom: 1px solid var(--waha-border);
+        .oi { font-size: 20px; color: var(--waha-green-dark); }
+        &:hover { background: var(--waha-hover); }
+    }
+    .o_waha_archived_count { margin-inline-start: auto; color: var(--waha-green); font-size: 12px; font-weight: 600; }
+    .o_waha_list_icon { flex: none; font-size: 18px; color: var(--waha-muted); margin-inline-start: 4px; }
+    .o_waha_avatar_group { background: var(--waha-avatar-group); color: #ffffff; .oi { font-size: 24px; } }
+    .o_waha_author { font-size: 12.8px; font-weight: 600; margin-bottom: 2px; }
+    .o_waha_pending {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 240px;
+        width: 100%;
+        margin-bottom: 4px;
+        padding: 10px;
+        border: 0;
+        border-radius: 6px;
+        background: var(--waha-quote);
+        color: var(--waha-text);
+        text-align: start;
+        &:hover:not(:disabled) { filter: brightness(0.97); }
+    }
+    .o_waha_pending_type { font-size: 32px; color: var(--waha-muted); }
     .o_waha_empty_list {
         padding: 40px 16px;
         text-align: center;
@@ -353,6 +385,19 @@
     }
     .o_waha_media_bubble {
         padding: 3px;
+        .o_waha_media_link { position: relative; display: block; }
+        &::after {
+            content: "";
+            position: absolute;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
+            height: 36px;
+            border-radius: 0 0 6px 6px;
+            background: linear-gradient(to top, rgba(11, 20, 26, 0.45), transparent);
+            pointer-events: none;
+        }
+        .o_waha_meta { z-index: 1; }
         .o_waha_meta {
             bottom: 7px;
             inset-inline-end: 9px;

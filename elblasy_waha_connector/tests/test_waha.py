@@ -149,8 +149,14 @@ class TestWaha(WahaCommon):
         self.assertEqual(ok.state, 'done')
 
     def test_07_group_ignored(self):
+        self.session.inbox_groups = False  # groups kept out of the inbox
         ev = self._feed(self._incoming(chat='1203@g.us', mid='g1'))
         self.assertEqual(ev.state, 'ignored')
+        self.session.inbox_groups = True  # default: groups appear in the inbox like WhatsApp Web
+        ev = self._feed(self._incoming(chat='1203@g.us', mid='g2'))
+        self.assertEqual(ev.state, 'done')
+        conv = self.env['elblasy.waha.conversation'].search([('remote_chat_id', '=', '1203@g.us')])
+        self.assertEqual((conv.chat_type, len(conv.message_ids)), ('group', 1))
 
     def test_08_send_text(self):
         self._feed(self._incoming())

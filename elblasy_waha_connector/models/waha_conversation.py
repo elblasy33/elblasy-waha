@@ -17,7 +17,7 @@ USER = 'elblasy_waha_connector.group_waha_user'
 class WahaConversation(models.Model):
     _name = 'elblasy.waha.conversation'
     _description = "WhatsApp Conversation"
-    _order = 'last_message_date desc, id desc'
+    _order = 'wa_pinned desc, last_message_date desc nulls last, id desc'
 
     name = fields.Char(compute='_compute_name', store=True)
     session_id = fields.Many2one('elblasy.waha.session', required=True, ondelete='cascade', index=True)
@@ -41,6 +41,9 @@ class WahaConversation(models.Model):
     picture_synced_at = fields.Datetime(readonly=True)
     label_ids = fields.Many2many('elblasy.waha.label', 'elblasy_waha_conv_label_rel', 'conversation_id', 'label_id')
     awaiting_since = fields.Datetime(readonly=True, help="First unanswered incoming message.")
+    wa_pinned = fields.Boolean("Pinned", readonly=True)
+    wa_archived = fields.Boolean("Archived on WhatsApp", readonly=True)
+    wa_muted = fields.Boolean("Muted", readonly=True)
     last_autoreply_date = fields.Datetime(readonly=True)
     active = fields.Boolean(default=True)
     message_ids = fields.One2many('elblasy.waha.message', 'conversation_id')
@@ -109,6 +112,9 @@ class WahaConversation(models.Model):
             if display_name and not conv.display_name_remote:
                 conv.display_name_remote = display_name
             return conv
+        if not display_name and chat_id.endswith('@g.us'):
+            display_name = self.env['elblasy.waha.group'].sudo().with_context(active_test=False).search(
+                [('session_id', '=', session.id), ('chat_id', '=', chat_id)], limit=1).name
         conv = self.create({
             'session_id': session.id, 'remote_chat_id': chat_id, 'remote_phone': phone or False,
             'display_name_remote': display_name or False,
@@ -171,11 +177,12 @@ class WahaConversation(models.Model):
     def _fetch_picture(self):
         self.ensure_one()
         client = self.session_id.sudo().server_id._get_client()
-        url = client.picture_url(self.session_id.session_name, self.remote_chat_id)
+        is_group = self.chat_type == 'group'
+        url = client.picture_url(self.session_id.session_name, self.remote_chat_id, group=is_group)
         vals = {'picture_synced_at': fields.Datetime.now()}
         if url:
             vals['image_128'] = BinaryBytes(client.download_picture(url))
-        if not self.display_name_remote:
+        if not self.display_name_remote and not is_group:
             # the name WhatsApp shows (saved name on the phone, else the person's own profile name)
             try:
                 name = client.contact_name(self.session_id.session_name, self.remote_chat_id)
@@ -190,7 +197,7 @@ class WahaConversation(models.Model):
     def _cron_sync_pictures(self, limit=20):
         stale = fields.Datetime.subtract(fields.Datetime.now(), days=self.PICTURE_REFRESH_DAYS)
         convs = self.sudo().search(
-            [('chat_type', 'in', ('user', 'lid')), ('session_id.status', '=', 'WORKING'),
+            [('chat_type', 'in', ('user', 'lid', 'group')), ('session_id.status', '=', 'WORKING'),
              '|', ('picture_synced_at', '=', False), ('picture_synced_at', '<', stale)],
             order='last_message_date desc', limit=limit)
         for conv in convs:
@@ -260,15 +267,23 @@ class WahaConversation(models.Model):
         self.check_access('read')
 
     @api.model
-    def inbox_conversations(self, session_id=None, search=None, limit=40, offset=0, label_id=None, unread=False):
+    def inbox_conversations(self, session_id=None, search=None, limit=60, offset=0, label_id=None, unread=False,
+                            kind=None):
+        """Chat list, WhatsApp order: pinned first, then the latest activity. ``kind``: 'groups' or 'archived'."""
         self._check_user()
-        domain = [('chat_type', '!=', 'group')]
+        domain = ['|', ('chat_type', '!=', 'group'), ('session_id.inbox_groups', '=', True)]
         if session_id:
             domain.append(('session_id', '=', session_id))
         if label_id:
             domain.append(('label_ids', 'in', [label_id]))
         if unread:
             domain.append(('unread_count', '>', 0))
+        if kind == 'groups':
+            domain.append(('chat_type', '=', 'group'))
+        if kind == 'archived':
+            domain.append(('wa_archived', '=', True))
+        elif not search:
+            domain.append(('wa_archived', '=', False))  # like WhatsApp: archived chats live in their own list
         if search:
             domain += ['|', '|', ('name', 'ilike', search), ('remote_phone', 'ilike', search),
                        ('partner_id.name', 'ilike', search)]
@@ -281,6 +296,8 @@ class WahaConversation(models.Model):
                 'partner_name': c.partner_id.name, 'session_id': c.session_id.id,
                 'session_name': c.session_id.name, 'session_status': c.session_id.status,
                 'is_me': bool(c.remote_phone and c.remote_phone == c.session_id.phone_number),
+                'is_group': c.chat_type == 'group', 'pinned': c.wa_pinned, 'muted': c.wa_muted,
+                'last_author': (last.author_name or '') if last and last.direction == 'in' else '',
                 'last_message': c.last_message_preview, 'last_date': fields.Datetime.to_string(c.last_message_date),
                 'last_type': last.message_type or '', 'last_body': (last.body or '')[:200] if last else '',
                 'last_direction': last.direction or '', 'last_status': last.delivery_status or '',
@@ -290,6 +307,90 @@ class WahaConversation(models.Model):
                 'image_ts': fields.Datetime.to_string(c.picture_synced_at) or '',
             })
         return result
+
+    @api.model
+    def inbox_archived_count(self, session_id=None):
+        self._check_user()
+        domain = [('wa_archived', '=', True)] + ([('session_id', '=', session_id)] if session_id else [])
+        return self.search_count(domain)
+
+    REFRESH_SECONDS = 30
+
+    @api.model
+    def inbox_refresh(self, session_id=None):
+        """Mirror the phone's chat list (called by the inbox in the background; at most every 30 s)."""
+        self._check_user()
+        Session = self.env['elblasy.waha.session']
+        sessions = Session.browse(session_id) if session_id else Session.search([])
+        recent = fields.Datetime.subtract(fields.Datetime.now(), seconds=self.REFRESH_SECONDS)
+        changed = False
+        for session in sessions.sudo().filtered(lambda s: s.status == 'WORKING'):
+            if session.chats_synced_at and session.chats_synced_at > recent:
+                continue
+            try:
+                session._sync_chat_list()
+                changed = True
+            except WahaError as e:
+                _logger.info("Inbox refresh of session %s failed: %s", session.id, e)
+        return changed
+
+    HISTORY_PAGE = 40
+
+    def inbox_fetch_history(self, before=None):
+        """Import the chat's messages that Odoo does not have yet (latest ones, or older than ``before``)."""
+        self.ensure_one()
+        self._check_user()
+        session = self.session_id.sudo()
+        if session.status != 'WORKING':
+            return 0
+        params = {'limit': self.HISTORY_PAGE, 'downloadMedia': 'false'}
+        if before:
+            params['filter.timestamp.lte'] = int(fields.Datetime.to_datetime(before).timestamp()) - 1
+        try:
+            messages = session.server_id._get_client().get(
+                f'/api/{session.session_name}/chats/{self.remote_chat_id}/messages', params)
+        except WahaError as e:
+            _logger.info("History of chat %s unavailable: %s", self.id, e)
+            return 0
+        Event = self.env['elblasy.waha.webhook.event'].sudo()
+        Message = self.env['elblasy.waha.message'].sudo()
+        before_count = Message.search_count([('conversation_id', '=', self.id)])
+        for payload in messages if isinstance(messages, list) else []:
+            if not isinstance(payload, dict):
+                continue
+            try:
+                with self.env.cr.savepoint():
+                    Event._handle_message(session, payload, history=True)
+            except (ValueError, LookupError):
+                continue
+        return Message.search_count([('conversation_id', '=', self.id)]) - before_count
+
+    def inbox_download_media(self, message_id):
+        """Fetch a file that was left on WhatsApp (media policy) and keep it in Odoo."""
+        self.ensure_one()
+        self._check_user()
+        message = self.env['elblasy.waha.message'].sudo().browse(message_id).exists()
+        if not message or message.conversation_id != self or not message.remote_message_id:
+            raise UserError(self.env._("This message cannot be found."))
+        if message.attachment_ids:
+            return message._to_ui()
+        session = self.session_id.sudo()
+        if session.status != 'WORKING':
+            raise UserError(self.env._("The WhatsApp session is not connected (status: %s).", session.status or '?'))
+        try:
+            data = session.server_id._get_client().get(
+                f'/api/{session.session_name}/chats/{self.remote_chat_id}/messages/{message.remote_message_id}',
+                {'downloadMedia': 'true'})
+        except WahaError as e:
+            raise UserError(self.env._("WhatsApp could not provide the file: %s", e))
+        media = data.get('media') if isinstance(data, dict) and isinstance(data.get('media'), dict) else {}
+        if not media.get('url'):
+            raise UserError(self.env._("WhatsApp no longer has this file."))
+        self.env['elblasy.waha.webhook.event'].sudo()._store_media(session, message, media, message.message_type)
+        if not message.attachment_ids:
+            raise UserError(message.failure_reason or self.env._("The file could not be downloaded."))
+        message.media_pending = False
+        return message._to_ui()
 
     @api.model
     def inbox_sessions(self):
@@ -302,8 +403,10 @@ class WahaConversation(models.Model):
         self.ensure_one()
         self._check_user()
         domain = [('conversation_id', '=', self.id)]
-        if before_id:
-            domain.append(('id', '<', before_id))
+        oldest = self.env['elblasy.waha.message'].browse(before_id).exists() if before_id else None
+        if oldest:
+            # by date, not id: history imported later has newer ids than the messages it precedes
+            domain += ['|', ('date', '<', oldest.date), '&', ('date', '=', oldest.date), ('id', '<', oldest.id)]
         msgs = self.env['elblasy.waha.message'].search(domain, order='date desc, id desc', limit=limit)
         return {
             'messages': [m._to_ui() for m in reversed(msgs)],

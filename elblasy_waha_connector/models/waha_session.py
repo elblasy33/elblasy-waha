@@ -79,6 +79,22 @@ class WahaSession(models.Model):
         "Auto-sync messages", help="Fetch new incoming messages from WAHA every minute. Use it when the webhook "
         "cannot reach Odoo (local installation); with a working webhook leave it off.")
     messages_synced_at = fields.Datetime("Last Messages Sync", readonly=True, copy=False)
+    chats_synced_at = fields.Datetime("Last Chat List Sync", readonly=True, copy=False)
+    inbox_groups = fields.Boolean(
+        "Groups in the inbox", default=True,
+        help="Show WhatsApp groups and their messages in the inbox, like WhatsApp Web.")
+    media_download = fields.Selection(
+        [('all', "All files"), ('limit', "Up to the size limit (videos on demand)"), ('none', "On demand only")],
+        string="Download media", default='limit', required=True,
+        help="Files that are not downloaded automatically show a Download button in the inbox.")
+    media_max_mb = fields.Integer("Size limit (MB)", default=10)
+    group_media_download = fields.Boolean(
+        "Download group media", default=False,
+        help="Groups often share many files: by default their media is downloaded only when opened.")
+    media_retention_days = fields.Integer(
+        "Keep media (days)", default=0,
+        help="Delete downloaded WhatsApp files older than this (0 = keep forever). Texts are always kept; "
+             "an expired file can be downloaded again while WhatsApp still has it.")
     groups_synced_at = fields.Datetime(readonly=True, copy=False)
     group_ids = fields.One2many('elblasy.waha.group', 'session_id')
     webhook_token = fields.Char(copy=False, readonly=True, index=True, groups=MANAGER,
@@ -459,6 +475,95 @@ class WahaSession(models.Model):
             'title': self.env._("Messages sync"), 'type': 'warning' if skipped else 'success', 'message': message}}
 
     @api.model
+    # ------------------------------------------------------------------
+    # media policy
+    # ------------------------------------------------------------------
+    def _auto_download(self, mtype, size, is_group):
+        """Download this media now? Otherwise the inbox offers it on demand."""
+        self.ensure_one()
+        if is_group and not self.group_media_download:
+            return False
+        if self.media_download == 'all':
+            return True
+        if self.media_download == 'none' or mtype == 'video':
+            return False
+        return not size or size <= max(self.media_max_mb, 1) * 1024 * 1024
+
+    @api.model
+    def _cron_purge_media(self):
+        Attachment = self.env['ir.attachment'].sudo()
+        Message = self.env['elblasy.waha.message'].sudo()
+        for session in self.sudo().search([('media_retention_days', '>', 0)]):
+            cutoff = fields.Datetime.subtract(fields.Datetime.now(), days=session.media_retention_days)
+            messages = Message.search([('session_id', '=', session.id), ('date', '<', cutoff),
+                                       ('attachment_ids', '!=', False)], limit=2000)
+            if messages:
+                Attachment.search([('res_model', '=', Message._name), ('res_id', 'in', messages.ids)]).unlink()
+                messages.write({'media_pending': True})
+
+    # ------------------------------------------------------------------
+    # chat list mirror (same order, names, unread counts as the phone)
+    # ------------------------------------------------------------------
+    CHAT_LIST_SIZE = 50
+
+    def _sync_chat_list(self, limit=None):
+        """Mirror the phone's chat list: WhatsApp's own order, names, pinned/archived/muted state, unread counts and
+        the last message of each chat (even when its webhook never reached Odoo)."""
+        self.ensure_one()
+        session = self.sudo()
+        client = session.server_id._get_client()
+        chats = client.get(f'/api/{session.session_name}/chats/overview', {'limit': limit or self.CHAT_LIST_SIZE})
+        Conv = self.env['elblasy.waha.conversation'].sudo()
+        Event = self.env['elblasy.waha.webhook.event'].sudo().with_context(waha_history=True)
+        count = 0
+        for chat in chats if isinstance(chats, list) else []:
+            chat_id = chat.get('id')
+            chat_id = chat_id.get('_serialized') if isinstance(chat_id, dict) else chat_id
+            suffix = chat_id.rpartition('@')[2] if isinstance(chat_id, str) else ''
+            if suffix not in ('c.us', 'lid', 'g.us') or (suffix == 'g.us' and not session.inbox_groups):
+                continue
+            raw = chat.get('_chat') if isinstance(chat.get('_chat'), dict) else {}
+            name = chat.get('name') or raw.get('name')
+            name = name.strip()[:128] if isinstance(name, str) and name.strip() else False
+            if name and name.lstrip('+').replace(' ', '').isdigit():
+                name = False  # WhatsApp shows the number when it knows no name
+            conv = Conv._get_or_create(session, chat_id, name)
+            last = chat.get('lastMessage')
+            if isinstance(last, dict) and last.get('id'):
+                try:
+                    with self.env.cr.savepoint():
+                        Event._handle_message(session, last, history=True)
+                except (ValueError, LookupError):
+                    pass  # a malformed last message must not stop the list
+            unread = raw.get('unreadCount')
+            vals = {'wa_pinned': bool(raw.get('pinned')), 'wa_archived': bool(raw.get('archived')),
+                    'wa_muted': bool(raw.get('isMuted'))}
+            if isinstance(unread, int):
+                vals['unread_count'] = 1 if unread < 0 else unread  # -1 = marked as unread on the phone
+            if name and conv.display_name_remote != name:
+                vals['display_name_remote'] = name
+            vals = {key: value for key, value in vals.items() if conv[key] != value}
+            if vals:
+                conv.write(vals)
+            picture = chat.get('picture')
+            if isinstance(picture, str) and picture and not conv.image_128 and not conv.picture_synced_at:
+                try:
+                    conv.write({'image_128': BinaryBytes(client.download_picture(picture)),
+                                'picture_synced_at': fields.Datetime.now()})
+                except WahaError:
+                    conv.picture_synced_at = fields.Datetime.now()
+            count += 1
+        session.chats_synced_at = fields.Datetime.now()
+        return count
+
+    @api.model
+    def _cron_sync_chat_lists(self):
+        for session in self.sudo().search([('status', '=', 'WORKING')]):
+            try:
+                session._sync_chat_list()
+            except WahaError as e:
+                _logger.info("Chat list of session %s not refreshed: %s", session.id, e)
+
     def _cron_sync_messages(self):
         for session in self.sudo().search([('auto_sync_messages', '=', True), ('status', '=', 'WORKING')]):
             if not session.messages_synced_at:

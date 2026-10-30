@@ -48,6 +48,17 @@ light and dark themes, one pane at a time on phones. A chat known by its phone n
 one conversation. Reactions, edits and deletions need the session webhook to include the new events: press
 **Connect** once on existing sessions after upgrading (WAHA restarts the session, no new QR needed).
 
+## Chat list, groups and media
+The chat list mirrors the phone (*WAHA: mirror the WhatsApp chat list*, every 5 minutes and when the inbox is open):
+WhatsApp's order, pinned first, archived chats in their own list, names, pictures, unread counts and the last message
+of each chat, even when its webhook never reached Odoo. Opening a chat imports the messages Odoo lacks; scrolling up
+loads older ones from WhatsApp. Groups appear in the inbox (session option *Groups in the inbox*) with the author of
+each message; auto-replies and opt-out keywords never run in groups.
+
+Media policy per session (*Media & storage*): download all files, files up to a size limit (default 10 MB, videos
+on demand) or none; group media on demand by default. Files not downloaded show a Download card and are fetched from
+WhatsApp when clicked. *Keep media (days)* deletes old files (texts stay); Odoo's filestore stores identical files once.
+
 ## Webhook processing
 The webhook only checks the signature, stores the event once and answers WAHA immediately. The cron
 *WAHA: process webhook events* is woken up at once and handles events in arrival order (media download,

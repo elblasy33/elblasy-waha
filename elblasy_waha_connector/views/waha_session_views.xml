@@ -58,6 +58,7 @@
                             <field name="phone_number"/>
                             <field name="whatsapp_profile_name"/>
                             <field name="engine"/>
+                            <field name="inbox_groups" groups="elblasy_waha_connector.group_waha_manager"/>
                             <field name="auto_sync_messages" groups="elblasy_waha_connector.group_waha_manager"/>
                             <field name="check_numbers" groups="elblasy_waha_connector.group_waha_manager"/>
                             <field name="sync_read_state" groups="elblasy_waha_connector.group_waha_manager"/>
@@ -68,6 +69,12 @@
                             <field name="capping_status" invisible="not capping_status" groups="elblasy_waha_connector.group_waha_manager"/>
                             <field name="capping_used" invisible="capping_total &lt;= 0" groups="elblasy_waha_connector.group_waha_manager"/>
                             <field name="capping_total" invisible="capping_total &lt;= 0" groups="elblasy_waha_connector.group_waha_manager"/>
+                        </group>
+                        <group string="Media &amp; storage" groups="elblasy_waha_connector.group_waha_manager">
+                            <field name="media_download"/>
+                            <field name="media_max_mb" invisible="media_download != 'limit'"/>
+                            <field name="group_media_download" invisible="not inbox_groups"/>
+                            <field name="media_retention_days"/>
                         </group>
                         <group string="Webhook" groups="elblasy_waha_connector.group_waha_manager">
                             <field name="webhook_url" widget="CopyClipboardChar"/>
