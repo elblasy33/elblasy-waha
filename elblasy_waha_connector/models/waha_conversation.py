@@ -287,26 +287,38 @@ class WahaConversation(models.Model):
         if search:
             domain += ['|', '|', ('name', 'ilike', search), ('remote_phone', 'ilike', search),
                        ('partner_id.name', 'ilike', search)]
-        convs = self.search(domain, limit=limit, offset=offset)
-        result = []
-        for c in convs:
-            last = c.last_message_id.sudo()
-            result.append({
-                'id': c.id, 'name': c.name, 'phone': c.remote_phone, 'partner_id': c.partner_id.id,
-                'partner_name': c.partner_id.name, 'session_id': c.session_id.id,
-                'session_name': c.session_id.name, 'session_status': c.session_id.status,
-                'is_me': bool(c.remote_phone and c.remote_phone == c.session_id.phone_number),
-                'is_group': c.chat_type == 'group', 'pinned': c.wa_pinned, 'muted': c.wa_muted,
-                'last_author': (last.author_name or '') if last and last.direction == 'in' else '',
-                'last_message': c.last_message_preview, 'last_date': fields.Datetime.to_string(c.last_message_date),
-                'last_type': last.message_type or '', 'last_body': (last.body or '')[:200] if last else '',
-                'last_direction': last.direction or '', 'last_status': last.delivery_status or '',
-                'last_revoked': last.is_revoked,
-                'unread': c.unread_count, 'has_image': bool(c.image_128),
-                'labels': [{'id': l.id, 'name': l.name, 'color': l.color_hex} for l in c.label_ids],
-                'image_ts': fields.Datetime.to_string(c.picture_synced_at) or '',
-            })
-        return result
+        return [c._inbox_row() for c in self.search(domain, limit=limit, offset=offset)]
+
+    def _inbox_row(self):
+        self.ensure_one()
+        c = self
+        last = c.last_message_id.sudo()
+        return {
+            'id': c.id, 'name': c.name, 'phone': c.remote_phone, 'partner_id': c.partner_id.id,
+            'partner_name': c.partner_id.name, 'session_id': c.session_id.id,
+            'session_name': c.session_id.name, 'session_status': c.session_id.status,
+            'is_me': bool(c.remote_phone and c.remote_phone == c.session_id.phone_number),
+            'is_group': c.chat_type == 'group', 'pinned': c.wa_pinned, 'muted': c.wa_muted,
+            'last_author': (last.author_name or '') if last and last.direction == 'in' else '',
+            'last_message': c.last_message_preview, 'last_date': fields.Datetime.to_string(c.last_message_date),
+            'last_type': last.message_type or '', 'last_body': (last.body or '')[:200] if last else '',
+            'last_direction': last.direction or '', 'last_status': last.delivery_status or '',
+            'last_revoked': last.is_revoked,
+            'unread': c.unread_count, 'has_image': bool(c.image_128),
+            'labels': [{'id': l.id, 'name': l.name, 'color': l.color_hex} for l in c.label_ids],
+            'image_ts': fields.Datetime.to_string(c.picture_synced_at) or '',
+        }
+
+    def inbox_conversation(self):
+        """One chat for the inbox (opened from a report, a contact...)."""
+        self.ensure_one()
+        self._check_user()
+        return self._inbox_row()
+
+    def action_open_inbox(self):
+        self.ensure_one()
+        return {'type': 'ir.actions.client', 'tag': 'elblasy_waha_inbox', 'name': self.env._("WhatsApp Inbox"),
+                'context': {'waha_conversation_id': self.id}}
 
     @api.model
     def inbox_archived_count(self, session_id=None):

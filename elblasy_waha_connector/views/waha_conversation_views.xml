@@ -7,6 +7,7 @@
             <list>
                 <field name="name"/><field name="remote_phone"/><field name="partner_id"/>
                 <field name="session_id"/><field name="last_message_date"/><field name="unread_count"/>
+                <button name="action_open_inbox" type="object" icon="forum" title="Open in Inbox"/>
             </list>
         </field>
     </record>
@@ -16,6 +17,7 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <button name="action_open_inbox" type="object" string="Open in Inbox" class="btn-primary" invisible="not id"/>
                     <button name="action_create_partner" type="object" string="Create Contact" invisible="partner_id"/>
                     <button name="action_resolve_lid" type="object" string="Find phone number"
                             invisible="chat_type != 'lid' or remote_phone"/>

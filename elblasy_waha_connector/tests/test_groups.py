@@ -1005,6 +1005,36 @@ class TestGroups(TransactionCase):
             self.assertEqual(conv.with_user(self.user).inbox_fetch_history(), 0)  # nothing twice
 
 
+    def test_54_reports_filter_by_phone_and_contact(self):
+        partner = self.env['res.partner'].create({'name': 'Report Customer', 'phone': '+20 100 123 9000'})
+        reply_to = self._msg('rep1', body='price?')
+        conv = reply_to.conversation_id
+        conv.partner_id = partner
+        self.env['elblasy.waha.message'].create({
+            'conversation_id': conv.id, 'direction': 'out', 'body': 'It is 100', 'user_id': self.manager.id,
+            'date': fields_dt_from_ts(1700000000 + 600), 'remote_message_id': 'rep-out', 'delivery_status': 'read'})
+        Report = self.env['elblasy.waha.report.message'].with_user(self.manager)
+        rows = Report.search([('phone', 'ilike', '1239000')])
+        self.assertEqual(set(rows.mapped('direction')), {'in', 'out'})
+        self.assertEqual(Report.search([('partner_id', 'child_of', partner.id)]), rows)
+        human = rows.filtered(lambda r: r.direction == 'out')
+        self.assertAlmostEqual(human.response_minutes, 10.0, places=1)  # 600 s after the customer's message
+        self.assertFalse(rows.filtered(lambda r: r.direction == 'in').response_minutes)  # no zeros in averages
+        self.assertIn(human.weekday, dict(human._fields['weekday'].selection))
+        self.assertTrue(0 <= human.hour <= 23)
+        groups = Report.read_group([('phone', 'ilike', '1239000')], ['user_id'], ['__count'])
+        self.assertTrue(groups)
+        chat = self.env['elblasy.waha.report.chat'].with_user(self.manager).search([('conversation_id', '=', conv.id)])
+        self.assertEqual((chat.incoming_count, chat.outgoing_count, chat.partner_id), (1, 1, partner))
+        self.assertAlmostEqual(chat.avg_response_minutes, 10.0, places=1)
+        self.assertFalse(chat.waiting)  # answered
+        action = chat.action_open_chat()
+        self.assertEqual((action['tag'], action['context']['waha_conversation_id']), ('elblasy_waha_inbox', conv.id))
+        self.assertEqual(partner.action_open_waha_conversations()['tag'], 'elblasy_waha_inbox')  # one chat: open it
+        with self.assertRaises(AccessError):
+            self.env['elblasy.waha.report.chat'].with_user(self.user).search([])  # reports are for managers
+
+
 def fields_dt_sub_minutes(minutes):
     from odoo import fields
     return fields.Datetime.subtract(fields.Datetime.now(), minutes=minutes)

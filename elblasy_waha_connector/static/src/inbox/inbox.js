@@ -105,6 +105,13 @@ export class WahaInbox extends Component {
             await this.loadConversations();
         });
         onMounted(() => {
+            // opened from a report, a contact...: show that chat directly
+            const convId = this.props.action?.context?.waha_conversation_id;
+            if (convId) {
+                this.openById(convId);
+            }
+        });
+        onMounted(() => {
             // mirror the phone's chat list in the background, then every minute while the inbox is open
             this.refresh();
             this._refreshTimer = setInterval(() => this.refresh(), 60000);
@@ -294,6 +301,12 @@ export class WahaInbox extends Component {
         } finally {
             delete this.state.downloading[m.id];
         }
+    }
+
+    async openById(convId) {
+        const listed = this.state.conversations.find((c) => c.id === convId);
+        const conv = listed || (await this.orm.call(MODEL, "inbox_conversation", [[convId]]));
+        await this.openConversation(conv);
     }
 
     closeConversation() {

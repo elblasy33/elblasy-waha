@@ -57,6 +57,8 @@ class ResPartner(models.Model):
 
     def action_open_waha_conversations(self):
         self.ensure_one()
+        if len(self.waha_conversation_ids) == 1:
+            return self.waha_conversation_ids.action_open_inbox()  # one chat: straight to it, like WhatsApp
         return {
             'type': 'ir.actions.act_window', 'name': self.env._("WhatsApp Conversations"),
             'res_model': 'elblasy.waha.conversation', 'view_mode': 'list,form',

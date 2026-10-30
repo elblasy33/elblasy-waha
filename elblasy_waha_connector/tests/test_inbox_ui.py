@@ -81,3 +81,26 @@ class TestInboxUi(HttpCase):
         with patch(f'{client}.get', return_value=[]):  # chat list mirror and history: nothing new on WhatsApp
             self.browser_js('/odoo/action-elblasy_waha_connector.waha_inbox_action', CHECK_INBOX, login='admin',
                             timeout=90)
+
+    def test_reports_open(self):
+        admin = self.env.ref('base.user_admin')
+        admin.group_ids = [(4, self.env.ref('elblasy_waha_connector.group_waha_manager').id)]
+        server = self.env['elblasy.waha.server'].create({'name': 'S', 'base_url': 'http://waha.test'})
+        session = self.env['elblasy.waha.session'].create({'name': 'R', 'session_name': 'rep', 'server_id': server.id})
+        conv = self.env['elblasy.waha.conversation'].create({
+            'session_id': session.id, 'remote_chat_id': '201001230001@c.us', 'remote_phone': '201001230001'})
+        self.env['elblasy.waha.message'].create({'conversation_id': conv.id, 'direction': 'in', 'body': 'hi',
+                                                 'remote_message_id': 'rp1'})
+        for action, selector in (('waha_report_action', '.o_list_renderer'), ('waha_report_chat_action', '.o_list_renderer'),
+                                 ('waha_report_peak_action', '.o_pivot'), ('waha_report_agent_action', '.o_pivot'),
+                                 ('waha_report_waiting_action', '.o_list_renderer, .o_view_nocontent')):
+            code = """
+                (async () => {
+                    for (let i = 0; i < 150 && !document.querySelector('%s'); i++) {
+                        await new Promise((r) => setTimeout(r, 100));
+                    }
+                    if (!document.querySelector('%s')) throw new Error('report did not render: %s');
+                    console.log('test successful');
+                })().catch((e) => console.error(e.message));
+            """ % (selector, selector, action)
+            self.browser_js(f'/odoo/action-elblasy_waha_connector.{action}', code, login='admin', timeout=60)

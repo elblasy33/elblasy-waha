@@ -15,3 +15,4 @@ from . import waha_conversation
 from . import waha_message
 from . import waha_webhook_event
 from . import res_partner
+from . import waha_report

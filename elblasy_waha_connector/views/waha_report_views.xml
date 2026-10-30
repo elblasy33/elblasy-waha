@@ -21,32 +21,323 @@
             </search>
         </field>
     </record>
-    <record id="waha_message_view_pivot" model="ir.ui.view">
-        <field name="name">elblasy.waha.message.pivot</field>
-        <field name="model">elblasy.waha.message</field>
+    <!-- ============================================================ messages analysis -->
+    <record id="waha_report_message_view_search" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.message.search</field>
+        <field name="model">elblasy.waha.report.message</field>
         <field name="arch" type="xml">
-            <pivot>
-                <field name="session_id" type="row"/>
-                <field name="direction" type="col"/>
-                <field name="response_seconds" type="measure"/>
-            </pivot>
+            <search>
+                <field name="phone" string="Phone number" filter_domain="[('phone', 'ilike', self)]"/>
+                <field name="partner_id" operator="child_of"/>
+                <field name="conversation_id"/>
+                <field name="body" string="Text"/>
+                <field name="user_id"/>
+                <field name="author_name"/>
+                <field name="session_id"/>
+                <filter name="incoming" string="Received" domain="[('direction', '=', 'in')]"/>
+                <filter name="outgoing" string="Sent" domain="[('direction', '=', 'out')]"/>
+                <separator/>
+                <filter name="human" string="Human replies" domain="[('direction', '=', 'out'), ('is_auto', '=', False)]"/>
+                <filter name="auto" string="Automatic" domain="[('is_auto', '=', True)]"/>
+                <separator/>
+                <filter name="media" string="With a file" domain="[('has_media', '=', True)]"/>
+                <filter name="failed" string="Failed" domain="[('delivery_status', '=', 'failed')]"/>
+                <filter name="unconfirmed" string="Not confirmed" domain="[('delivery_status', '=', 'unknown')]"/>
+                <separator/>
+                <filter name="private" string="Private chats" domain="[('chat_type', '!=', 'group')]"/>
+                <filter name="groups" string="Groups" domain="[('chat_type', '=', 'group')]"/>
+                <filter name="no_contact" string="Not a contact yet" domain="[('partner_id', '=', False), ('chat_type', '!=', 'group')]"/>
+                <separator/>
+                <filter name="date" string="Date" date="date"/>
+                <filter name="last7" string="Last 7 days" domain="[('date', '&gt;=', (context_today() - relativedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter name="last30" string="Last 30 days" domain="[('date', '&gt;=', (context_today() - relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <group>
+                    <filter name="g_partner" string="Contact" context="{'group_by': 'partner_id'}"/>
+                    <filter name="g_chat" string="Chat" context="{'group_by': 'conversation_id'}"/>
+                    <filter name="g_session" string="WhatsApp number" context="{'group_by': 'session_id'}"/>
+                    <filter name="g_user" string="Agent" context="{'group_by': 'user_id'}"/>
+                    <filter name="g_direction" string="Direction" context="{'group_by': 'direction'}"/>
+                    <filter name="g_type" string="Type" context="{'group_by': 'message_type'}"/>
+                    <filter name="g_status" string="Delivery" context="{'group_by': 'delivery_status'}"/>
+                    <filter name="g_weekday" string="Weekday" context="{'group_by': 'weekday'}"/>
+                    <filter name="g_hour" string="Hour" context="{'group_by': 'hour'}"/>
+                    <filter name="g_day" string="Day" context="{'group_by': 'date:day'}"/>
+                    <filter name="g_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
         </field>
     </record>
-    <record id="waha_message_view_graph" model="ir.ui.view">
-        <field name="name">elblasy.waha.message.graph</field>
-        <field name="model">elblasy.waha.message</field>
+    <record id="waha_report_message_view_list" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.message.list</field>
+        <field name="model">elblasy.waha.report.message</field>
         <field name="arch" type="xml">
-            <graph type="bar">
+            <list create="0" edit="0" delete="0" decoration-danger="delivery_status == 'failed'"
+                  decoration-muted="is_auto">
+                <field name="date"/>
+                <field name="conversation_id"/>
+                <field name="partner_id" optional="show"/>
+                <field name="phone" optional="show"/>
+                <field name="direction" widget="badge" decoration-info="direction == 'in'" decoration-success="direction == 'out'"/>
+                <field name="message_type" optional="show"/>
+                <field name="body"/>
+                <field name="author_name" optional="hide"/>
+                <field name="user_id" optional="show" widget="many2one_avatar_user"/>
+                <field name="is_auto" optional="hide"/>
+                <field name="delivery_status" optional="show" widget="badge" decoration-danger="delivery_status == 'failed'"
+                       decoration-success="delivery_status == 'read'" decoration-warning="delivery_status == 'unknown'"/>
+                <field name="response_minutes" optional="show" avg="Average"/>
+                <field name="session_id" optional="hide"/>
+                <button name="action_open_chat" type="object" icon="forum" title="Open the chat"/>
+            </list>
+        </field>
+    </record>
+    <record id="waha_report_message_view_form" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.message.form</field>
+        <field name="model">elblasy.waha.report.message</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_open_chat" type="object" string="Open the chat" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date"/><field name="conversation_id"/><field name="partner_id"/><field name="phone"/>
+                            <field name="session_id"/>
+                        </group>
+                        <group>
+                            <field name="direction"/><field name="message_type"/><field name="delivery_status"/>
+                            <field name="user_id"/><field name="author_name" invisible="not author_name"/>
+                            <field name="response_minutes" invisible="not response_minutes"/>
+                        </group>
+                    </group>
+                    <field name="body"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="waha_report_message_view_graph" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.message.graph</field>
+        <field name="model">elblasy.waha.report.message</field>
+        <field name="arch" type="xml">
+            <graph type="bar" stacked="1">
                 <field name="date" interval="day"/>
                 <field name="direction"/>
             </graph>
         </field>
     </record>
+    <record id="waha_report_message_view_pivot" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.message.pivot</field>
+        <field name="model">elblasy.waha.report.message</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="partner_id" type="row"/>
+                <field name="direction" type="col"/>
+                <field name="nbr" type="measure"/>
+                <field name="response_minutes" type="measure"/>
+            </pivot>
+        </field>
+    </record>
     <record id="waha_report_action" model="ir.actions.act_window">
-        <field name="name">WhatsApp Activity</field>
-        <field name="res_model">elblasy.waha.message</field>
-        <field name="view_mode">graph,pivot,list</field>
+        <field name="name">WhatsApp Messages</field>
+        <field name="res_model">elblasy.waha.report.message</field>
+        <field name="view_mode">list,graph,pivot,form</field>
         <field name="context">{'search_default_last30': 1}</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">No WhatsApp messages yet</p>
+            <p>Search by phone number, contact, chat, agent or text; group by contact, weekday or hour.</p></field>
+    </record>
+
+    <!-- peak hours: when do customers write? -->
+    <record id="waha_report_peak_view_pivot" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.message.pivot.peak</field>
+        <field name="model">elblasy.waha.report.message</field>
+        <field name="arch" type="xml">
+            <pivot disable_linking="0">
+                <field name="weekday" type="row"/>
+                <field name="hour" type="col"/>
+                <field name="nbr" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="waha_report_peak_view_graph" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.message.graph.peak</field>
+        <field name="model">elblasy.waha.report.message</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="hour"/>
+                <field name="nbr" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="waha_report_peak_action" model="ir.actions.act_window">
+        <field name="name">Peak Hours</field>
+        <field name="res_model">elblasy.waha.report.message</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'pivot', 'view_id': ref('waha_report_peak_view_pivot')}),
+                                      (0, 0, {'view_mode': 'graph', 'view_id': ref('waha_report_peak_view_graph')})]"/>
+        <field name="context">{'search_default_incoming': 1, 'search_default_private': 1, 'search_default_last30': 1}</field>
+        <field name="help" type="html"><p>Messages received by weekday and hour (your company's time zone): plan who answers when.</p></field>
+    </record>
+
+    <!-- agents: who answers, how fast -->
+    <record id="waha_report_agent_view_pivot" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.message.pivot.agent</field>
+        <field name="model">elblasy.waha.report.message</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="user_id" type="row"/>
+                <field name="date" interval="week" type="col"/>
+                <field name="nbr" type="measure"/>
+                <field name="response_minutes" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="waha_report_agent_view_graph" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.message.graph.agent</field>
+        <field name="model">elblasy.waha.report.message</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="user_id"/>
+                <field name="response_minutes" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="waha_report_agent_action" model="ir.actions.act_window">
+        <field name="name">Agents</field>
+        <field name="res_model">elblasy.waha.report.message</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'pivot', 'view_id': ref('waha_report_agent_view_pivot')}),
+                                      (0, 0, {'view_mode': 'graph', 'view_id': ref('waha_report_agent_view_graph')})]"/>
+        <field name="context">{'search_default_human': 1, 'search_default_last30': 1}</field>
+        <field name="help" type="html"><p>Replies written by each person and their average response time.</p></field>
+    </record>
+
+    <!-- ============================================================ chats / customers analysis -->
+    <record id="waha_report_chat_view_search" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.chat.search</field>
+        <field name="model">elblasy.waha.report.chat</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="phone" string="Phone number" filter_domain="[('phone', 'ilike', self)]"/>
+                <field name="partner_id" operator="child_of"/>
+                <field name="conversation_id"/>
+                <field name="session_id"/>
+                <filter name="waiting" string="Waiting for a reply" domain="[('waiting', '=', True)]"/>
+                <filter name="active7" string="Active in the last 7 days" domain="[('days_silent', '&lt;=', 7)]"/>
+                <filter name="silent30" string="Silent for 30+ days" domain="[('days_silent', '&gt;=', 30)]"
+                        help="Customers to contact again"/>
+                <filter name="failed" string="With failed messages" domain="[('failed_count', '&gt;', 0)]"/>
+                <separator/>
+                <filter name="private" string="Private chats" domain="[('chat_type', '!=', 'group')]"/>
+                <filter name="groups" string="Groups" domain="[('chat_type', '=', 'group')]"/>
+                <filter name="no_contact" string="Not a contact yet" domain="[('partner_id', '=', False), ('chat_type', '!=', 'group')]"/>
+                <separator/>
+                <filter name="first_date" string="First message" date="first_date"/>
+                <filter name="last_date" string="Last message" date="last_date"/>
+                <group>
+                    <filter name="g_partner" string="Contact" context="{'group_by': 'partner_id'}"/>
+                    <filter name="g_session" string="WhatsApp number" context="{'group_by': 'session_id'}"/>
+                    <filter name="g_type" string="Chat type" context="{'group_by': 'chat_type'}"/>
+                    <filter name="g_first" string="First message (month)" context="{'group_by': 'first_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="waha_report_chat_view_list" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.chat.list</field>
+        <field name="model">elblasy.waha.report.chat</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0" decoration-warning="waiting" decoration-muted="days_silent &gt;= 30">
+                <field name="conversation_id"/>
+                <field name="partner_id" optional="show"/>
+                <field name="phone" optional="show"/>
+                <field name="chat_type" optional="hide"/>
+                <field name="first_date" optional="hide"/>
+                <field name="last_date"/>
+                <field name="last_incoming_date" optional="hide"/>
+                <field name="incoming_count" sum="Total"/>
+                <field name="outgoing_count" sum="Total"/>
+                <field name="auto_count" optional="hide" sum="Total"/>
+                <field name="media_count" optional="hide" sum="Total"/>
+                <field name="failed_count" optional="show" sum="Total" decoration-danger="failed_count &gt; 0"/>
+                <field name="avg_response_minutes" optional="show"/>
+                <field name="max_response_minutes" optional="hide"/>
+                <field name="awaiting_since" optional="show" widget="remaining_days" invisible="not waiting"/>
+                <field name="days_silent" optional="show"/>
+                <field name="waiting" column_invisible="1"/>
+                <field name="session_id" optional="hide"/>
+                <button name="action_open_chat" type="object" icon="forum" title="Open the chat"/>
+            </list>
+        </field>
+    </record>
+    <record id="waha_report_chat_view_form" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.chat.form</field>
+        <field name="model">elblasy.waha.report.chat</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0" delete="0">
+                <header>
+                    <button name="action_open_chat" type="object" string="Open the chat" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="conversation_id"/></h1></div>
+                    <group>
+                        <group string="Contact">
+                            <field name="partner_id"/><field name="phone"/><field name="chat_type"/><field name="session_id"/>
+                        </group>
+                        <group string="Activity">
+                            <field name="first_date"/><field name="last_date"/><field name="last_incoming_date"/>
+                            <field name="days_silent"/><field name="awaiting_since" invisible="not waiting"/>
+                            <field name="waiting" invisible="1"/>
+                        </group>
+                        <group string="Messages">
+                            <field name="incoming_count"/><field name="outgoing_count"/><field name="auto_count"/>
+                            <field name="media_count"/><field name="failed_count"/>
+                        </group>
+                        <group string="Response time">
+                            <field name="avg_response_minutes"/><field name="max_response_minutes"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="waha_report_chat_view_pivot" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.chat.pivot</field>
+        <field name="model">elblasy.waha.report.chat</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="first_date" interval="month" type="row"/>
+                <field name="nbr" type="measure"/>
+                <field name="incoming_count" type="measure"/>
+                <field name="outgoing_count" type="measure"/>
+                <field name="avg_response_minutes" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="waha_report_chat_view_graph" model="ir.ui.view">
+        <field name="name">elblasy.waha.report.chat.graph</field>
+        <field name="model">elblasy.waha.report.chat</field>
+        <field name="arch" type="xml">
+            <graph type="line">
+                <field name="first_date" interval="month"/>
+            </graph>
+        </field>
+    </record>
+    <record id="waha_report_chat_action" model="ir.actions.act_window">
+        <field name="name">Customers &amp; Chats</field>
+        <field name="res_model">elblasy.waha.report.chat</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <field name="context">{'search_default_private': 1}</field>
+        <field name="help" type="html"><p>One line per chat: volumes, first and last contact, response times.
+            "Silent for 30+ days" lists customers to contact again; the line chart shows new chats per month.</p></field>
+    </record>
+    <record id="waha_report_waiting_action" model="ir.actions.act_window">
+        <field name="name">Waiting for a Reply</field>
+        <field name="res_model">elblasy.waha.report.chat</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('waiting', '=', True)]</field>
+        <field name="context">{'search_default_private': 1}</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Nobody is waiting for an answer</p></field>
     </record>
 
     <record id="waha_optout_view_list" model="ir.ui.view">

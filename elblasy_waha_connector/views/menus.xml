@@ -29,8 +29,16 @@
     <menuitem id="menu_waha_group_create" name="Create Group" parent="menu_waha_root"
               action="waha_group_create_action" sequence="35" groups="group_waha_manager"/>
     <menuitem id="menu_waha_reporting" name="Reporting" parent="menu_waha_root" sequence="80" groups="group_waha_manager"/>
-    <menuitem id="menu_waha_report_activity" name="Activity &amp; Response Time" parent="menu_waha_reporting"
+    <menuitem id="menu_waha_report_waiting" name="Waiting for a Reply" parent="menu_waha_reporting"
+              action="waha_report_waiting_action" sequence="5"/>
+    <menuitem id="menu_waha_report_activity" name="Messages" parent="menu_waha_reporting"
               action="waha_report_action" sequence="10"/>
+    <menuitem id="menu_waha_report_chats" name="Customers &amp; Chats" parent="menu_waha_reporting"
+              action="waha_report_chat_action" sequence="20"/>
+    <menuitem id="menu_waha_report_peak" name="Peak Hours" parent="menu_waha_reporting"
+              action="waha_report_peak_action" sequence="30"/>
+    <menuitem id="menu_waha_report_agents" name="Agents" parent="menu_waha_reporting"
+              action="waha_report_agent_action" sequence="40"/>
     <menuitem id="menu_waha_autoreply" name="Auto-replies" parent="menu_waha_config" action="waha_autoreply_action"
               sequence="60" groups="group_waha_manager"/>
     <menuitem id="menu_waha_optout" name="Opt-outs" parent="menu_waha_config" action="waha_optout_action"
