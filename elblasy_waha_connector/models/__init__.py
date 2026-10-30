@@ -16,3 +16,5 @@ from . import waha_message
 from . import waha_webhook_event
 from . import res_partner
 from . import waha_report
+from . import waha_tracked_model
+from . import waha_dashboard

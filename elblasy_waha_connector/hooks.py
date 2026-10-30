@@ -53,3 +53,4 @@ def ensure_hr_integration(env):
 def post_init_hook(env):
     ensure_action_menu_bindings(env)
     ensure_hr_integration(env)
+    env['elblasy.waha.tracked.model']._ensure_defaults()

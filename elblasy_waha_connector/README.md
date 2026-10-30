@@ -67,6 +67,19 @@ failed, groups, contacts not in Odoo; period picker; group by contact, agent, ty
 re-engage customers, new chats per month), **Peak Hours** (received messages by weekday × hour, company time zone)
 and **Agents** (replies and average response time per person and week). Every line opens the chat in the inbox.
 
+## Dashboard and business impact
+*Reporting ▸ Dashboard* (last item, never the landing page): today's new chats, received messages, team replies,
+chats waiting for a reply, average response time (and share answered within 15 minutes), automatic replies,
+documents sent and failures, each compared with yesterday and clickable; last 14 days, today by hour, waiting list,
+team today, business from WhatsApp (30 days) and documents sent today.
+
+*Configuration ▸ Tracked Documents* lists the business documents measured against WhatsApp: any model with a date
+and a customer (suggested: confirmed sales orders, posted customer invoices, CRM leads, POS orders, helpdesk tickets,
+tasks), with an optional amount, a filter and a window in days. *Reporting ▸ Business from WhatsApp* shows, per
+document, whether its customer (company included) chatted on WhatsApp in that window, whether the document itself was
+sent on WhatsApp, and the amounts. *Reporting ▸ Sent Documents* lists every document sent on WhatsApp from any app
+(Send to WhatsApp, automations and, with the bridge, Odoo WhatsApp templates).
+
 ## Webhook processing
 The webhook only checks the signature, stores the event once and answers WAHA immediately. The cron
 *WAHA: process webhook events* is woken up at once and handles events in arrival order (media download,

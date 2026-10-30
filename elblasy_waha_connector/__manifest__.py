@@ -1,6 +1,6 @@
 {
     'name': 'Elblasy WhatsApp (WAHA)',
-    'version': '20.0.3.5.0',
+    'version': '20.0.3.6.0',
     'author': 'Elblasy.app',
     'website': 'https://elblasy.app',
     'category': 'Productivity/Discuss',
@@ -33,11 +33,13 @@ and automation rules with a throttled queue. See static/description/index.html.
         'views/waha_report_views.xml',
         'views/menus.xml',
         'views/waha_label_call_views.xml',
+        'views/waha_business_views.xml',
         'data/ir_cron.xml',
     ],
     'assets': {
         'web.assets_backend': [
             'elblasy_waha_connector/static/src/inbox/*',
+            'elblasy_waha_connector/static/src/dashboard/*',
             ('remove', 'elblasy_waha_connector/static/src/inbox/*.dark.scss'),
         ],
         'web.assets_web_dark': [

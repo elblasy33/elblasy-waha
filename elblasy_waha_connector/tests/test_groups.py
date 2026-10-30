@@ -1035,6 +1035,55 @@ class TestGroups(TransactionCase):
             self.env['elblasy.waha.report.chat'].with_user(self.user).search([])  # reports are for managers
 
 
+    def test_55_business_from_whatsapp_any_model(self):
+        """Any model can be measured: here contacts whose company chatted on WhatsApp before they were created."""
+        Partner = self.env['res.partner']
+        company = Partner.create({'name': 'Chatty Co', 'is_company': True})
+        quiet = Partner.create({'name': 'Quiet Co', 'is_company': True})
+        conv = self.env['elblasy.waha.conversation'].create({
+            'session_id': self.session.id, 'remote_chat_id': '201001239800@c.us', 'remote_phone': '201001239800',
+            'partner_id': company.id})
+        self.env['elblasy.waha.message'].create({'conversation_id': conv.id, 'direction': 'in', 'body': 'quote please',
+                                                 'remote_message_id': 'biz1', 'date': fields_dt_sub_minutes(2 * 1440)})
+        won = Partner.create({'name': 'Buyer', 'parent_id': company.id})
+        lost = Partner.create({'name': 'Other', 'parent_id': quiet.id})
+        ir_fields = self.env['ir.model.fields']
+        tracked = self.env['elblasy.waha.tracked.model'].create({
+            'model_id': self.env['ir.model']._get('res.partner').id,
+            'date_field_id': ir_fields._get('res.partner', 'create_date').id,
+            'partner_field_id': ir_fields._get('res.partner', 'parent_id').id,
+            'domain': "[('name', 'in', ['Buyer', 'Other'])]", 'window_days': 7})
+        self.env['elblasy.waha.group.post'].create({
+            'session_id': self.session.id, 'chat_id': '201001239800@c.us', 'partner_id': company.id,
+            'res_model': 'res.partner', 'res_id': won.id, 'state': 'sent', 'body': 'your card'})
+        Business = self.env['elblasy.waha.report.business'].with_user(self.manager)
+        rows = {r.res_id: r for r in Business.search([('tracked_model_id', '=', tracked.id)])}
+        self.assertEqual(set(rows), {won.id, lost.id})
+        self.assertEqual((rows[won.id].from_whatsapp, rows[won.id].sent_on_whatsapp, rows[won.id].whatsapp_customer),
+                         (True, True, True))
+        self.assertAlmostEqual(rows[won.id].days_after_chat, 2, delta=0.1)
+        self.assertEqual(rows[won.id].record_name, won.display_name)
+        self.assertFalse(rows[lost.id].from_whatsapp or rows[lost.id].whatsapp_customer)
+        self.assertEqual(rows[won.id].action_open_record()['res_id'], won.id)
+        documents = self.env['elblasy.waha.report.document'].with_user(self.manager).search([('res_id', '=', won.id)])
+        self.assertEqual((documents.model_id.model, documents.state, documents.channel), ('res.partner', 'sent', 'customer'))
+        with self.assertRaises(Exception):
+            tracked.domain = "[('nope', '=', 1)]"  # a broken filter is refused, not silently ignored
+
+    def test_56_dashboard(self):
+        self.session.write({'status': 'WORKING'})
+        waiting = self._msg('dash1', body='hello?')
+        Dashboard = self.env['elblasy.waha.dashboard']
+        data = Dashboard.with_user(self.manager).get_data()
+        self.assertGreaterEqual(data['waiting_count'], 1)
+        self.assertIn(waiting.conversation_id.id, [w['id'] for w in data['waiting']])
+        self.assertEqual(len(data['days']), 14)
+        self.assertEqual(len(data['hours']), 24)
+        self.assertTrue({'received', 'sent', 'avg_response', 'new_chats', 'documents'} <= set(data['today']))
+        with self.assertRaises(AccessError):
+            Dashboard.with_user(self.user).get_data()
+
+
 def fields_dt_sub_minutes(minutes):
     from odoo import fields
     return fields.Datetime.subtract(fields.Datetime.now(), minutes=minutes)

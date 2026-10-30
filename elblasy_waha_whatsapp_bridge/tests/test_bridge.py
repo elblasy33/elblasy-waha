@@ -268,3 +268,16 @@ class TestBridge(TransactionCase):
         from odoo.addons.elblasy_waha_whatsapp_bridge.patch import PATCHED
         for name in PATCHED:
             self.assertTrue(hasattr(getattr(WhatsAppApi, name), '__wrapped__'), name)
+
+    def test_documents_report_counts_template_sends(self):
+        partner = self.env['res.partner'].create({'name': 'Template Customer'})
+        template = self.env['whatsapp.template'].create({
+            'name': 'Invoice', 'template_name': 'invoice_doc', 'wa_account_id': self.account.id, 'body': 'Hi',
+            'model_id': self.env['ir.model']._get('res.partner').id, 'template_type': 'utility'})
+        note = partner.message_post(body="WhatsApp sent", partner_ids=partner.ids)
+        self.env['whatsapp.message'].create({
+            'mobile_number': '201001234567', 'wa_account_id': self.account.id, 'state': 'sent',
+            'wa_template_id': template.id, 'mail_message_id': note.id})
+        row = self.env['elblasy.waha.report.document'].search([('source', '=', 'template')])
+        self.assertEqual((row.res_model, row.res_id, row.template, row.partner_id, row.session_id, row.state),
+                         ('res.partner', partner.id, 'invoice_doc', partner, self.session, 'sent'))

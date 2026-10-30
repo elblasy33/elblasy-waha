@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="elblasy_waha_connector.Dashboard">
+        <div class="o_waha_dashboard h-100 overflow-auto">
+            <div class="o_waha_dash_header d-flex flex-wrap align-items-center gap-3 px-4 py-3">
+                <div class="me-auto">
+                    <h2 class="m-0"><i class="oi text-success me-2" data-icon="oi_whatsapp"/>WhatsApp today</h2>
+                    <small class="text-muted" t-out="this.todayLabel"/>
+                </div>
+                <select t-if="this.state.data and this.state.data.sessions.length > 1" class="form-select w-auto"
+                        t-on-change="this.onSessionChange">
+                    <option value="0">All numbers</option>
+                    <option t-foreach="this.state.data.sessions" t-as="s" t-key="s.id" t-att-value="s.id" t-out="s.name"/>
+                </select>
+                <button class="btn btn-secondary" t-on-click="this.load" title="Refresh">
+                    <i class="oi" t-att-class="{ 'oi-spin': this.state.loading }" data-icon="refresh"/>
+                </button>
+            </div>
+            <t t-if="this.state.data">
+                <t t-set="d" t-value="this.state.data"/>
+                <div class="o_waha_dash_body px-4 pb-4">
+                    <!-- KPI cards -->
+                    <div class="o_waha_kpis">
+                        <div t-foreach="this.cards" t-as="card" t-key="card.key" class="card o_waha_kpi"
+                             t-att-class="{ o_waha_kpi_alert: card.alert }" t-on-click="() => this.openCard(card)">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="text-muted small" t-out="card.label"/>
+                                    <i class="oi o_waha_kpi_icon" t-att-data-icon="card.icon"/>
+                                </div>
+                                <div class="o_waha_kpi_value" t-out="this.display(card)"/>
+                                <t t-set="tr" t-value="this.trend(card)"/>
+                                <div t-if="tr" class="small" t-att-class="tr.cls">
+                                    <i class="oi me-1" t-att-data-icon="tr.icon"/><t t-out="tr.text"/>
+                                </div>
+                                <div t-if="card.sub" class="small text-muted" t-out="card.sub"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                        <!-- last 14 days -->
+                        <div class="col-lg-7">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Last 14 days</h5>
+                                    <div class="o_waha_legend small text-muted mb-2">
+                                        <span class="o_waha_dot o_waha_in"/>Received
+                                        <span class="o_waha_dot o_waha_out ms-3"/>Sent
+                                    </div>
+                                    <div class="o_waha_bars">
+                                        <div t-foreach="d.days" t-as="day" t-key="day.date" class="o_waha_bar_col"
+                                             t-att-title="day.date + ': ' + day.received + ' / ' + day.sent">
+                                            <div class="o_waha_bar_pair">
+                                                <div class="o_waha_bar o_waha_in" t-att-style="'height:' + this.pct(day.received, this.maxDay)"/>
+                                                <div class="o_waha_bar o_waha_out" t-att-style="'height:' + this.pct(day.sent, this.maxDay)"/>
+                                            </div>
+                                            <div class="o_waha_bar_label" t-out="this.dayShort(day.date)"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- today by hour -->
+                        <div class="col-lg-5">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Received today, by hour</h5>
+                                    <div class="o_waha_hours">
+                                        <div t-foreach="d.hours" t-as="count" t-key="count_index" class="o_waha_hour"
+                                             t-att-style="'opacity:' + this.heat(count)" t-att-title="count_index + ':00 — ' + count"/>
+                                    </div>
+                                    <div class="d-flex justify-content-between small text-muted mt-1">
+                                        <span>0</span><span>6</span><span>12</span><span>18</span><span>23</span>
+                                    </div>
+                                    <p class="small text-muted mt-3 mb-0">See <b>Reporting ▸ Peak Hours</b> for the whole month.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- waiting -->
+                        <div class="col-lg-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Waiting for a reply <span class="badge text-bg-warning ms-1" t-if="d.waiting_count" t-out="d.waiting_count"/></h5>
+                                    <div t-if="!d.waiting.length" class="text-muted py-3"><i class="oi me-1 text-success" data-icon="check_circle"/>Nobody is waiting.</div>
+                                    <div t-foreach="d.waiting" t-as="w" t-key="w.id" class="o_waha_wait d-flex align-items-center gap-2"
+                                         t-on-click="() => this.openChat(w)">
+                                        <i class="oi text-warning" data-icon="schedule"/>
+                                        <div class="flex-grow-1 text-truncate">
+                                            <b dir="auto" t-out="w.name"/>
+                                            <div class="small text-muted text-truncate" dir="auto" t-out="w.preview"/>
+                                        </div>
+                                        <span class="badge text-bg-light" t-out="this.waited(w.minutes)"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- agents -->
+                        <div class="col-lg-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Team today</h5>
+                                    <div t-if="!d.agents.length" class="text-muted py-3">No replies yet today.</div>
+                                    <table t-else="" class="table table-sm align-middle mb-0">
+                                        <thead><tr><th>Agent</th><th class="text-end">Replies</th><th class="text-end">Avg response</th></tr></thead>
+                                        <tbody>
+                                            <tr t-foreach="d.agents" t-as="a" t-key="a_index">
+                                                <td t-out="a.name"/>
+                                                <td class="text-end" t-out="a.replies"/>
+                                                <td class="text-end" t-out="a.avg_response !== null ? a.avg_response + ' min' : '—'"/>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- business impact -->
+                        <div class="col-lg-8">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Business from WhatsApp <small class="text-muted">· last 30 days</small></h5>
+                                    <p class="small text-muted">Documents whose customer chatted on WhatsApp shortly before them.
+                                        Choose the documents in <b>Configuration ▸ Tracked Documents</b>.</p>
+                                    <div t-if="!d.business.length" class="text-muted py-2">No tracked documents in the last 30 days.</div>
+                                    <table t-else="" class="table table-sm table-hover align-middle mb-0">
+                                        <thead><tr><th>Document</th><th class="text-end">Total</th><th class="text-end">After WhatsApp</th>
+                                            <th style="width: 30%"/><th class="text-end">Amount after WhatsApp</th></tr></thead>
+                                        <tbody>
+                                            <tr t-foreach="d.business" t-as="b" t-key="b.id" class="o_waha_click" t-on-click="() => this.openBusiness(b)">
+                                                <td t-out="b.name"/>
+                                                <td class="text-end" t-out="b.count"/>
+                                                <td class="text-end"><t t-out="b.from_whatsapp"/> <small class="text-muted">(<t t-out="b.pct"/>%)</small></td>
+                                                <td><div class="progress" style="height: 6px"><div class="progress-bar bg-success" t-att-style="'width:' + b.pct + '%'"/></div></td>
+                                                <td class="text-end" t-out="b.has_amount ? this.money(b.whatsapp_amount) : '—'"/>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- documents sent today -->
+                        <div class="col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Documents sent today</h5>
+                                    <div t-if="!d.documents.length" class="text-muted py-2">Nothing sent today.</div>
+                                    <div t-foreach="d.documents" t-as="doc" t-key="doc_index" class="d-flex justify-content-between border-bottom py-1">
+                                        <span t-out="doc.model"/><b t-out="doc.count"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

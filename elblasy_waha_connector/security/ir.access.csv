@@ -52,3 +52,9 @@ access_waha_report_message_manager,waha.report.message.manager,elblasy.waha.repo
 access_waha_report_chat_manager,waha.report.chat.manager,elblasy.waha.report.chat,group_waha_manager,r,
 rule_waha_report_message_company,waha.report.message multi-company,elblasy.waha.report.message,,r,"[('company_id', 'in', company_ids)]"
 rule_waha_report_chat_company,waha.report.chat multi-company,elblasy.waha.report.chat,,r,"[('company_id', 'in', company_ids)]"
+access_waha_tracked_model_user,waha.tracked.model.user,elblasy.waha.tracked.model,group_waha_user,r,
+access_waha_tracked_model_manager,waha.tracked.model.manager,elblasy.waha.tracked.model,group_waha_manager,crud,
+access_waha_report_document_manager,waha.report.document.manager,elblasy.waha.report.document,group_waha_manager,r,
+access_waha_report_business_manager,waha.report.business.manager,elblasy.waha.report.business,group_waha_manager,r,
+rule_waha_report_document_company,waha.report.document multi-company,elblasy.waha.report.document,,r,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+rule_waha_report_business_company,waha.report.business multi-company,elblasy.waha.report.business,,r,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"

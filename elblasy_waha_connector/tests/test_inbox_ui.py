@@ -93,7 +93,11 @@ class TestInboxUi(HttpCase):
                                                  'remote_message_id': 'rp1'})
         for action, selector in (('waha_report_action', '.o_list_renderer'), ('waha_report_chat_action', '.o_list_renderer'),
                                  ('waha_report_peak_action', '.o_pivot'), ('waha_report_agent_action', '.o_pivot'),
-                                 ('waha_report_waiting_action', '.o_list_renderer, .o_view_nocontent')):
+                                 ('waha_report_waiting_action', '.o_list_renderer, .o_view_nocontent'),
+                                 ('waha_report_document_action', '.o_list_renderer, .o_view_nocontent'),
+                                 ('waha_report_business_action', '.o_pivot, .o_view_nocontent'),
+                                 ('waha_tracked_model_action', '.o_list_renderer, .o_view_nocontent'),
+                                 ('waha_dashboard_action', '.o_waha_kpi')):
             code = """
                 (async () => {
                     for (let i = 0; i < 150 && !document.querySelector('%s'); i++) {
