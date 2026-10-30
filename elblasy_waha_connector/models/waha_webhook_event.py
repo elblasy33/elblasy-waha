@@ -16,6 +16,15 @@ MAX_ATTEMPTS = 5
 BATCH_SIZE = 500
 RETRY_DELAY = timedelta(minutes=2)  # lets an ack that overtook its message wait for it
 IGNORED_SUFFIXES = ('g.us', 'broadcast', 'newsletter')
+THUMBNAIL_PREFIXES = ('/9j/', 'iVBORw0KGgo', 'UklGR')  # base64 of JPEG, PNG, WEBP
+MEDIA_TYPES = {'image', 'video', 'audio', 'ptt', 'document', 'sticker', 'location'}
+
+
+def looks_like_thumbnail(text):
+    """WEBJS puts a base64 preview in ``body`` for media without caption (and in quoted media): never text."""
+    return isinstance(text, str) and len(text) > 100 and text.startswith(THUMBNAIL_PREFIXES) and ' ' not in text
+
+
 # WhatsApp system notices (encryption banners, group notifications, call logs...): not chat messages
 SYSTEM_TYPES = {'e2e_notification', 'notification', 'notification_template', 'gp2', 'protocol', 'ciphertext',
                 'call_log', 'broadcast_notification', 'pinned_message', 'keep_in_chat'}
@@ -38,6 +47,8 @@ def parse_content(p):
     if wtype in SYSTEM_TYPES:
         return None
     body = p.get('body') or False
+    if looks_like_thumbnail(body):
+        body = False
     vals = {'is_forwarded': bool(data.get('isForwarded') or p.get('isForwarded'))}
     location = p.get('location') if isinstance(p.get('location'), dict) else None
     if wtype == 'revoked':
@@ -75,10 +86,15 @@ def parse_content(p):
     quoted = data.get('quotedMsg') if isinstance(data.get('quotedMsg'), dict) else {}
     if reply or quoted:
         vals['quoted_remote_id'] = reply.get('id') or data.get('quotedStanzaID') or False
-        quoted_body = reply.get('body') or quoted.get('caption') or quoted.get('body')
-        if quoted.get('type') == 'location' or (quoted_body and len(quoted_body) > 2000):
-            quoted_body = False  # thumbnails, not text
-        vals['quoted_body'] = (quoted_body or f"[{quoted.get('type') or 'message'}]")[:250]
+        quoted_type = quoted.get('type') or ''
+        quoted_body = quoted.get('caption') if quoted_type in MEDIA_TYPES else None
+        quoted_body = quoted_body or reply.get('body') or quoted.get('body')
+        if looks_like_thumbnail(quoted_body) or (quoted_type in MEDIA_TYPES and quoted_body == quoted.get('body')
+                                                  and quoted_type != 'document'):
+            quoted_body = False  # a picture preview, not text
+        label = {'image': "📷 Photo", 'video': "🎥 Video", 'audio': "🎤 Audio", 'ptt': "🎤 Voice message",
+                 'document': "📄 Document", 'sticker': "Sticker", 'location': "📍 Location"}.get(quoted_type)
+        vals['quoted_body'] = (quoted_body or label or "…")[:250]
     return vals
 
 
@@ -116,12 +132,9 @@ class WahaWebhookEvent(models.Model):
             return self.browse()  # the same event arrived twice at the same time; any other error must surface
 
     def _schedule_processing(self):
-        """Wake the cron worker up; process inline only when that cron was disabled."""
-        cron = self.env.ref('elblasy_waha_connector.cron_waha_retry_events', raise_if_not_found=False)
-        if cron and cron.sudo().active:
-            cron.sudo()._trigger()
-        else:
-            self._process_event()
+        """Process at once: waiting for a free cron worker made Discuss lag by minutes on busy servers.
+        Each event runs in its own savepoint; whatever fails stays in the inbox of events and the cron retries it."""
+        self._process_event()
 
     def _process_event(self):
         for event in self:

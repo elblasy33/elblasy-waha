@@ -1141,6 +1141,17 @@ class TestGroups(TransactionCase):
         self.assertTrue(mine.is_revoked)
 
 
+    def test_58_picture_previews_are_never_text(self):
+        thumb = '/9j/4AAQSkZJRgABAQAAAQABAAD' + 'A' * 300
+        photo = self._msg('th1', hasMedia=True, body=thumb, _data={'type': 'image'})
+        self.assertFalse(photo.body)
+        reply = self._msg('th2', body='who is this?', replyTo={'id': 'x', 'body': thumb},
+                          _data={'type': 'chat', 'quotedMsg': {'type': 'image', 'body': thumb}})
+        self.assertEqual(reply.quoted_body, '📷 Photo')
+        captioned = self._msg('th3', body='ok', _data={'type': 'chat', 'quotedMsg': {'type': 'image', 'caption': 'Invoice 12'}})
+        self.assertEqual(captioned.quoted_body, 'Invoice 12')
+
+
 def fields_dt_sub_minutes(minutes):
     from odoo import fields
     return fields.Datetime.subtract(fields.Datetime.now(), minutes=minutes)

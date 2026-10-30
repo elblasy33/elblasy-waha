@@ -272,9 +272,7 @@ class TestWebhookHttp(WahaCommon, HttpCase):
         self.assertEqual(self._post(self._incoming()).status_code, 200)
         self.assertEqual(self._post(self._incoming()).status_code, 200)  # replay
         events = self.env['elblasy.waha.webhook.event'].search([('session_id', '=', self.session.id)])
-        self.assertEqual(events.mapped('state'), ['pending'])  # acknowledged at once, processed by the cron
-        with patch.object(type(self.env['ir.cron']), '_commit_progress', return_value=60.0):
-            self.env['elblasy.waha.webhook.event']._cron_retry_failed()
+        self.assertEqual(events.mapped('state'), ['done'])  # processed in the request: no wait for a cron worker
         self.assertEqual(self.env['elblasy.waha.message'].search_count([('session_id', '=', self.session.id)]), 1)
 
     def test_02_webhook_rejections(self):

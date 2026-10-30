@@ -91,10 +91,10 @@ sent on WhatsApp, and the amounts. *Reporting ▸ Sent Documents* lists every do
 (Send to WhatsApp, automations and, with the bridge, Odoo WhatsApp templates).
 
 ## Webhook processing
-The webhook only checks the signature, stores the event once and answers WAHA immediately. The cron
-*WAHA: process webhook events* is woken up at once and handles events in arrival order (media download,
-auto-replies, the native WhatsApp bridge); failed events are retried after 2 minutes, up to 5 times. Keep that cron
-active: if it is archived (Odoo.sh staging neutralizes crons) events are processed inside the webhook request instead.
+The webhook checks the signature, stores the event once (idempotent) and processes it right away, each event in its
+own savepoint, so the inbox and Discuss show messages within seconds. An event that fails (an ack before its message,
+WAHA unreachable for a media file...) stays in *Webhook Events* and the cron *WAHA: process webhook events* retries it
+after 2 minutes, up to 5 times.
 
 ## Limits
 Inbox sends text and files (max 15 MB); inbound media is stored and displayed. Auto-sync is a polling fallback (about 1 minute delay), not a replacement for the webhook. WEBJS is unofficial:

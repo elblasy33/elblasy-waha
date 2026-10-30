@@ -199,7 +199,7 @@
                                                     <i class="oi o_waha_doc_dl" data-icon="download"/>
                                                 </a>
                                             </t>
-                                            <button t-if="m.media_pending and !m.attachments.length" class="o_waha_pending"
+                                            <button t-if="this.isMediaWithoutFile(m)" class="o_waha_pending"
                                                     t-on-click="() => this.downloadMedia(m)" t-att-disabled="this.state.downloading[m.id]">
                                                 <i class="oi o_waha_pending_type" t-att-data-icon="this.pendingIcon(m)"/>
                                                 <span class="o_waha_doc_info">
@@ -223,7 +223,7 @@
                                                 <div class="o_waha_poll_text" dir="auto" t-out="m.body"/>
                                             </div>
                                             <span t-elif="m.body" class="o_waha_text" dir="auto"><span t-if="this.spaceAtStart(m.body)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/><t t-out="this.bodyHtml(m)"/><button t-if="this.isLong(m)" class="o_waha_read_more" t-on-click="() => this.expand(m)">Read more</button><span t-if="!this.spaceAtStart(m.body)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/></span>
-                                            <span t-elif="!m.attachments.length and m.type !== 'sticker'" class="o_waha_text o_waha_unsupported"><span t-if="this.spaceAtStart(this.unsupportedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/><t t-out="this.unsupportedLabel"/><span t-if="!this.spaceAtStart(this.unsupportedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/></span>
+                                            <span t-elif="!m.attachments.length and !this.isMediaWithoutFile(m)" class="o_waha_text o_waha_unsupported"><span t-if="this.spaceAtStart(this.unsupportedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/><t t-out="this.unsupportedLabel"/><span t-if="!this.spaceAtStart(this.unsupportedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/></span>
                                         </t>
                                         <div t-if="this.needsMetaLine(m)" class="o_waha_meta_space"/>
                                         <span class="o_waha_meta">

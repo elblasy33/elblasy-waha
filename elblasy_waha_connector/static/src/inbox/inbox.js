@@ -869,7 +869,7 @@ export class WahaInbox extends Component {
         if (m.revoked || this.isBareMedia(m)) {
             return false;
         }
-        if (["location", "contact", "poll", "sticker"].includes(m.type) || (m.media_pending && !m.body)) {
+        if (["location", "contact", "poll", "sticker"].includes(m.type) || (this.isMediaWithoutFile(m) && !m.body)) {
             return true;
         }
         return !m.body && m.attachments.length > 0;
@@ -935,10 +935,19 @@ export class WahaInbox extends Component {
     }
 
     /** Media without a caption shows the time over the picture, like WhatsApp. */
+    /** A file message whose file is not in Odoo yet (media policy, older import...): offer to download it. */
+    isMediaWithoutFile(m) {
+        return (
+            !m.revoked &&
+            !m.attachments.length &&
+            (m.media_pending || ["image", "video", "audio", "document", "sticker"].includes(m.type))
+        );
+    }
+
     isBareMedia(m) {
         return (
             !m.body &&
-            !m.media_pending &&
+            !this.isMediaWithoutFile(m) &&
             !m.revoked &&
             m.attachments.length > 0 &&
             m.attachments.every((a) => ["image", "video"].includes(this.kindOf(a)))

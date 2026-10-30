@@ -161,6 +161,12 @@ def send(api, bsuid, number, message_type, send_vals, parent_message_id=False):
 # inbound: WAHA webhook payload -> Meta "value" dict understood by whatsapp.account._process_messages
 # ----------------------------------------------------------------------
 ACK_STATUS = {1: 'sent', 2: 'delivered', 3: 'read', 4: 'read'}
+THUMBNAIL_PREFIXES = ('/9j/', 'iVBORw0KGgo', 'UklGR')  # base64 of JPEG, PNG, WEBP
+
+
+def looks_like_thumbnail(text):
+    """WEBJS puts a base64 preview in ``body`` for media without caption: never show it as text."""
+    return isinstance(text, str) and len(text) > 100 and text.startswith(THUMBNAIL_PREFIXES) and ' ' not in text
 
 
 def _sender_identifiers(chat, resolve_lid=None):
@@ -211,7 +217,8 @@ def meta_value_from_message(account, payload, resolve_lid=None):
             kind = 'sticker'
         message['type'] = kind
         message[kind] = {'id': media['url'], 'mime_type': mimetype or 'application/octet-stream',
-                         'filename': media.get('filename') or None, 'caption': payload.get('body') or None,
+                         'filename': media.get('filename') or None,
+                         'caption': None if looks_like_thumbnail(payload.get('body')) else payload.get('body') or None,
                          'voice': bool(data.get('type') == 'ptt')}
     elif isinstance(payload.get('location'), dict) and payload['location'].get('latitude') is not None:
         loc = payload['location']
@@ -219,7 +226,10 @@ def meta_value_from_message(account, payload, resolve_lid=None):
         message['location'] = {'latitude': loc['latitude'], 'longitude': loc['longitude'],
                                'name': loc.get('name'), 'address': loc.get('address')}
     else:
-        body = payload.get('body') or ('[unsupported content]' if payload.get('hasMedia') else '')
+        body = payload.get('body') or ''
+        if looks_like_thumbnail(body):
+            body = ''
+        body = body or ('[unsupported content]' if payload.get('hasMedia') else '')
         if not body:
             return None
         message['type'] = 'text'

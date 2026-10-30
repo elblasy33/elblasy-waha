@@ -364,3 +364,8 @@ msgstr "اكتب الرسالة المراد إرسالها."
 #: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.whatsapp_composer_view_form_waha
 msgid "Write your message..."
 msgstr "اكتب رسالتك..."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: code:addons/elblasy_waha_whatsapp_bridge/models/waha_webhook_event.py:0
+msgid "📎 File sent from WhatsApp (open the phone to view it)"
+msgstr "📎 ملف أُرسل من واتساب (افتح الهاتف لعرضه)"

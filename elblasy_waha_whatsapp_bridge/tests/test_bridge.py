@@ -281,3 +281,39 @@ class TestBridge(TransactionCase):
         row = self.env['elblasy.waha.report.document'].search([('source', '=', 'template')])
         self.assertEqual((row.res_model, row.res_id, row.template, row.partner_id, row.session_id, row.state),
                          ('res.partner', partner.id, 'invoice_doc', partner, self.session, 'sent'))
+
+    def test_replies_from_the_phone_appear_in_discuss(self):
+        """WhatsApp shows a message on every linked device: Discuss must show replies typed on the phone too."""
+        incoming = {'event': 'message.any', 'payload': {
+            'id': 'false_201001234567@c.us_IN1', 'from': '201001234567@c.us', 'fromMe': False, 'body': 'Hello',
+            'timestamp': 1700000000, '_data': {'notifyName': 'Mona'}}}
+        self.assertEqual(self._feed(incoming, 'in-1').state, 'done')
+        channel = self.env['discuss.channel'].search([('channel_type', '=', 'whatsapp')], order='id desc', limit=1)
+        reply = {'event': 'message.any', 'payload': {
+            'id': 'true_201001234567@c.us_OUT1', 'from': '201000000000@c.us', 'to': '201001234567@c.us',
+            'fromMe': True, 'body': 'Welcome, how can I help?', 'timestamp': 1700000060, 'ack': 2}}
+        with patch(f'{CLIENT}.lid_to_phone', return_value=False):
+            self.assertEqual(self._feed(reply, 'out-1').state, 'done')
+        posted = channel.message_ids.filtered(lambda m: 'how can I help' in (m.body or ''))
+        self.assertEqual(len(posted), 1)
+        self.assertEqual(posted.author_id, self.session.company_id.partner_id)
+        wa = self.env['whatsapp.message'].search([('msg_uid', '=', 'true_201001234567@c.us_OUT1')])
+        self.assertEqual((wa.message_type, wa.state, wa.mail_message_id), ('outbound', 'delivered', posted))
+        # webhook redelivery: shown once
+        reply2 = dict(reply)
+        self.assertEqual(self._feed(reply2, 'out-1-again').state, 'ignored')
+        # a message sent from Discuss itself (its WhatsApp id is known): never shown twice
+        sent = self.env['whatsapp.message'].create({'mobile_number': '+201001234567', 'wa_account_id': self.account.id,
+                                                    'state': 'sent', 'msg_uid': 'true_201001234567@c.us_ODOO'})
+        echo = {'event': 'message.any', 'payload': dict(reply['payload'], id=sent.msg_uid, body='from discuss')}
+        self.assertEqual(self._feed(echo, 'out-2').state, 'ignored')
+        self.assertFalse(channel.message_ids.filtered(lambda m: 'from discuss' in (m.body or '')))
+        # a picture preview is never shown as text
+        thumb = '/9j/' + 'A' * 200
+        media = {'event': 'message.any', 'payload': dict(reply['payload'], id='true_201001234567@c.us_IMG', body=thumb,
+                                                         hasMedia=True, media=None)}
+        self.assertEqual(self._feed(media, 'out-3').state, 'done')
+        shown = channel.message_ids.filtered(lambda m: 'File sent from WhatsApp' in (m.body or ''))
+        self.assertTrue(shown)
+        self.assertFalse(channel.message_ids.filtered(lambda m: '/9j/' in (m.body or '')))
+
