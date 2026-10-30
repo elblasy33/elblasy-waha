@@ -1,0 +1,4038 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* elblasy_waha_connector
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-30 14:46+0000\n"
+"PO-Revision-Date: 2026-10-30 14:46+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: elblasy_waha_connector
+#: model:ir.module.module,description:base.module_elblasy_waha_connector
+msgid ""
+"\n"
+"Elblasy WhatsApp (WAHA)\n"
+"=======================\n"
+"Connect Odoo to a WAHA server (https://waha.devlike.pro): WhatsApp sessions with QR login,\n"
+"inbox with live messages, instant messages from contacts / employees / documents,\n"
+"WhatsApp groups (sync, whitelist, send text and PDF documents), customer-linked groups\n"
+"and automation rules with a throttled queue. See static/description/index.html.\n"
+msgstr ""
+"\n"
+"Elblasy WhatsApp (WAHA)\n"
+"=======================\n"
+"ربط Odoo بخادم WAHA (https://waha.devlike.pro): جلسات WhatsApp بتسجيل الدخول عبر QR،\n"
+"صندوق وارد برسائل مباشرة، ورسائل فورية من جهات الاتصال / الموظفين / المستندات،\n"
+"مجموعات WhatsApp (مزامنة، قائمة بيضاء، إرسال نصوص ومستندات PDF)، مجموعات مرتبطة بالعملاء\n"
+"وقواعد أتمتة بطابور مُنظَّم. راجع static/description/index.html.\n"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "\"Delete for me\" only hides it in Odoo (reports keep it)."
+msgstr "«الحذف لدي» يخفيها في Odoo فقط (وتبقى في التقارير)."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+msgid ""
+"%s chat(s) were skipped because WAHA was slow; press Sync again, nothing is "
+"lost."
+msgstr ""
+"تم تخطي %s دردشة لأن WAHA كان بطيئًا؛ اضغط مزامنة مرة أخرى، لن يضيع شيء."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "%s days"
+msgstr "%s يوم"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+msgid ""
+"%s group(s) synced. Tick \"Odoo can post here\" on the ones you want to use."
+msgstr ""
+"تمت مزامنة %s مجموعة. فعّل «يمكن لـ Odoo النشر هنا» على المجموعات التي تريد "
+"استخدامها."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "%s h"
+msgstr "%s س"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group.py:0
+#: code:addons/elblasy_waha_connector/wizard/waha_group_create.py:0
+msgid "%s has no valid phone number."
+msgstr "%s ليس لديه رقم هاتف صالح."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+msgid "%s label(s) synced."
+msgstr "تمت مزامنة %s تصنيف."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "%s min"
+msgstr "%s د"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_tracked_model.py:0
+msgid "%s must be a stored field of %s."
+msgstr "يجب أن يكون %s حقلًا مخزّنًا في %s."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+msgid "%s new message(s) imported."
+msgstr "تم استيراد %s رسالة جديدة."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "%s vs yesterday"
+msgstr "%s مقارنة بالأمس"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "%s within 15 min"
+msgstr "%s خلال 15 دقيقة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "(You)"
+msgstr "(أنت)"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "+%s is not registered on WhatsApp."
+msgstr "الرقم +%s غير مسجل على واتساب."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_session__capping_total
+msgid "-1 = no quota"
+msgstr "-1 = بدون حصة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_autoreply__work_days
+msgid "0 = Monday ... 6 = Sunday, separated by commas."
+msgstr "0 = الاثنين ... 6 = الأحد، مفصولة بفواصل."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_conversation_chat_uniq
+msgid "A conversation already exists for this chat."
+msgstr "توجد محادثة بالفعل لهذه الدردشة."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_tracked_model__window_days
+msgid ""
+"A document counts as coming from WhatsApp when the customer exchanged "
+"messages in the days before it."
+msgstr ""
+"يُحتسب المستند على أنه قادم من واتساب إذا تبادل العميل رسائل في الأيام التي "
+"سبقته."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__api_key
+msgid "API Key"
+msgstr "مفتاح API"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__action_id
+msgid "Action"
+msgstr "إجراء"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__active
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__active
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__active
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__active
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__active
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__active
+msgid "Active"
+msgstr "نشط"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+msgid "Active in the last 7 days"
+msgstr "نشط خلال آخر 7 أيام"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_form
+msgid "Activity"
+msgstr "النشاط"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_members_view_form
+msgid "Add"
+msgstr "إضافة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Add Members"
+msgstr "إضافة أعضاء"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group.py:0
+msgid "Add members"
+msgstr "إضافة أعضاء"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_group_members
+msgid "Add members to a WhatsApp group"
+msgstr "إضافة أعضاء إلى مجموعة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_group_create__link_to_partners
+msgid "Add the group to each contact so documents also go to it."
+msgstr "أضف المجموعة إلى كل جهة اتصال لتصلها المستندات أيضًا."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Add to the contact's notes"
+msgstr "إضافة إلى ملاحظات جهة الاتصال"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "Added to the contact's notes."
+msgstr "تمت الإضافة إلى ملاحظات جهة الاتصال."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_member__role__admin
+msgid "Admin"
+msgstr "مشرف"
+
+#. module: elblasy_waha_connector
+#: model:res.groups,name:elblasy_waha_connector.group_waha_admin
+msgid "Administrator"
+msgstr "مدير النظام"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_business_view_search
+msgid "After WhatsApp"
+msgstr "بعد واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__from_whatsapp
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_business_view_search
+msgid "After a WhatsApp chat"
+msgstr "بعد دردشة واتساب"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__user_id
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_message_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Agent"
+msgstr "الموظف"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_report_agent_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_report_agents
+msgid "Agents"
+msgstr "الموظفون"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "All"
+msgstr "الكل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__media_download__all
+msgid "All files"
+msgstr "كل الملفات"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "All numbers"
+msgstr "كل الأرقام"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__allowed_group_ids
+msgid "Allowed Group"
+msgstr "المجموعة المسموح بها"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_search
+msgid "Allowed to post"
+msgstr "مسموح بالنشر"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__waha_group_ids
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_cron__waha_group_ids
+msgid "Also send to groups"
+msgstr "إرسال إلى المجموعات أيضًا"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__amount
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__amount_field_id
+msgid "Amount"
+msgstr "المبلغ"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__whatsapp_amount
+msgid "Amount after WhatsApp"
+msgstr "المبلغ بعد واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_queue__state
+msgid ""
+"An item stays 'Interrupted while sending' if the server stopped during its "
+"run: check the chat before retrying it, it may already have been delivered."
+msgstr ""
+"يبقى العنصر في حالة «توقف أثناء الإرسال» إذا توقف الخادم أثناء تشغيله: افحص "
+"الدردشة قبل إعادة المحاولة، فقد يكون قد تم تسليمه بالفعل."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Archived"
+msgstr "مؤرشفة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__wa_archived
+msgid "Archived on WhatsApp"
+msgstr "مؤرشفة على واتساب"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Attach"
+msgstr "إرفاق"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__report_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__waha_report_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_cron__waha_report_id
+msgid "Attach report"
+msgstr "إرفاق التقرير"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__attachment_ids
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__attachment_ids
+msgid "Attachments"
+msgstr "المرفقات"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__attempts
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__attempts
+msgid "Attempts"
+msgstr "المحاولات"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__audio
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__audio
+msgid "Audio"
+msgstr "صوت"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_server.py:0
+msgid "Authentication error"
+msgstr "خطأ في المصادقة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__author_name
+msgid "Author"
+msgstr "المؤلف"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_autoreply_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_autoreply
+msgid "Auto-replies"
+msgstr "الردود التلقائية"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "Auto-reply"
+msgstr "رد تلقائي"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__auto_sync_messages
+msgid "Auto-sync messages"
+msgstr "مزامنة الرسائل تلقائيًا"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__auto_count
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__is_auto
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_message_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Automatic"
+msgstr "تلقائي"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "Automatic replies"
+msgstr "الردود التلقائية"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__is_auto
+msgid "Automatic reply"
+msgstr "رد تلقائي"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_queue_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_queue
+msgid "Automation Queue"
+msgstr "طابور الأتمتة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_list
+msgid "Average"
+msgstr "المتوسط"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "Average response"
+msgstr "متوسط الاستجابة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "Avg response"
+msgstr "متوسط الاستجابة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__avg_response_minutes
+msgid "Avg response (min)"
+msgstr "متوسط الاستجابة (د)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__awaiting_since
+msgid "Awaiting Since"
+msgstr "في الانتظار منذ"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Back"
+msgstr "رجوع"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_session__check_numbers
+msgid ""
+"Before sending to a phone number from the Send WhatsApp window or an "
+"automation rule, ask WAHA whether the number has WhatsApp (sending to "
+"unregistered numbers raises the ban risk)."
+msgstr ""
+"قبل الإرسال إلى رقم هاتف من نافذة إرسال واتساب أو من قاعدة أتمتة، اسأل WAHA "
+"هل الرقم لديه واتساب (الإرسال إلى أرقام غير مسجلة يزيد خطر الحظر)."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__body
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__body
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__body
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__body
+msgid "Body"
+msgstr "المحتوى"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_report_business_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_report_business
+msgid "Business from WhatsApp"
+msgstr "أعمال من واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__chat_id
+msgid "Caller"
+msgstr "المتصل"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_call_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_calls
+msgid "Calls"
+msgstr "المكالمات"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_create_view_form
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_members_view_form
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_send_view_form
+msgid "Cancel"
+msgstr "إلغاء"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__capping_status
+msgid "Capping Status"
+msgstr "حالة الحد الأقصى"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__capping_total
+msgid "Capping Total"
+msgstr "إجمالي الحد الأقصى"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__capping_used
+msgid "Capping Used"
+msgstr "المستخدم من الحد الأقصى"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__channel
+msgid "Channel"
+msgstr "القناة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__conversation_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__conversation_id
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Chat"
+msgstr "دردشة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__chat_type
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__chat_type
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__chat_type
+msgid "Chat Type"
+msgstr "نوع الدردشة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+msgid "Chat type"
+msgstr "نوع الدردشة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__nbr
+msgid "Chats"
+msgstr "الدردشات"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "Choose at least one other chat of the same WhatsApp number."
+msgstr "اختر دردشة واحدة أخرى على الأقل من نفس رقم واتساب."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/wizard/waha_group_send.py:0
+msgid "Choose the customer and/or at least one group."
+msgstr "اختر العميل و/أو مجموعة واحدة على الأقل."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__client_token
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__client_token
+msgid "Client Token"
+msgstr "رمز العميل"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form_qr
+msgid "Close"
+msgstr "إغلاق"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_label__color_hex
+msgid "Color Hex"
+msgstr "اللون (Hex)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_label__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_optout__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__company_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__company_id
+msgid "Company"
+msgstr "الشركة"
+
+#. module: elblasy_waha_connector
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_config
+msgid "Configuration"
+msgstr "الإعدادات"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "Configuration ▸ Tracked Documents"
+msgstr "الإعدادات ▸ المستندات المتتبَّعة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Connect"
+msgstr "اتصال"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__timeout_connect
+msgid "Connect Timeout (s)"
+msgstr "مهلة الاتصال (ث)"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+msgid "Connect WhatsApp"
+msgstr "ربط واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__status__working
+msgid "Connected"
+msgstr "متصل"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form_qr
+msgid "Connected as"
+msgstr "متصل باسم"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_server_view_form
+msgid "Connection"
+msgstr "الاتصال"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_server.py:0
+msgid "Connection OK (%s session(s) on server)."
+msgstr "الاتصال سليم (%s جلسة على الخادم)."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model,name:elblasy_waha_connector.model_res_partner
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__partner_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__partner_id
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_conversation__chat_type__user
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_chat__chat_type__user
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__chat_type__user
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_form
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Contact"
+msgstr "جهة اتصال"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__contact
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__contact
+msgid "Contact card"
+msgstr "بطاقة جهة اتصال"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_members__partner_ids
+msgid "Contacts"
+msgstr "جهات الاتصال"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_group_create__partner_ids
+msgid "Contacts with a phone number"
+msgstr "جهات الاتصال التي لها رقم هاتف"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__conversation_id
+msgid "Conversation"
+msgstr "محادثة"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_conversation_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_conversations
+msgid "Conversations"
+msgstr "المحادثات"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "Copied"
+msgstr "تم النسخ"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Copy"
+msgstr "نسخ"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_conversation_view_form
+msgid "Create Contact"
+msgstr "إنشاء جهة اتصال"
+
+#. module: elblasy_waha_connector
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_group_create
+msgid "Create Group"
+msgstr "إنشاء مجموعة"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_group_create_action
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_group_create_menu_action
+msgid "Create WhatsApp group"
+msgstr "إنشاء مجموعة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_group_create
+msgid "Create a WhatsApp group"
+msgstr "إنشاء مجموعة واتساب"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Create contact"
+msgstr "إنشاء جهة اتصال"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_create_view_form
+msgid "Create group"
+msgstr "إنشاء مجموعة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_members__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_label__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_optout__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__create_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__create_uid
+msgid "Created by"
+msgstr "أنشأه"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_members__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_label__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_optout__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__create_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__create_date
+msgid "Created on"
+msgstr "تاريخ الإنشاء"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__partner_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__partner_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__partner_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__partner_field_id
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_business_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_search
+msgid "Customer"
+msgstr "العميل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__partner_id
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_document__channel__customer
+msgid "Customer chat"
+msgstr "دردشة العميل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_optout__source__keyword
+msgid "Customer message"
+msgstr "رسالة العميل"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_report_chat_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_report_chats
+msgid "Customers & Chats"
+msgstr "العملاء والدردشات"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+msgid "Customers to contact again"
+msgstr "عملاء للتواصل معهم مجددًا"
+
+#. module: elblasy_waha_connector
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_dashboard
+msgid "Dashboard"
+msgstr "لوحة المتابعة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_optout__date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__date_field_id
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_business_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_message_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Day"
+msgstr "اليوم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__days_after_chat
+msgid "Days after the chat"
+msgstr "أيام بعد الدردشة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__days_silent
+msgid "Days since last message"
+msgstr "أيام منذ آخر رسالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_session__reject_calls
+msgid ""
+"Decline WhatsApp calls automatically (needs the call.received webhook "
+"event)."
+msgstr "رفض مكالمات واتساب تلقائيًا (يتطلب حدث call.received في Webhook)."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__dedupe_key
+msgid "Dedupe Key"
+msgstr "مفتاح منع التكرار"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__waha_delay_minutes
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_cron__waha_delay_minutes
+msgid "Delay (minutes)"
+msgstr "التأخير (بالدقائق)"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Delete"
+msgstr "حذف"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_session__media_retention_days
+msgid ""
+"Delete downloaded WhatsApp files older than this (0 = keep forever). Texts "
+"are always kept; an expired file can be downloaded again while WhatsApp "
+"still has it."
+msgstr ""
+"حذف ملفات واتساب المنزّلة الأقدم من هذه المدة (0 = الاحتفاظ دائمًا). تبقى "
+"النصوص دائمًا؛ ويمكن تنزيل الملف المنتهي مجددًا طالما بقي على واتساب."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Delete for everyone"
+msgstr "حذف للجميع"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Delete for me"
+msgstr "حذف لدي"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Delete message?"
+msgstr "حذف الرسالة؟"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__is_revoked
+msgid "Deleted for everyone"
+msgstr "تم الحذف للجميع"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__hidden
+msgid "Deleted for me"
+msgstr "تم الحذف لدي"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__delivery_status__delivered
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__delivery_status__delivered
+msgid "Delivered"
+msgstr "تم التسليم"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Delivery"
+msgstr "التسليم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__delivery_status
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__delivery_status
+msgid "Delivery Status"
+msgstr "حالة التسليم"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Demote"
+msgstr "تخفيض الرتبة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__description
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Description"
+msgstr "الوصف"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_conversation__remote_phone
+msgid "Digits only; empty when the chat id does not carry a phone number."
+msgstr "أرقام فقط؛ فارغ إذا لم يحمل معرّف الدردشة رقم هاتف."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__direction
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__direction
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_message_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Direction"
+msgstr "الاتجاه"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_dashboard__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_members__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_label__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_optout__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_res_partner__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__cooldown_minutes
+msgid "Do not reply again within (min)"
+msgstr "عدم الرد مجددًا خلال (د)"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__record_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__record_name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__model_id
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__document
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__document
+msgid "Document"
+msgstr "المستند"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__tracked_model_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__model_id
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_business_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_search
+msgid "Document type"
+msgstr "نوع المستند"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__nbr
+msgid "Documents"
+msgstr "المستندات"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_report_document
+msgid "Documents Sent on WhatsApp"
+msgstr "المستندات المرسلة عبر واتساب"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "Documents sent"
+msgstr "المستندات المرسلة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "Documents sent today"
+msgstr "المستندات المرسلة اليوم"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.res_partner_view_form_waha
+msgid "Documents sent with \"Send WhatsApp\" also go to these groups."
+msgstr "المستندات المرسلة عبر «إرسال واتساب» تصل إلى هذه المجموعات أيضًا."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid ""
+"Documents whose customer chatted on WhatsApp shortly before them.\n"
+"                                        Choose the documents in"
+msgstr ""
+"المستندات التي تحدث عميلها على واتساب قبلها بوقت قصير.\n"
+"                                        اختر المستندات في"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_queue__state__done
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_webhook_event__state__done
+msgid "Done"
+msgstr "تم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__group_media_download
+msgid "Download group media"
+msgstr "تنزيل وسائط المجموعة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__media_download
+msgid "Download media"
+msgstr "تنزيل الوسائط"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_group_post_client_token_uniq
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_message_client_token_uniq
+msgid "Duplicate send request."
+msgstr "طلب إرسال مكرر."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_webhook_event_dedupe_uniq
+msgid "Duplicate webhook event."
+msgstr "حدث Webhook مكرر."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Edit"
+msgstr "تعديل"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Edit message"
+msgstr "تعديل الرسالة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__is_edited
+msgid "Edited"
+msgstr "معدّلة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Elblasy WhatsApp"
+msgstr "Elblasy واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.module.module,shortdesc:base.module_elblasy_waha_connector
+msgid "Elblasy WhatsApp (WAHA)"
+msgstr "Elblasy واتساب (WAHA)"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Emoji"
+msgstr "رمز تعبيري"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_message__reactions
+msgid "Emoji reactions by sender: {sender: emoji}."
+msgstr "التفاعلات بالرموز التعبيرية حسب المرسل: {sender: emoji}."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__engine
+msgid "Engine"
+msgstr "المحرك"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid ""
+"Enter a phone number (with country code) or choose a contact that has one."
+msgstr "أدخل رقم هاتف (مع رمز الدولة) أو اختر جهة اتصال لها رقم."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/wizard/waha_group_send.py:0
+msgid "Enter the number and pick the WhatsApp session to send privately."
+msgstr "أدخل الرقم واختر جلسة واتساب للإرسال بشكل خاص."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__error
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__error
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__error
+msgid "Error"
+msgstr "خطأ"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__event_type
+msgid "Event Type"
+msgstr "نوع الحدث"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_report_document_action
+msgid ""
+"Every document sent on WhatsApp, from any app: \"Send to WhatsApp\", automations\n"
+"            and Odoo WhatsApp templates."
+msgstr ""
+"كل مستند أُرسل عبر واتساب، من أي تطبيق: «إرسال إلى واتساب»، والأتمتة\n"
+"            وقوالب واتساب في Odoo."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__failed_count
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_post__state__failed
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__delivery_status__failed
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_queue__state__failed
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_document__state__failed
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__delivery_status__failed
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__status__failed
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_webhook_event__state__failed
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Failed"
+msgstr "فشل"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "Failed messages"
+msgstr "الرسائل الفاشلة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__failure_reason
+msgid "Failure Reason"
+msgstr "سبب الفشل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_session__auto_sync_messages
+msgid ""
+"Fetch new incoming messages from WAHA every minute. Use it when the webhook "
+"cannot reach Odoo (local installation); with a working webhook leave it off."
+msgstr ""
+"جلب الرسائل الواردة الجديدة من WAHA كل دقيقة. استخدمه عندما لا يستطيع "
+"Webhook الوصول إلى Odoo (تثبيت محلي)؛ وإذا كان Webhook يعمل فاتركه معطلًا."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__attachment_ids
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__media_count
+msgid "Files"
+msgstr "الملفات"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_session__media_download
+msgid ""
+"Files that are not downloaded automatically show a Download button in the "
+"inbox."
+msgstr "الملفات التي لا تُنزَّل تلقائيًا يظهر لها زر تنزيل في صندوق الوارد."
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_conversation_view_form
+msgid "Filled from the phone"
+msgstr "يُملأ من الهاتف"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_conversation_view_form
+msgid "Find phone number"
+msgstr "البحث عن رقم الهاتف"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__first_date
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+msgid "First message"
+msgstr "أول رسالة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+msgid "First message (month)"
+msgstr "أول رسالة (شهر)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_autoreply__trigger__first
+msgid "First message of a conversation"
+msgstr "أول رسالة في المحادثة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_conversation__awaiting_since
+msgid "First unanswered incoming message."
+msgstr "أول رسالة واردة بدون رد."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Forward"
+msgstr "إعادة توجيه"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Forward message to"
+msgstr "إعادة توجيه الرسالة إلى"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__is_forwarded
+msgid "Forwarded"
+msgstr "معاد توجيهها"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "Forwarded to %s chat(s)."
+msgstr "تمت إعادة التوجيه إلى %s دردشة."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__weekday__5
+msgid "Friday"
+msgstr "الجمعة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__from_me
+msgid "From Me"
+msgstr "مني"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__group_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_members__group_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__group_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__group_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__group_ids
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_conversation__chat_type__group
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_chat__chat_type__group
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_document__channel__group
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__chat_type__group
+msgid "Group"
+msgstr "المجموعة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__chat_id
+msgid "Group ID"
+msgstr "معرّف المجموعة"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_group_post_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_group_posts
+msgid "Group Posts"
+msgstr "منشورات المجموعة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__author_name
+msgid "Group member"
+msgstr "عضو المجموعة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__name
+msgid "Group name"
+msgstr "اسم المجموعة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__group_ids
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_groups
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Groups"
+msgstr "المجموعات"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__groups_synced_at
+msgid "Groups Synced At"
+msgstr "وقت مزامنة المجموعات"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__inbox_groups
+msgid "Groups in the inbox"
+msgstr "المجموعات في صندوق الوارد"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_session__group_media_download
+msgid ""
+"Groups often share many files: by default their media is downloaded only "
+"when opened."
+msgstr ""
+"تتبادل المجموعات ملفات كثيرة غالبًا: افتراضيًا تُنزَّل وسائطها عند فتحها "
+"فقط."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_res_partner__waha_group_ids
+#: model:ir.model.fields,help:elblasy_waha_connector.field_res_users__waha_group_ids
+msgid "Groups that receive the documents sent to this contact."
+msgstr "المجموعات التي تتلقى المستندات المرسلة إلى جهة الاتصال هذه."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group.py:0
+msgid "Groups were synced less than a minute ago, please wait."
+msgstr "تمت مزامنة المجموعات منذ أقل من دقيقة، يرجى الانتظار."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__has_api_key
+msgid "Has Api Key"
+msgstr "لديه مفتاح API"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_autoreply_view_form
+msgid "Hello {name}, thanks for contacting us..."
+msgstr "مرحبًا {name}، شكرًا لتواصلك معنا..."
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.ir_actions_server_view_form_waha
+msgid ""
+"Hello {{ object.partner_id.name }}, your order {{ object.name }} is "
+"confirmed."
+msgstr "مرحبًا {{ object.partner_id.name }}، تم تأكيد طلبك {{ object.name }}."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_conversation__chat_type__lid
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_chat__chat_type__lid
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__chat_type__lid
+msgid "Hidden ID"
+msgstr "المعرّف المخفي"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__hour
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Hour"
+msgstr "الساعة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_message_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Human replies"
+msgstr "الردود البشرية"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_report_message__response_minutes
+msgid ""
+"Human replies only: minutes between the customer's first unanswered message "
+"and the reply."
+msgstr ""
+"الردود البشرية فقط: الدقائق بين أول رسالة من العميل بدون رد والرد عليها."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_dashboard__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_members__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_label__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_optout__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_res_partner__id
+msgid "ID"
+msgstr "المعرّف"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_conversation__remote_chat_id
+msgid ""
+"Identifier used by WhatsApp (…@c.us, …@lid, …@g.us). Filled automatically "
+"from the phone number when left empty."
+msgstr ""
+"المعرّف الذي يستخدمه واتساب (…@c.us، …@lid، …@g.us). يُملأ تلقائيًا من رقم "
+"الهاتف إذا ترك فارغًا."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_webhook_event__state__ignored
+msgid "Ignored"
+msgstr "متجاهل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__image
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__image
+msgid "Image"
+msgstr "صورة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__image_128
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__image_128
+msgid "Image 128"
+msgstr "صورة 128"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Import recent incoming messages from WAHA (no webhook needed)."
+msgstr "استيراد الرسائل الواردة الأخيرة من WAHA (بدون الحاجة إلى Webhook)."
+
+#. module: elblasy_waha_connector
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_inbox
+msgid "Inbox"
+msgstr "صندوق الوارد"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__direction__in
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__direction__in
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_message_view_search
+msgid "Incoming"
+msgstr "وارد"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__info_admin_only
+msgid "Info Admin Only"
+msgstr "معلومات للمشرف فقط"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_group_send__phone
+msgid "International format, e.g. +20 100 123 4567"
+msgstr "بالصيغة الدولية، مثال: +20 100 123 4567"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_queue__state__sending
+msgid "Interrupted while sending"
+msgstr "توقف أثناء الإرسال"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_tracked_model.py:0
+msgid "Invalid filter for %(doc)s: %(error)s"
+msgstr "فلتر غير صالح لـ %(doc)s: %(error)s"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "Invalid phone number (use the international format with country code)."
+msgstr "رقم هاتف غير صالح (استخدم الصيغة الدولية مع رمز الدولة)."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__invite_link
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Invite Link"
+msgstr "رابط الدعوة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__is_video
+msgid "Is Video"
+msgstr "هو فيديو"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__media_retention_days
+msgid "Keep media (days)"
+msgstr "مدة الاحتفاظ بالوسائط (أيام)"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Kept on WhatsApp · click to download"
+msgstr "محفوظ على واتساب · اضغط للتنزيل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__keywords
+msgid "Keywords"
+msgstr "الكلمات المفتاحية"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__label_ids
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__label_ids
+msgid "Label"
+msgstr "تصنيف"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_label_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_labels
+msgid "Labels"
+msgstr "التصنيفات"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "Last 14 days"
+msgstr "آخر 14 يومًا"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_message_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Last 30 days"
+msgstr "آخر 30 يومًا"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Last 7 days"
+msgstr "آخر 7 أيام"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__last_autoreply_date
+msgid "Last Autoreply Date"
+msgstr "تاريخ آخر رد تلقائي"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__chats_synced_at
+msgid "Last Chat List Sync"
+msgstr "آخر مزامنة لقائمة الدردشات"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__last_connected_at
+msgid "Last Connected At"
+msgstr "آخر اتصال في"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__last_error
+msgid "Last Error"
+msgstr "آخر خطأ"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__last_message_id
+msgid "Last Message"
+msgstr "آخر رسالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__last_message_date
+msgid "Last Message Date"
+msgstr "تاريخ آخر رسالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__last_message_preview
+msgid "Last Message Preview"
+msgstr "معاينة آخر رسالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__messages_synced_at
+msgid "Last Messages Sync"
+msgstr "آخر مزامنة للرسائل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__last_status_update
+msgid "Last Status Update"
+msgstr "آخر تحديث للحالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__last_sync_date
+msgid "Last Sync Date"
+msgstr "تاريخ آخر مزامنة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__last_test_date
+msgid "Last Test Date"
+msgstr "تاريخ آخر اختبار"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__last_test_result
+msgid "Last Test Result"
+msgstr "نتيجة آخر اختبار"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_members__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_label__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_optout__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__write_uid
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_members__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_label__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_optout__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__write_date
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__last_date
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+msgid "Last message"
+msgstr "آخر رسالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__last_incoming_date
+msgid "Last message from them"
+msgstr "آخر رسالة منهم"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_server_view_form
+msgid "Last test"
+msgstr "آخر اختبار"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__latitude
+msgid "Latitude"
+msgstr "خط العرض"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Leave Group"
+msgstr "مغادرة المجموعة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_autoreply__session_id
+msgid "Leave empty to apply to every session."
+msgstr "اتركه فارغًا للتطبيق على كل الجلسات."
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Leave this WhatsApp group? Odoo will no longer post to it."
+msgstr "مغادرة مجموعة واتساب هذه؟ لن ينشر Odoo فيها بعد الآن."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "Link this chat to a contact first."
+msgstr "اربط هذه الدردشة بجهة اتصال أولًا."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__link_to_partners
+msgid "Link to these contacts"
+msgstr "ربط بجهات الاتصال هذه"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__location
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__location
+msgid "Location"
+msgstr "الموقع"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Log out"
+msgstr "تسجيل الخروج"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Log out of WhatsApp? You will need to scan a QR code again."
+msgstr "تسجيل الخروج من واتساب؟ ستحتاج إلى مسح رمز QR مرة أخرى."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__longitude
+msgid "Longitude"
+msgstr "خط الطول"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_group__chat_id
+msgid "Looks like 123456789@g.us"
+msgstr "مثال: 123456789@g.us"
+
+#. module: elblasy_waha_connector
+#: model:res.groups,name:elblasy_waha_connector.group_waha_manager
+msgid "Manager"
+msgstr "مدير"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_optout__source__manual
+msgid "Manual"
+msgstr "يدوي"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__sync_read_state
+msgid "Mark as read on the phone"
+msgstr "تعليم كمقروءة على الهاتف"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_tracked_model_action
+msgid "Measure any document against WhatsApp"
+msgstr "قِس أي مستند عبر واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_message__message_type__media
+msgid "Media"
+msgstr "الوسائط"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Media & storage"
+msgstr "الوسائط والتخزين"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__media_pending
+msgid "Media not downloaded"
+msgstr "لم يتم تنزيل الوسائط"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__member_ids
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_member__role__participant
+msgid "Member"
+msgstr "عضو"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_group_member_member_uniq
+msgid "Member already in the group."
+msgstr "العضو موجود بالفعل في المجموعة."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__partner_ids
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Members"
+msgstr "الأعضاء"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__members_synced_at
+msgid "Members Synced At"
+msgstr "تمت مزامنة الأعضاء في"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Menu"
+msgstr "القائمة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_dashboard.py:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__message_ids
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__message_ids
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__body
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__message_id
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_send_view_form
+msgid "Message"
+msgstr "رسالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__message_type
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__message_type
+msgid "Message Type"
+msgstr "نوع الرسالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_group_message_remote_uniq
+msgid "Message already stored."
+msgstr "الرسالة محفوظة بالفعل."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_autoreply__trigger__keyword
+msgid "Message contains a keyword"
+msgstr "الرسالة تحتوي على كلمة مفتاحية"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Message info"
+msgstr "معلومات الرسالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_message_action
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__post_ids
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__nbr
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_report_activity
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_form
+msgid "Messages"
+msgstr "الرسائل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__messages_admin_only
+msgid "Messages Admin Only"
+msgstr "الرسائل للمشرفين فقط"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Messages go through your own WAHA server."
+msgstr "تمر الرسائل عبر خادم WAHA الخاص بك."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "Messages received"
+msgstr "الرسائل المستلمة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_report_peak_action
+msgid ""
+"Messages received by weekday and hour (your company's time zone): plan who "
+"answers when."
+msgstr ""
+"الرسائل المستلمة حسب يوم الأسبوع والساعة (بالمنطقة الزمنية لشركتك): خطط لمن "
+"يرد ومتى."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+msgid "Messages sync"
+msgstr "مزامنة الرسائل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__model
+msgid "Model"
+msgstr "النموذج"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__weekday__1
+msgid "Monday"
+msgstr "الاثنين"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_business_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Month"
+msgstr "الشهر"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "More reactions"
+msgstr "المزيد من ردود الفعل"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__wa_muted
+msgid "Muted"
+msgstr "مكتومة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_label__name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__name
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__name
+msgid "Name"
+msgstr "الاسم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_message__author_name
+msgid "Name of the group member who wrote the message."
+msgstr "اسم عضو المجموعة الذي كتب الرسالة."
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_server_view_form
+msgid "Network"
+msgstr "الشبكة"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_server.py:0
+msgid "Network error"
+msgstr "خطأ في الشبكة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "New chats"
+msgstr "دردشات جديدة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__timelock_active
+msgid "New-contact lock"
+msgstr "قفل جهات الاتصال الجديدة"
+
+#. module: elblasy_waha_connector
+#: model:res.groups.privilege,placeholder:elblasy_waha_connector.res_groups_privilege_waha
+msgid "No"
+msgstr "لا"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_business_view_search
+msgid "No WhatsApp contact"
+msgstr "لا توجد جهة اتصال واتساب"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_report_action
+msgid "No WhatsApp messages yet"
+msgstr "لا توجد رسائل واتساب بعد"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "No chats found."
+msgstr "لم يتم العثور على دردشات."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "No replies yet today."
+msgstr "لا توجد ردود اليوم حتى الآن."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "No tracked documents in the last 30 days."
+msgstr "لا توجد مستندات متتبعة في آخر 30 يومًا."
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_report_waiting_action
+msgid "Nobody is waiting for an answer"
+msgstr "لا أحد ينتظر ردًا"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "Nobody is waiting."
+msgstr "لا أحد في الانتظار."
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Not a contact yet"
+msgstr "ليست جهة اتصال بعد"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_post__state__unknown
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__delivery_status__unknown
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_queue__state__unknown
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__delivery_status__unknown
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Not confirmed"
+msgstr "غير مؤكد"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/wizard/waha_group_send.py:0
+msgid "Not confirmed (check before resending): %s"
+msgstr "غير مؤكد (تحقق قبل إعادة الإرسال): %s"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/wizard/waha_group_send.py:0
+msgid "Not sent to: %s"
+msgstr "لم يُرسل إلى: %s"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "Nothing sent today."
+msgstr "لم يُرسل شيء اليوم."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__phone
+msgid "Number"
+msgstr "الرقم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__webhook_base_url
+msgid "Odoo Public URL"
+msgstr "عنوان URL العام لـ Odoo"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_document__source__template
+msgid "Odoo WhatsApp template"
+msgstr "قالب واتساب في Odoo"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__allow_send
+msgid "Odoo can post here"
+msgstr "يمكن لـ Odoo النشر هنا"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "Odoo is not allowed to post to this group."
+msgstr "غير مسموح لـ Odoo بالنشر في هذه المجموعة."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__media_download__none
+msgid "On demand only"
+msgstr "عند الطلب فقط"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__waha_once_per_record
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_cron__waha_once_per_record
+msgid "Once per record"
+msgstr "مرة واحدة لكل سجل"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_report_chat_action
+msgid ""
+"One line per chat: volumes, first and last contact, response times.\n"
+"            \"Silent for 30+ days\" lists customers to contact again; the line chart shows new chats per month."
+msgstr ""
+"سطر واحد لكل دردشة: الأحجام، أول وآخر تواصل، أوقات الاستجابة.\n"
+"            تعرض \"صامتة لأكثر من 30 يومًا\" العملاء الذين يجب التواصل معهم مجددًا؛ ويعرض الرسم الخطي الدردشات الجديدة شهريًا."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_autoreply__keywords
+msgid "One per line or separated by commas (case-insensitive)."
+msgstr "واحدة في كل سطر أو مفصولة بفواصل (غير حساسة لحالة الأحرف)."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+msgid "Only WhatsApp administrators can delete sessions."
+msgstr "يمكن لمسؤولي واتساب فقط حذف الجلسات."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+msgid "Only WhatsApp administrators can log a session out."
+msgstr "يمكن لمسؤولي واتساب فقط تسجيل الخروج من الجلسة."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_server.py:0
+msgid "Only WhatsApp managers can do this."
+msgstr "يمكن لمديري واتساب فقط تنفيذ هذا الإجراء."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__domain
+msgid "Only documents matching"
+msgstr "المستندات المطابقة فقط"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "Only messages sent from this number can be deleted for everyone."
+msgstr "يمكن حذف الرسائل المرسلة من هذا الرقم فقط للجميع."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_group__info_admin_only
+msgid "Only the admins can edit the group info."
+msgstr "يمكن للمشرفين فقط تعديل معلومات المجموعة."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_group__messages_admin_only
+msgid "Only the admins of the group can write in it."
+msgstr "يمكن لمشرفي المجموعة فقط الكتابة فيها."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "Only the author or a WhatsApp manager can delete this message."
+msgstr "يمكن لكاتب الرسالة أو لمدير واتساب فقط حذف هذه الرسالة."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "Only your text messages of the last %s minutes can be edited."
+msgstr "يمكن تعديل رسائلك النصية في آخر %s دقيقة فقط."
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form_qr
+msgid "Open WhatsApp &gt; Linked devices &gt; Link a device, then scan:"
+msgstr "افتح واتساب &gt; الأجهزة المرتبطة &gt; ربط جهاز، ثم امسح:"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Open contact"
+msgstr "فتح جهة الاتصال"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_conversation_view_form
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_conversation_view_list
+msgid "Open in Inbox"
+msgstr "فتح في صندوق الوارد"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_form
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_list
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_form
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_list
+msgid "Open the chat"
+msgstr "فتح الدردشة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_business_view_list
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_list
+msgid "Open the document"
+msgstr "فتح المستند"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_group__log_messages
+msgid ""
+"Opt-in: messages written in the group are saved in Odoo (privacy: only "
+"enable for groups you own)."
+msgstr ""
+"اشتراك اختياري: تُحفظ الرسائل المكتوبة في المجموعة داخل Odoo (الخصوصية: "
+"فعّله فقط للمجموعات التي تملكها)."
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_optout_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_optout
+msgid "Opt-outs"
+msgstr "إلغاءات الاشتراك"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_tracked_model__amount_field_id
+msgid "Optional. Amounts are added as stored, without currency conversion."
+msgstr "اختياري. تُجمع المبالغ كما هي مخزنة، دون تحويل العملة."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_conversation__chat_type__other
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_message__message_type__other
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__other
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_chat__chat_type__other
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__chat_type__other
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__other
+msgid "Other"
+msgstr "أخرى"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__direction__out
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__direction__out
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_message_view_search
+msgid "Outgoing"
+msgstr "صادرة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_message__response_seconds
+msgid ""
+"Outgoing human replies: seconds since the customer's first unanswered "
+"message."
+msgstr ""
+"الردود البشرية الصادرة: عدد الثواني منذ أول رسالة من العميل لم يُرد عليها."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_autoreply__trigger__outside_hours
+msgid "Outside business hours"
+msgstr "خارج ساعات العمل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_member__role__superadmin
+msgid "Owner"
+msgstr "المالك"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__participants_count
+msgid "Participants Count"
+msgstr "عدد المشاركين"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__partner_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__partner_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__partner_id
+msgid "Partner"
+msgstr "الشريك"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__status__passkey_confirmation_required
+msgid "Passkey Confirmation Required"
+msgstr "مطلوب تأكيد مفتاح المرور"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__status__passkey_required
+msgid "Passkey Required"
+msgstr "مطلوب مفتاح مرور"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__payload
+msgid "Payload"
+msgstr "البيانات المرسلة"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_report_peak_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_report_peak
+msgid "Peak Hours"
+msgstr "ساعات الذروة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_queue__state__pending
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_webhook_event__state__pending
+msgid "Pending"
+msgstr "قيد الانتظار"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_autoreply__cooldown_minutes
+msgid ""
+"Per conversation, shared by all rules: prevents answering every single "
+"message."
+msgstr "لكل محادثة، مشتركة بين كل القواعد: تمنع الرد على كل رسالة."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_ir_actions_server__waha_user_id
+#: model:ir.model.fields,help:elblasy_waha_connector.field_ir_cron__waha_user_id
+msgid "Permissions of this user apply when the message is built and sent."
+msgstr "تُطبق صلاحيات هذا المستخدم عند إنشاء الرسالة وإرسالها."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__remote_phone
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__phone
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__phone
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__phone
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__phone
+msgid "Phone"
+msgstr "الهاتف"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_optout__phone
+msgid "Phone (digits)"
+msgstr "الهاتف (أرقام)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__phone_number
+msgid "Phone Number"
+msgstr "رقم الهاتف"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Phone number"
+msgstr "رقم الهاتف"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "Photo"
+msgstr "صورة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__picture_synced_at
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__picture_synced_at
+msgid "Picture Synced At"
+msgstr "تمت مزامنة الصورة في"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Pin"
+msgstr "تثبيت"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__wa_pinned
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__is_pinned
+msgid "Pinned"
+msgstr "مثبتة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_ir_actions_server__waha_body
+#: model:ir.model.fields,help:elblasy_waha_connector.field_ir_cron__waha_body
+msgid ""
+"Placeholders: {{ object.name }}, {{ object.partner_id.name }}, {{ "
+"object.amount_total }}..."
+msgstr ""
+"المتغيرات: {{ object.name }}, {{ object.partner_id.name }}, {{ "
+"object.amount_total }}..."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__poll
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__poll
+msgid "Poll"
+msgstr "استطلاع"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__post_ids
+msgid "Post"
+msgstr "نشر"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Posts"
+msgstr "المنشورات"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Private chats"
+msgstr "الدردشات الخاصة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__profile_image
+msgid "Profile Image"
+msgstr "صورة الملف الشخصي"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Promote"
+msgstr "ترقية"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__qr_image
+msgid "Qr Image"
+msgstr "صورة QR"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__qr_updated_at
+msgid "Qr Updated At"
+msgstr "تاريخ تحديث QR"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_tracked_model_action
+msgid ""
+"Quotations, invoices, opportunities, tickets, repairs, rentals... any model "
+"with a date and a customer."
+msgstr ""
+"عروض الأسعار، الفواتير، الفرص، التذاكر، الإصلاحات، الإيجارات... أي نموذج له "
+"تاريخ وعميل."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_webhook_event__payload
+msgid "Raw event; may contain message content."
+msgstr "حدث خام؛ قد يحتوي على محتوى الرسالة."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__reactions
+msgid "Reactions"
+msgstr "ردود الفعل"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__delivery_status__read
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__delivery_status__read
+msgid "Read"
+msgstr "مقروءة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Read more"
+msgstr "قراءة المزيد"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__incoming_count
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Received"
+msgstr "مستلمة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "Received today, by hour"
+msgstr "المستلمة اليوم، حسب الساعة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__record_name
+msgid "Record Name"
+msgstr "اسم السجل"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form_qr
+msgid "Refresh"
+msgstr "تحديث"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Refresh Picture"
+msgstr "تحديث الصورة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Refresh Status"
+msgstr "تحديث الحالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__reject_calls
+msgid "Reject incoming calls"
+msgstr "رفض المكالمات الواردة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__rejected
+msgid "Rejected"
+msgstr "مرفوض"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__remote_call_id
+msgid "Remote Call"
+msgstr "استدعاء عن بُعد"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__remote_message_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__remote_message_id
+msgid "Remote Message"
+msgstr "رسالة عن بُعد"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Remove"
+msgstr "إزالة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Remove this member from the group?"
+msgstr "إزالة هذا العضو من المجموعة؟"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_message__hidden
+msgid "Removed from the inbox by a user; kept in the reports for the record."
+msgstr "أزاله مستخدم من صندوق الوارد؛ ويبقى في التقارير للتوثيق."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__replied
+msgid "Replied"
+msgstr "تم الرد"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "Replies"
+msgstr "الردود"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "Replies by the team"
+msgstr "ردود الفريق"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_report_agent_action
+msgid "Replies written by each person and their average response time."
+msgstr "الردود التي كتبها كل شخص ومتوسط زمن استجابته."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__reply_text
+msgid "Reply"
+msgstr "رد"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__quoted_body
+msgid "Reply to"
+msgstr "الرد على"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__quoted_remote_id
+msgid "Reply to (id)"
+msgstr "الرد على (المعرّف)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__reject_calls_message
+msgid "Reply to callers"
+msgstr "الرد على المتصلين"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Reply to yourself"
+msgstr "الرد على نفسك"
+
+#. module: elblasy_waha_connector
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_reporting
+msgid "Reporting"
+msgstr "التقارير"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "Reporting ▸ Peak Hours"
+msgstr "التقارير ▸ ساعات الذروة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__res_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__res_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__res_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__res_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__res_id
+msgid "Res"
+msgstr "المورد"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__res_model
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__res_model
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__res_model
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__res_model
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__res_model
+msgid "Res Model"
+msgstr "نموذج المورد"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__timeout_read
+msgid "Response Timeout (s)"
+msgstr "مهلة الاستجابة (ث)"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_form
+msgid "Response time"
+msgstr "زمن الاستجابة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__response_minutes
+msgid "Response time (min)"
+msgstr "زمن الاستجابة (دقيقة)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__response_seconds
+msgid "Response time (s)"
+msgstr "زمن الاستجابة (ثانية)"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Restart"
+msgstr "إعادة التشغيل"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_queue_view_list
+msgid "Retry"
+msgstr "إعادة المحاولة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Revoke Link"
+msgstr "إلغاء الرابط"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Revoke the current invite link and create a new one?"
+msgstr "إلغاء رابط الدعوة الحالي وإنشاء رابط جديد؟"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__role
+msgid "Role"
+msgstr "الدور"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__weekday__6
+msgid "Saturday"
+msgstr "السبت"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__status__scan_qr_code
+msgid "Scan QR Code"
+msgstr "مسح رمز QR"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__scheduled_for
+msgid "Scheduled For"
+msgstr "مجدولة في"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Scroll up for older messages"
+msgstr "مرّر لأعلى لعرض الرسائل الأقدم"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_report_action
+msgid ""
+"Search by phone number, contact, chat, agent or text; group by contact, "
+"weekday or hour."
+msgstr ""
+"ابحث برقم الهاتف أو جهة الاتصال أو الدردشة أو الموظف أو النص؛ وجمّع حسب جهة "
+"الاتصال أو يوم الأسبوع أو الساعة."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Search or start a new chat"
+msgstr "ابحث أو ابدأ دردشة جديدة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Search…"
+msgstr "بحث…"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "See"
+msgstr "عرض"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Select a chat to start."
+msgstr "اختر دردشة للبدء."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_send_view_form
+msgid "Send"
+msgstr "إرسال"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/res_partner.py:0
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.res_partner_view_form_waha
+msgid "Send WhatsApp"
+msgstr "إرسال واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__ir_actions_server__state__waha_send
+msgid "Send WhatsApp (WAHA)"
+msgstr "إرسال واتساب (WAHA)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_group_send
+msgid "Send a document to the customer and/or WhatsApp groups"
+msgstr "إرسال مستند إلى العميل و/أو مجموعات واتساب"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Send and receive WhatsApp messages from Odoo."
+msgstr "أرسل واستقبل رسائل واتساب من Odoo."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__waha_user_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_cron__waha_user_id
+msgid "Send as"
+msgstr "إرسال كـ"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Send message"
+msgstr "إرسال رسالة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_queue_view_list
+msgid "Send now"
+msgstr "إرسال الآن"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_document__source__waha
+msgid "Send to WhatsApp / automation"
+msgstr "إرسال إلى واتساب / الأتمتة"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/hooks.py:0
+#: code:addons/elblasy_waha_connector/models/waha_group.py:0
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_group_send_action
+msgid "Send to WhatsApp group"
+msgstr "إرسال إلى مجموعة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__waha_use_partner_groups
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_cron__waha_use_partner_groups
+msgid "Send to the customer's groups"
+msgstr "إرسال إلى مجموعات العميل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__waha_send_customer
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_cron__waha_send_customer
+msgid "Send to the customer's number"
+msgstr "إرسال إلى رقم العميل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__send_to_customer
+msgid "Send to this number"
+msgstr "إرسال إلى هذا الرقم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__sender_id
+msgid "Sender"
+msgstr "المرسل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__sender_identifier
+msgid "Sender Identifier"
+msgstr "معرّف المرسل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__sender_name
+msgid "Sender Name"
+msgstr "اسم المرسل"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_post__state__pending
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__delivery_status__pending
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_document__state__pending
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__delivery_status__pending
+msgid "Sending"
+msgstr "جارٍ الإرسال"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__nbr
+msgid "Sends"
+msgstr "عمليات الإرسال"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__outgoing_count
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_post__state__sent
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__delivery_status__sent
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_document__state__sent
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__delivery_status__sent
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Sent"
+msgstr "مرسلة"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_report_document_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_report_documents
+msgid "Sent Documents"
+msgstr "المستندات المرسلة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__user_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__user_id
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_search
+msgid "Sent by"
+msgstr "أرسلها"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_search
+msgid "Sent from"
+msgstr "أُرسلت من"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__sent_on_whatsapp
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_business_view_search
+msgid "Sent on WhatsApp"
+msgstr "أُرسلت عبر واتساب"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/wizard/waha_group_send.py:0
+msgid "Sent to %s target(s)."
+msgstr "تم الإرسال إلى %s جهة."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__sequence
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__sequence
+msgid "Sequence"
+msgstr "التسلسل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__server_id
+msgid "Server"
+msgstr "الخادم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_ir_actions_server
+msgid "Server Action"
+msgstr "إجراء الخادم"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_server.py:0
+msgid "Server error"
+msgstr "خطأ في الخادم"
+
+#. module: elblasy_waha_connector
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_servers
+msgid "Servers"
+msgstr "الخوادم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_call__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_label__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__session_ids
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__session_id
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_conversation_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_message_view_search
+msgid "Session"
+msgstr "الجلسة"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+msgid "Session name may only contain letters, digits, '-' and '_'."
+msgstr "يجب أن يحتوي اسم الجلسة على أحرف وأرقام و '-' و '_' فقط."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Session offline"
+msgstr "الجلسة غير متصلة"
+
+#. module: elblasy_waha_connector
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_sessions
+msgid "Sessions"
+msgstr "الجلسات"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_session__inbox_groups
+msgid ""
+"Show WhatsApp groups and their messages in the inbox, like WhatsApp Web."
+msgstr "عرض مجموعات واتساب ورسائلها في صندوق الوارد، مثل واتساب Web."
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+msgid "Silent for 30+ days"
+msgstr "صامتة لأكثر من 30 يومًا"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__media_max_mb
+msgid "Size limit (MB)"
+msgstr "حد الحجم (MB)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_queue__state__skipped
+msgid "Skipped"
+msgstr "تم تخطيها"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__max_response_minutes
+msgid "Slowest response (min)"
+msgstr "أبطأ استجابة (دقيقة)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_optout__source
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__source
+msgid "Source"
+msgstr "المصدر"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Star"
+msgstr "تمييز بنجمة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__is_starred
+msgid "Starred"
+msgstr "مميزة بنجمة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__status__starting
+msgid "Starting"
+msgstr "جارٍ البدء"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__state
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__state
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__state
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_webhook_event__state
+msgid "State"
+msgstr "الحالة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__status
+msgid "Status"
+msgstr "الحالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__status_hint
+msgid "Status Hint"
+msgstr "تلميح الحالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__status_raw
+msgid "Status Raw"
+msgstr "الحالة الخام"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__sticker
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__sticker
+msgid "Sticker"
+msgstr "ملصق"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Stop"
+msgstr "إيقاف"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__status__stopped
+msgid "Stopped"
+msgstr "متوقفة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__log_messages
+msgid "Store incoming messages"
+msgstr "حفظ الرسائل الواردة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group__name
+msgid "Subject"
+msgstr "الموضوع"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__weekday__7
+msgid "Sunday"
+msgstr "الأحد"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Sync Groups"
+msgstr "مزامنة المجموعات"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Sync Labels"
+msgstr "مزامنة التصنيفات"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
+msgid "Sync Members"
+msgstr "مزامنة الأعضاء"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Sync Messages"
+msgstr "مزامنة الرسائل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__target_name
+msgid "Target Name"
+msgstr "اسم الهدف"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__chat_id
+msgid "Target chat"
+msgstr "الدردشة المستهدفة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "Team today"
+msgstr "الفريق اليوم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_session__session_name
+msgid "Technical name used in WAHA (letters, digits, - and _)."
+msgstr "الاسم التقني المستخدم في WAHA (حروف وأرقام و - و _)."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__template
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_search
+msgid "Template"
+msgstr "قالب"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_server_view_form
+msgid "Test Connection"
+msgstr "اختبار الاتصال"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_message__message_type__text
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__text
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__text
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Text"
+msgstr "نص"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form_qr
+msgid "The QR code is not ready yet, press Refresh."
+msgstr "رمز QR غير جاهز بعد، اضغط على تحديث."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_server.py:0
+msgid "The WAHA Base URL must start with http:// or https://."
+msgstr "يجب أن يبدأ عنوان WAHA الأساسي (Base URL) بـ http:// أو https://."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_dashboard.py:0
+msgid "The WhatsApp dashboard is for WhatsApp managers."
+msgstr "لوحة متابعة واتساب مخصصة لمديري واتساب."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "The WhatsApp number is not connected. Messages cannot be sent."
+msgstr "رقم واتساب غير متصل. لا يمكن إرسال الرسائل."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "The WhatsApp session is not connected (status: %s)."
+msgstr "جلسة واتساب غير متصلة (الحالة: %s)."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "The WhatsApp session is not connected."
+msgstr "جلسة واتساب غير متصلة."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_tracked_model.py:0
+msgid "The WhatsApp window must be at least one day."
+msgstr "يجب ألا تقل نافذة واتساب عن يوم واحد."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "The browser did not allow copying."
+msgstr "لم يسمح المتصفح بالنسخ."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_report_business__from_whatsapp
+msgid ""
+"The customer exchanged WhatsApp messages in the window before this document."
+msgstr "تبادل العميل رسائل واتساب خلال النافذة السابقة لهذا المستند."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_report_business__whatsapp_customer
+msgid "The customer has a WhatsApp chat (at any time)."
+msgstr "لدى العميل دردشة واتساب (في أي وقت)."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "The file could not be downloaded."
+msgstr "تعذر تنزيل الملف."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "The file could not be read."
+msgstr "تعذرت قراءة الملف."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "The file could not be sent."
+msgstr "تعذر إرسال الملف."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "The file is empty."
+msgstr "الملف فارغ."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "The file is too large (maximum %s MB)."
+msgstr "الملف كبير جدًا (الحد الأقصى %s MB)."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "The file is too large (maximum 15 MB)."
+msgstr "الملف كبير جدًا (الحد الأقصى 15 MB)."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_message__media_pending
+msgid ""
+"The file stays on WhatsApp until someone opens it (media policy of the "
+"session)."
+msgstr "يبقى الملف على واتساب حتى يفتحه أحد (سياسة الوسائط للجلسة)."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/wizard/waha_group_create.py:0
+msgid ""
+"The group was created on WhatsApp but WAHA did not return its id. Use Sync "
+"Groups to import it."
+msgstr ""
+"تم إنشاء المجموعة على واتساب لكن WAHA لم يُرجع معرّفها. استخدم مزامنة "
+"المجموعات لاستيرادها."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "The label could not be changed."
+msgstr "تعذر تغيير التصنيف."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "The message could not be sent."
+msgstr "تعذر إرسال الرسالة."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "The message is empty."
+msgstr "الرسالة فارغة."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_conversation__lid_chat_id
+msgid ""
+"The …@lid id of the same person when the chat is known by its phone number."
+msgstr "معرّف …@lid لنفس الشخص عندما تكون الدردشة معروفة برقم هاتفه."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_message_remote_uniq
+msgid "This WhatsApp message is already stored."
+msgstr "رسالة واتساب هذه محفوظة بالفعل."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "This conversation is already linked to a contact."
+msgstr "هذه المحادثة مرتبطة بجهة اتصال بالفعل."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_group_chat_uniq
+msgid "This group is already registered for the session."
+msgstr "هذه المجموعة مسجلة بالفعل للجلسة."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_label_label_uniq
+msgid "This label already exists for the session."
+msgstr "هذا التصنيف موجود بالفعل للجلسة."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "This label does not belong to the session of the chat."
+msgstr "هذا التصنيف لا ينتمي إلى جلسة الدردشة."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "This message cannot be found."
+msgstr "تعذر العثور على هذه الرسالة."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "This message was deleted"
+msgstr "تم حذف هذه الرسالة"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "This message was never delivered to WhatsApp."
+msgstr "لم تُسلَّم هذه الرسالة إلى واتساب مطلقًا."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "This number asked to stop receiving automatic messages."
+msgstr "طلب هذا الرقم التوقف عن استقبال الرسائل التلقائية."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_optout_phone_uniq
+msgid "This number is already opted out."
+msgstr "تم إلغاء اشتراك هذا الرقم بالفعل."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_session_session_name_uniq
+msgid "This session name already exists on the server."
+msgstr "اسم الجلسة هذا موجود بالفعل على الخادم."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__weekday__4
+msgid "Thursday"
+msgstr "الخميس"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__tz
+msgid "Time zone"
+msgstr "المنطقة الزمنية"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__timelock_ends
+msgid "Timelock Ends"
+msgstr "نهاية القفل الزمني"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_server_check_timeouts
+msgid "Timeouts must be positive."
+msgstr "يجب أن تكون مهلات الانتظار أكبر من صفر."
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_search
+msgid "To customers"
+msgstr "إلى العملاء"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_document_view_search
+msgid "To groups"
+msgstr "إلى المجموعات"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "Today"
+msgstr "اليوم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__token
+msgid "Token"
+msgstr "الرمز المميز (Token)"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "Too many messages to this chat in the last minute, please wait."
+msgstr "رسائل كثيرة جدًا إلى هذه الدردشة في الدقيقة الأخيرة، يرجى الانتظار."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_business_view_list
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_list
+msgid "Total"
+msgstr "الإجمالي"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_tracked_model_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_tracked_models
+msgid "Tracked Documents"
+msgstr "المستندات المتتبعة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_report_business_action
+msgid ""
+"Tracked documents (Configuration ▸ Tracked Documents) and whether their customer\n"
+"            chatted on WhatsApp shortly before. Compare with \"No WhatsApp contact\" to see what WhatsApp brings."
+msgstr ""
+"المستندات المتتبعة (الإعدادات ▸ المستندات المتتبعة) وما إذا كان عميلها قد "
+"تحدث على واتساب قبلها بوقت قصير. قارنها بـ \"بدون جهة اتصال واتساب\" لمعرفة "
+"ما يضيفه واتساب."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__trigger
+msgid "Trigger"
+msgstr "المشغّل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__weekday__2
+msgid "Tuesday"
+msgstr "الثلاثاء"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__message_type
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__state
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_cron__state
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Type"
+msgstr "النوع"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Type a message"
+msgstr "اكتب رسالة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_ir_actions_server__state
+#: model:ir.model.fields,help:elblasy_waha_connector.field_ir_cron__state
+msgid ""
+"Type of server action. The following values are available:\n"
+"- 'Update a Record': update the values of a record\n"
+"- 'Create Activity': create an activity (Discuss)\n"
+"- 'Send Email': post a message, a note or send an email (Discuss)\n"
+"- 'Send SMS': send SMS, log them on documents (SMS)- 'Add/Remove Followers': add or remove followers to a record (Discuss)\n"
+"- 'Create Record': create a new record with new values\n"
+"- 'Execute Code': a block of Python code that will be executed\n"
+"- 'Send Webhook Notification': send a POST request to an external system, also known as a Webhook\n"
+"- 'Multi Actions': define an action that triggers several other server actions\n"
+msgstr ""
+"نوع إجراء الخادم. القيم المتاحة:\n"
+"- 'Update a Record': تحديث قيم سجل\n"
+"- 'Create Activity': إنشاء نشاط (المناقشة)\n"
+"- 'Send Email': نشر رسالة أو ملاحظة أو إرسال بريد إلكتروني (المناقشة)\n"
+"- 'Send SMS': إرسال رسائل SMS وتسجيلها على المستندات (SMS)- 'Add/Remove Followers': إضافة أو إزالة متابعين لسجل (المناقشة)\n"
+"- 'Create Record': إنشاء سجل جديد بقيم جديدة\n"
+"- 'Execute Code': كتلة من كود Python سيتم تنفيذها\n"
+"- 'Send Webhook Notification': إرسال طلب POST إلى نظام خارجي، يُعرف أيضًا باسم Webhook\n"
+"- 'Multi Actions': تعريف إجراء يشغّل عدة إجراءات خادم أخرى\n"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_server__webhook_base_url
+msgid "URL WAHA uses to reach this Odoo. Defaults to web.base.url."
+msgstr ""
+"عنوان URL الذي يستخدمه WAHA للوصول إلى Odoo هذا. القيمة الافتراضية "
+"web.base.url."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_server.py:0
+msgid "Unexpected response"
+msgstr "استجابة غير متوقعة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Unpin"
+msgstr "إلغاء التثبيت"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_conversation_view_search
+msgid "Unread"
+msgstr "غير مقروءة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__unread_count
+msgid "Unread Count"
+msgstr "عدد غير المقروءة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Unstar"
+msgstr "إلغاء التمييز بنجمة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "Unsupported message, open WhatsApp on the phone to view it"
+msgstr "رسالة غير مدعومة، افتح واتساب على الهاتف لعرضها"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__media_download__limit
+msgid "Up to the size limit (videos on demand)"
+msgstr "حتى حد الحجم (الفيديو عند الطلب)"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "Us"
+msgstr "نحن"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__user_id
+#: model:res.groups,name:elblasy_waha_connector.group_waha_user
+msgid "User"
+msgstr "المستخدم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__verify_ssl
+msgid "Verify HTTPS Certificate"
+msgstr "التحقق من شهادة HTTPS"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__use_hmac
+msgid "Verify Webhook HMAC"
+msgstr "التحقق من HMAC الخاص بـ Webhook"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__check_numbers
+msgid "Verify numbers"
+msgstr "التحقق من الأرقام"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__video
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__video
+msgid "Video"
+msgstr "فيديو"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__base_url
+msgid "WAHA Base URL"
+msgstr "عنوان WAHA الأساسي (Base URL)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_server
+msgid "WAHA Server"
+msgstr "خادم WAHA"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_server_action
+msgid "WAHA Servers"
+msgstr "خوادم WAHA"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__session_name
+msgid "WAHA Session Name"
+msgstr "اسم جلسة WAHA"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_webhook_event
+msgid "WAHA Webhook Event"
+msgstr "حدث Webhook من WAHA"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_server.py:0
+msgid "WAHA connection test"
+msgstr "اختبار الاتصال بـ WAHA"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_message.py:0
+msgid "WAHA did not return a message id."
+msgstr "لم يُرجع WAHA معرّف الرسالة."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group.py:0
+msgid "WAHA did not return an invite code (are you an admin of the group?)."
+msgstr "لم يُرجع WAHA رمز الدعوة (هل أنت مشرف في المجموعة؟)."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+msgid "WAHA error (%(kind)s): %(msg)s"
+msgstr "خطأ WAHA (%(kind)s): %(msg)s"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.server,name:elblasy_waha_connector.cron_waha_sync_messages_ir_actions_server
+msgid "WAHA: auto-sync incoming messages"
+msgstr "WAHA: مزامنة الرسائل الواردة تلقائيًا"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.server,name:elblasy_waha_connector.cron_waha_purge_media_ir_actions_server
+msgid "WAHA: delete expired media"
+msgstr "WAHA: حذف الوسائط المنتهية الصلاحية"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.server,name:elblasy_waha_connector.cron_waha_conversation_pictures_ir_actions_server
+msgid "WAHA: fetch chat pictures"
+msgstr "WAHA: جلب صور الدردشات"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.server,name:elblasy_waha_connector.cron_waha_group_pictures_ir_actions_server
+msgid "WAHA: fetch group pictures"
+msgstr "WAHA: جلب صور المجموعات"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.server,name:elblasy_waha_connector.cron_waha_chat_list_ir_actions_server
+msgid "WAHA: mirror the WhatsApp chat list"
+msgstr "WAHA: نسخ قائمة دردشات واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.server,name:elblasy_waha_connector.cron_waha_retry_events_ir_actions_server
+msgid "WAHA: process webhook events"
+msgstr "WAHA: معالجة أحداث Webhook"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.server,name:elblasy_waha_connector.cron_waha_purge_group_messages_ir_actions_server
+msgid "WAHA: purge old group messages"
+msgstr "WAHA: تنظيف رسائل المجموعات القديمة"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.server,name:elblasy_waha_connector.cron_waha_queue_ir_actions_server
+msgid "WAHA: send queued WhatsApp messages"
+msgstr "WAHA: إرسال رسائل واتساب المنتظرة في الطابور"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_res_partner__waha_conversation_ids
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_res_users__waha_conversation_ids
+msgid "Waha Conversation"
+msgstr "محادثة WAHA"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_res_partner__waha_conversation_count
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_res_users__waha_conversation_count
+msgid "Waha Conversation Count"
+msgstr "عدد محادثات WAHA"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_res_partner__waha_phone_digits
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_res_users__waha_phone_digits
+msgid "Waha Phone Digits"
+msgstr "أرقام هاتف WAHA"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_report_waiting_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_report_waiting
+msgid "Waiting for a Reply"
+msgstr "في انتظار رد"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__waiting
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+msgid "Waiting for a reply"
+msgstr "في انتظار رد"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__awaiting_since
+msgid "Waiting since"
+msgstr "في الانتظار منذ"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_server_view_form
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Webhook"
+msgstr "Webhook"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__webhook_event_id
+msgid "Webhook Event"
+msgstr "حدث Webhook"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_webhook_event_action
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_events
+msgid "Webhook Events"
+msgstr "أحداث Webhook"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__webhook_secret
+msgid "Webhook HMAC Secret"
+msgstr "المفتاح السري HMAC لـ Webhook"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__webhook_token
+msgid "Webhook Token"
+msgstr "رمز Webhook"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__webhook_url
+msgid "Webhook Url"
+msgstr "رابط Webhook"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_session_webhook_token_uniq
+msgid "Webhook token must be unique."
+msgstr "يجب أن يكون رمز Webhook فريدًا."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__weekday__3
+msgid "Wednesday"
+msgstr "الأربعاء"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__weekday
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "Weekday"
+msgstr "يوم الأسبوع"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/wizard/waha_group_send.py:0
+#: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_root
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.res_partner_view_form_waha
+msgid "WhatsApp"
+msgstr "واتساب"
+
+#. module: elblasy_waha_connector
+#: model:res.groups.privilege,name:elblasy_waha_connector.res_groups_privilege_waha
+msgid "WhatsApp (WAHA)"
+msgstr "واتساب (WAHA)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_autoreply
+msgid "WhatsApp Auto-reply Rule"
+msgstr "قاعدة الرد التلقائي في واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_queue
+msgid "WhatsApp Automation Queue"
+msgstr "طابور أتمتة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_report_business
+msgid "WhatsApp Business Impact"
+msgstr "أثر واتساب على الأعمال"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_call
+msgid "WhatsApp Call"
+msgstr "مكالمة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_report_chat
+msgid "WhatsApp Chat Analysis"
+msgstr "تحليل دردشات واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__remote_chat_id
+msgid "WhatsApp Chat ID"
+msgstr "معرّف دردشة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_conversation
+msgid "WhatsApp Conversation"
+msgstr "محادثة واتساب"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/res_partner.py:0
+msgid "WhatsApp Conversations"
+msgstr "محادثات واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.client,name:elblasy_waha_connector.waha_dashboard_action
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_dashboard
+msgid "WhatsApp Dashboard"
+msgstr "لوحة متابعة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_group
+msgid "WhatsApp Group"
+msgstr "مجموعة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_group_member
+msgid "WhatsApp Group Member"
+msgstr "عضو مجموعة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_group_message
+msgid "WhatsApp Group Message"
+msgstr "رسالة مجموعة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_group_post
+msgid "WhatsApp Group Post"
+msgstr "منشور مجموعة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_group_action
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_res_partner__waha_group_ids
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_res_users__waha_group_ids
+msgid "WhatsApp Groups"
+msgstr "مجموعات واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_member__wa_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_label__label_id
+msgid "WhatsApp ID"
+msgstr "معرّف واتساب"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+#: model:ir.actions.client,name:elblasy_waha_connector.waha_inbox_action
+msgid "WhatsApp Inbox"
+msgstr "صندوق وارد واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_label
+msgid "WhatsApp Label"
+msgstr "تصنيف واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_message
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__waha_body
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_cron__waha_body
+msgid "WhatsApp Message"
+msgstr "رسالة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_report_message
+msgid "WhatsApp Message Analysis"
+msgstr "تحليل رسائل واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_report_action
+msgid "WhatsApp Messages"
+msgstr "رسائل واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__display_name_remote
+msgid "WhatsApp Name"
+msgstr "اسم واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_document__session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__session_id
+msgid "WhatsApp Number"
+msgstr "رقم واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_optout
+msgid "WhatsApp Opt-out"
+msgstr "إلغاء اشتراك واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_session
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_actions_server__waha_session_id
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_ir_cron__waha_session_id
+msgid "WhatsApp Session"
+msgstr "جلسة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.actions.act_window,name:elblasy_waha_connector.waha_session_action
+msgid "WhatsApp Sessions"
+msgstr "جلسات واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_tracked_model
+msgid "WhatsApp Tracked Document"
+msgstr "مستند واتساب متتبع"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "WhatsApp could not provide the file: %s"
+msgstr "تعذر على واتساب توفير الملف: %s"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__whatsapp_customer
+msgid "WhatsApp customer"
+msgstr "عميل واتساب"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_business_view_search
+msgid "WhatsApp customers"
+msgstr "عملاء واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__lid_chat_id
+msgid "WhatsApp hidden ID"
+msgstr "معرّف واتساب المخفي"
+
+#. module: elblasy_waha_connector
+#: model:ir.module.module,summary:base.module_elblasy_waha_connector
+msgid ""
+"WhatsApp inbox, groups and automation for Odoo, powered by your own WAHA "
+"server"
+msgstr ""
+"صندوق وارد واتساب والمجموعات والأتمتة لـ Odoo، بالاعتماد على خادم WAHA الخاص"
+" بك"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "WhatsApp is limiting messages to new contacts on this number"
+msgstr "يقيّد واتساب الرسائل إلى جهات الاتصال الجديدة على هذا الرقم"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session.py:0
+msgid ""
+"WhatsApp is limiting messages to new contacts on this number right now. "
+"Existing conversations are not affected."
+msgstr ""
+"يقيّد واتساب حاليًا الرسائل إلى جهات الاتصال الجديدة على هذا الرقم. "
+"المحادثات القائمة غير متأثرة."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "WhatsApp lets you forward a message to 5 chats at most."
+msgstr "يتيح لك واتساب إعادة توجيه الرسالة إلى 5 دردشات كحد أقصى."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "WhatsApp message"
+msgstr "رسالة واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_post__wa_message_ids
+msgid "WhatsApp message ids"
+msgstr "معرّفات رسائل واتساب"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "WhatsApp message to"
+msgstr "رسالة واتساب إلى"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "WhatsApp no longer has this file."
+msgstr "لم يعد هذا الملف متوفرًا على واتساب."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "WhatsApp number"
+msgstr "رقم واتساب"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "WhatsApp number offline"
+msgstr "رقم واتساب غير متصل"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "WhatsApp refused the action."
+msgstr "رفض واتساب الإجراء."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid "WhatsApp refused the action: %s"
+msgstr "رفض واتساب الإجراء: %s"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+msgid ""
+"WhatsApp refused the label change (%s). Labels need a WhatsApp Business "
+"account."
+msgstr "رفض واتساب تغيير التصنيف (%s). تتطلب التصنيفات حساب واتساب Business."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_session__timelock_active
+msgid ""
+"WhatsApp restricts messaging people you have never chatted with (error 463)."
+msgstr "يقيّد واتساب مراسلة أشخاص لم تتحدث معهم من قبل (خطأ 463)."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "WhatsApp today"
+msgstr "واتساب اليوم"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_tracked_model__window_days
+msgid "WhatsApp window (days)"
+msgstr "نافذة واتساب (بالأيام)"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__whatsapp_profile_name
+msgid "Whatsapp Profile Name"
+msgstr "اسم الملف الشخصي في واتساب"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_session__sync_read_state
+msgid ""
+"When a chat is read in the Odoo inbox, clear its unread badge on the phone "
+"as well."
+msgstr ""
+"عند قراءة دردشة في صندوق وارد Odoo، امسح شارة غير المقروءة الخاصة بها على "
+"الهاتف أيضًا."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_group__allow_send
+msgid "Whitelist: only groups ticked here appear in the send wizard."
+msgstr "القائمة المسموح بها: تظهر في معالج الإرسال المجموعات المحددة هنا فقط."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__has_media
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
+msgid "With a file"
+msgstr "مع ملف"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
+msgid "With failed messages"
+msgstr "مع رسائل فاشلة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__work_days
+msgid "Work days"
+msgstr "أيام العمل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__work_from
+msgid "Work from"
+msgstr "العمل من"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_autoreply__work_to
+msgid "Work to"
+msgstr "العمل إلى"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "Write a message or attach a file."
+msgstr "اكتب رسالة أو أرفق ملفًا."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Yes"
+msgstr "نعم"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "Yesterday"
+msgstr "أمس"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "You are not allowed to use WhatsApp."
+msgstr "غير مسموح لك باستخدام واتساب."
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_conversation_view_form
+msgid "e.g. 201001234567"
+msgstr "مثال: 201001234567"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_tracked_model_view_form
+msgid "e.g. Confirmed sales orders"
+msgstr "مثال: أوامر البيع المؤكدة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_server__base_url
+msgid "e.g. https://waha.example.com"
+msgstr "مثال: https://waha.example.com"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "failed"
+msgstr "فشلت"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "for the whole month."
+msgstr "للشهر بأكمله."
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_server_view_form
+msgid "https://odoo.example.com"
+msgstr "https://odoo.example.com"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_server_view_form
+msgid "https://waha.example.com"
+msgstr "https://waha.example.com"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "min"
+msgstr "د"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "not confirmed"
+msgstr "غير مؤكد"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/res_partner.py:0
+msgid "partner_id"
+msgstr "partner_id"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_autoreply_view_form
+msgid "price, ثمن, تكلفة"
+msgstr "price, ثمن, تكلفة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
+msgid "same as yesterday"
+msgstr "مثل أمس"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
+msgid "sent"
+msgstr "تم الإرسال"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_autoreply__reply_text
+msgid "{name} is replaced by the customer's name."
+msgstr "يتم استبدال {name} باسم العميل."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
+msgid "· last 30 days"
+msgstr "· آخر 30 يومًا"

@@ -1,0 +1,366 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* elblasy_waha_whatsapp_bridge
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 20.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-30 14:46+0000\n"
+"PO-Revision-Date: 2026-10-30 14:46+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.module.module,description:base.module_elblasy_waha_whatsapp_bridge
+msgid ""
+"\n"
+"Odoo WhatsApp Bridge for WAHA\n"
+"=============================\n"
+"Add-on of \"Elblasy WhatsApp (WAHA)\" for Odoo Enterprise. Links a WAHA session to a\n"
+"``whatsapp.account`` and redirects the transport layer of the native ``whatsapp`` app\n"
+"(send, media, webhooks) to WAHA. Adds New Chat (Discuss) and free-text messages without\n"
+"templates. See static/description/index.html.\n"
+msgstr ""
+"\n"
+"جسر WhatsApp لـ Odoo عبر WAHA\n"
+"=============================\n"
+"إضافة لـ \"Elblasy WhatsApp (WAHA)\" على Odoo Enterprise. تربط جلسة WAHA بحساب\n"
+"``whatsapp.account`` وتحوّل طبقة النقل في تطبيق ``whatsapp`` الأصلي\n"
+"(الإرسال، الوسائط، Webhooks) إلى WAHA. تضيف دردشة جديدة (المناقشة) ورسائل نصية حرة بدون\n"
+"قوالب. راجع static/description/index.html.\n"
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/wizard/whatsapp_composer.py:0
+msgid "%s skipped (no phone number)."
+msgstr "تم تخطي %s (لا يوجد رقم هاتف)."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.whatsapp_account_view_form_waha
+msgid ". Meta credentials are not used."
+msgstr ". لا تُستخدم بيانات اعتماد Meta."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_webhook_event__bridge_message_ref
+msgid "Bridge Message Ref"
+msgstr "مرجع رسالة الجسر"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.waha_new_chat_view_form
+msgid "Cancel"
+msgstr "إلغاء"
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/wizard/waha_new_chat.py:0
+msgid "Choose a contact with a phone number or type a number."
+msgstr "اختر جهة اتصال لها رقم هاتف أو اكتب رقمًا."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model,name:elblasy_waha_whatsapp_bridge.model_res_partner
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_new_chat__partner_id
+msgid "Contact"
+msgstr "جهة اتصال"
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/models/whatsapp_account.py:0
+msgid "Could not open a conversation with this number."
+msgstr "تعذر فتح محادثة مع هذا الرقم."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_new_chat__create_uid
+msgid "Created by"
+msgstr "أنشأه"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_new_chat__create_date
+msgid "Created on"
+msgstr "تاريخ الإنشاء"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.waha_session_view_form_bridge
+msgid "Disable Odoo WhatsApp"
+msgstr "تعطيل واتساب الخاص بـ Odoo"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model,name:elblasy_waha_whatsapp_bridge.model_discuss_channel
+msgid "Discussion Channel"
+msgstr "قناة النقاش"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_discuss_channel__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_new_chat__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_report_document__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_session__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_webhook_event__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_res_partner__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_whatsapp_account__display_name
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_whatsapp_composer__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model,name:elblasy_waha_whatsapp_bridge.model_elblasy_waha_report_document
+msgid "Documents Sent on WhatsApp"
+msgstr "المستندات المرسلة عبر واتساب"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.module.module,shortdesc:base.module_elblasy_waha_whatsapp_bridge
+msgid "Elblasy WAHA - Odoo WhatsApp Bridge"
+msgstr "Elblasy WAHA - جسر واتساب لـ Odoo"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.waha_session_view_form_bridge
+msgid "Enable Odoo WhatsApp"
+msgstr "تفعيل واتساب الخاص بـ Odoo"
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/models/whatsapp_account.py:0
+msgid "Enter a valid phone number with the country code."
+msgstr "أدخل رقم هاتف صالحًا مع رمز الدولة."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_new_chat__message
+msgid "First message"
+msgstr "أول رسالة"
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/wizard/whatsapp_composer.py:0
+msgid ""
+"Free text can go to at most %s recipients at once; use a template or an "
+"automation rule for more."
+msgstr ""
+"يمكن إرسال النص الحر إلى %s مستلمين كحد أقصى في المرة الواحدة؛ استخدم قالبًا"
+" أو قاعدة أتمتة للمزيد."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_discuss_channel__id
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_new_chat__id
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_report_document__id
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_session__id
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_webhook_event__id
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_res_partner__id
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_whatsapp_account__id
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_whatsapp_composer__id
+msgid "ID"
+msgstr "المعرّف"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,help:elblasy_waha_whatsapp_bridge.field_elblasy_waha_new_chat__phone
+msgid "International format, e.g. +20 100 123 4567. Filled from the contact."
+msgstr "الصيغة الدولية، مثال: +20 100 123 4567. تُملأ من جهة الاتصال."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_new_chat__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_new_chat__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_whatsapp_composer__waha_message
+msgid "Message"
+msgstr "رسالة"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.ui.menu,name:elblasy_waha_whatsapp_bridge.menu_waha_new_chat
+msgid "New Chat (Discuss)"
+msgstr "دردشة جديدة (المناقشة)"
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/models/res_partner.py:0
+#: model:ir.actions.act_window,name:elblasy_waha_whatsapp_bridge.waha_new_chat_action
+msgid "New WhatsApp chat"
+msgstr "دردشة واتساب جديدة"
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/wizard/whatsapp_composer.py:0
+msgid "No valid phone number to send to."
+msgstr "لا يوجد رقم هاتف صالح للإرسال إليه."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_session__odoo_whatsapp_enabled
+msgid "Odoo WhatsApp via WAHA"
+msgstr "واتساب الخاص بـ Odoo عبر WAHA"
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/models/waha_session.py:0
+msgid "Only WhatsApp administrators can disable this."
+msgstr "يمكن لمديري واتساب فقط تعطيل هذا."
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/models/waha_session.py:0
+msgid "Only WhatsApp administrators can enable this."
+msgstr "يمكن لمديري واتساب فقط تفعيل هذا."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.waha_new_chat_view_form
+msgid "Open chat"
+msgstr "فتح الدردشة"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.waha_new_chat_view_form
+msgid "Optional first message"
+msgstr "رسالة أولى (اختيارية)"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.whatsapp_composer_view_form_waha
+msgid "Optional: leave empty to write a free message"
+msgstr "اختياري: اتركه فارغًا لكتابة رسالة حرة"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_new_chat__phone
+msgid "Phone"
+msgstr "الهاتف"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,help:elblasy_waha_whatsapp_bridge.field_whatsapp_composer__waha_message
+msgid ""
+"Plain text. Users who can edit mail templates may use {{ object.name }} "
+"placeholders."
+msgstr ""
+"نص عادي. يمكن للمستخدمين القادرين على تعديل قوالب البريد استخدام عناصر نائبة"
+" مثل {{ object.name }}."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.module.module,summary:base.module_elblasy_waha_whatsapp_bridge
+msgid ""
+"Run Odoo's native WhatsApp app (Enterprise) through your WAHA session and "
+"message anyone without templates"
+msgstr ""
+"شغّل تطبيق واتساب الأصلي في Odoo (Enterprise) عبر جلسة WAHA الخاصة بك وراسل "
+"أي شخص دون قوالب"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model,name:elblasy_waha_whatsapp_bridge.model_whatsapp_composer
+msgid "Send WhatsApp Wizard"
+msgstr "معالج إرسال واتساب"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_whatsapp_composer__waha_account_id
+msgid "Send with"
+msgstr "إرسال عبر"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model,name:elblasy_waha_whatsapp_bridge.model_elblasy_waha_new_chat
+msgid "Start a WhatsApp chat in Discuss"
+msgstr "ابدأ دردشة واتساب في المناقشة"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.constraint,message:elblasy_waha_whatsapp_bridge.constraint_whatsapp_account_waha_session_uniq
+msgid "This WAHA session is already linked to a WhatsApp account."
+msgstr "جلسة WAHA هذه مرتبطة بحساب واتساب بالفعل."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.whatsapp_account_view_form_waha
+msgid "This account sends and receives through the WAHA session"
+msgstr "يرسل هذا الحساب ويستقبل عبر جلسة WAHA"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.waha_session_view_form_bridge
+msgid "Unlink the native WhatsApp account from this session?"
+msgstr "هل تريد فصل حساب واتساب الأصلي عن هذه الجلسة؟"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.waha_session_view_form_bridge
+msgid ""
+"Use Odoo's native WhatsApp app (Discuss, templates, chatter) through this "
+"WAHA session."
+msgstr ""
+"استخدم تطبيق واتساب الأصلي في Odoo (المناقشة، القوالب، سجل الرسائل) عبر جلسة"
+" WAHA هذه."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_whatsapp_account__waha_session_id
+msgid "WAHA Session"
+msgstr "جلسة WAHA"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model,name:elblasy_waha_whatsapp_bridge.model_elblasy_waha_webhook_event
+msgid "WAHA Webhook Event"
+msgstr "حدث Webhook من WAHA"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_whatsapp_composer__waha_free_text
+msgid "Waha Free Text"
+msgstr "نص حر WAHA"
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/wizard/whatsapp_composer.py:0
+msgid "WhatsApp"
+msgstr "واتساب"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.waha_session_view_form_bridge
+msgid "WhatsApp Account"
+msgstr "حساب واتساب"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model,name:elblasy_waha_whatsapp_bridge.model_whatsapp_account
+msgid "WhatsApp Business Account"
+msgstr "حساب واتساب Business"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.res_partner_view_form_waha_chat
+msgid "WhatsApp Chat"
+msgstr "دردشة واتساب"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model,name:elblasy_waha_whatsapp_bridge.model_elblasy_waha_session
+msgid "WhatsApp Session"
+msgstr "جلسة واتساب"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_new_chat__account_id
+msgid "WhatsApp account"
+msgstr "حساب واتساب"
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,help:elblasy_waha_whatsapp_bridge.field_elblasy_waha_webhook_event__bridge_message_ref
+msgid "WhatsApp message id handled by the native app."
+msgstr "معرّف رسالة واتساب الذي يعالجه التطبيق الأصلي."
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/wizard/whatsapp_composer.py:0
+msgid "WhatsApp message sent"
+msgstr "تم إرسال رسالة واتساب"
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/wizard/whatsapp_composer.py:0
+msgid "WhatsApp message sent to %s recipient(s)."
+msgstr "تم إرسال رسالة واتساب إلى %s مستلم."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model:ir.model.fields,field_description:elblasy_waha_whatsapp_bridge.field_elblasy_waha_session__whatsapp_account_ids
+msgid "Whatsapp Account"
+msgstr "حساب واتساب"
+
+#. module: elblasy_waha_whatsapp_bridge
+#. odoo-python
+#: code:addons/elblasy_waha_whatsapp_bridge/wizard/whatsapp_composer.py:0
+msgid "Write the message to send."
+msgstr "اكتب الرسالة المراد إرسالها."
+
+#. module: elblasy_waha_whatsapp_bridge
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_whatsapp_bridge.whatsapp_composer_view_form_waha
+msgid "Write your message..."
+msgstr "اكتب رسالتك..."

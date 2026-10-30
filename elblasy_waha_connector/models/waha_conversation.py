@@ -3,6 +3,8 @@ import mimetypes
 import logging
 import uuid
 
+from markupsafe import Markup
+
 from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError
 from odoo.tools import BinaryBytes
@@ -414,7 +416,7 @@ class WahaConversation(models.Model):
         """Newest ``limit`` messages (older than ``before_id``), returned oldest first."""
         self.ensure_one()
         self._check_user()
-        domain = [('conversation_id', '=', self.id)]
+        domain = [('conversation_id', '=', self.id), ('hidden', '=', False)]
         oldest = self.env['elblasy.waha.message'].browse(before_id).exists() if before_id else None
         if oldest:
             # by date, not id: history imported later has newer ids than the messages it precedes
@@ -469,16 +471,146 @@ class WahaConversation(models.Model):
         self.sudo().label_ids = [(6, 0, labels.ids)]
         return [{'id': l.id, 'name': l.name, 'color': l.color_hex} for l in self.label_ids]
 
-    def inbox_send_text(self, text, client_token=None):
-        """Send a text message. Idempotent on ``client_token`` (double click safe)."""
+    def inbox_send_text(self, text, client_token=None, reply_to_id=None):
+        """Send a text message, optionally as a reply. Idempotent on ``client_token`` (double click safe)."""
         self.ensure_one()
         self._check_user()
         text = (text or '').strip()
         if not text:
             raise UserError(self.env._("The message is empty."))
-        return self._send_text(text, client_token, user=self.env.user)._to_ui()
+        reply_to = self._own_message(reply_to_id) if reply_to_id else None
+        return self._send_text(text, client_token, user=self.env.user, reply_to=reply_to)._to_ui()
 
-    def _send_text(self, text, client_token=None, user=None, is_auto=False):
+    # ------------------------------------------------------------------
+    # message actions (the menu of a message, like WhatsApp Web)
+    # ------------------------------------------------------------------
+    def _own_message(self, message_id, need_remote=True):
+        """A message of this chat, checked for the current user (actions run as the system afterwards)."""
+        self.ensure_one()
+        self._check_user()
+        message = self.env['elblasy.waha.message'].sudo().browse(message_id).exists()
+        if not message or message.conversation_id != self:
+            raise UserError(self.env._("This message cannot be found."))
+        if need_remote and not message.remote_message_id:
+            raise UserError(self.env._("This message was never delivered to WhatsApp."))
+        return message
+
+    def _client_call(self, method, path, payload=None):
+        session = self.session_id.sudo()
+        if session.status != 'WORKING':
+            raise UserError(self.env._("The WhatsApp session is not connected (status: %s).", session.status or '?'))
+        client = session.server_id._get_client()
+        try:
+            return getattr(client, method)(path, payload) if payload is not None else client._request(
+                method.upper(), path)
+        except WahaError as e:
+            raise UserError(self.env._("WhatsApp refused the action: %s", e))
+
+    def inbox_react(self, message_id, emoji):
+        """Add, change or remove (empty emoji) my reaction."""
+        message = self._own_message(message_id)
+        session = self.session_id.sudo()
+        self._client_call('put', '/api/reaction', {'session': session.session_name,
+                                                   'messageId': message.remote_message_id, 'reaction': emoji or ''})
+        message._set_reaction('me', emoji or False)
+        return message._to_ui()
+
+    def inbox_star(self, message_id, star=True):
+        message = self._own_message(message_id)
+        session = self.session_id.sudo()
+        self._client_call('put', '/api/star', {'session': session.session_name, 'chatId': self.remote_chat_id,
+                                               'messageId': message.remote_message_id, 'star': bool(star)})
+        message.is_starred = bool(star)
+        return message._to_ui()
+
+    PIN_DURATIONS = (86400, 604800, 2592000)  # 24 hours, 7 days, 30 days (WhatsApp's choices)
+
+    def inbox_pin(self, message_id, pin=True, duration=604800):
+        message = self._own_message(message_id)
+        session = self.session_id.sudo()
+        path = f'/api/{session.session_name}/chats/{self.remote_chat_id}/messages/{message.remote_message_id}'
+        if pin:
+            duration = duration if duration in self.PIN_DURATIONS else 604800
+            self._client_call('post', f'{path}/pin', {'duration': duration})
+        else:
+            self._client_call('post', f'{path}/unpin', {})
+        message.is_pinned = bool(pin)
+        return message._to_ui()
+
+    def inbox_edit(self, message_id, text):
+        """Edit one of our text messages (WhatsApp allows it for 15 minutes)."""
+        message = self._own_message(message_id)
+        text = (text or '').strip()
+        if not text:
+            raise UserError(self.env._("The message is empty."))
+        if not message._can_edit():
+            raise UserError(self.env._("Only your text messages of the last %s minutes can be edited.",
+                                       message.EDIT_MINUTES))
+        session = self.session_id.sudo()
+        self._client_call('put', f'/api/{session.session_name}/chats/{self.remote_chat_id}/messages/'
+                                 f'{message.remote_message_id}', {'text': text})
+        message.write({'body': text, 'is_edited': True})
+        return message._to_ui()
+
+    def inbox_delete(self, message_id, scope='me'):
+        """``everyone``: delete on WhatsApp (sent messages; author or manager). ``me``: hide from the inbox only."""
+        message = self._own_message(message_id, need_remote=scope == 'everyone')
+        if scope == 'everyone':
+            if message.direction != 'out':
+                raise UserError(self.env._("Only messages sent from this number can be deleted for everyone."))
+            if message.user_id != self.env.user and not self.env.user.has_group(
+                    'elblasy_waha_connector.group_waha_manager'):
+                raise AccessError(self.env._("Only the author or a WhatsApp manager can delete this message."))
+            session = self.session_id.sudo()
+            self._client_call('delete', f'/api/{session.session_name}/chats/{self.remote_chat_id}/messages/'
+                                        f'{message.remote_message_id}')
+            message.write({'is_revoked': True})
+        else:
+            message.write({'hidden': True})
+        message._notify_bus()
+        return True
+
+    def inbox_forward(self, message_id, conversation_ids):
+        """Forward a message to other chats of the same WhatsApp number."""
+        message = self._own_message(message_id)
+        targets = self.browse(conversation_ids).exists()
+        targets.check_access('read')
+        targets = targets.filtered(lambda c: c.session_id == self.session_id and c != self)
+        if not targets:
+            raise UserError(self.env._("Choose at least one other chat of the same WhatsApp number."))
+        if len(targets) > 5:
+            raise UserError(self.env._("WhatsApp lets you forward a message to 5 chats at most."))
+        session = self.session_id.sudo()
+        client = session.server_id._get_client()
+        Message = self.env['elblasy.waha.message'].sudo()
+        for target in targets:
+            copy = Message.create({
+                'conversation_id': target.id, 'direction': 'out', 'message_type': message.message_type,
+                'body': message.body, 'date': fields.Datetime.now(), 'delivery_status': 'pending',
+                'is_forwarded': True, 'sender_identifier': self.env.user.name, 'user_id': self.env.user.id,
+                'latitude': message.latitude, 'longitude': message.longitude,
+            })
+            for attachment in message.attachment_ids:
+                attachment.sudo().copy({'res_id': copy.id})
+            copy._deliver(lambda chat=target.remote_chat_id: client.post('/api/forwardMessage', {
+                'session': session.session_name, 'chatId': chat, 'messageId': message.remote_message_id}))
+        return len(targets)
+
+    def inbox_add_note(self, message_id):
+        """Keep a WhatsApp message in the contact's history (chatter note), with its files."""
+        message = self._own_message(message_id, need_remote=False)
+        if not self.partner_id:
+            raise UserError(self.env._("Link this chat to a contact first."))
+        self.partner_id.check_access('read')  # whoever sees the chat and the contact may keep the message there
+        who = self.env._("Customer") if message.direction == 'in' else (message.user_id.name or self.env._("Us"))
+        body = Markup("<p><b>%s</b> · %s</p><p>%s</p>") % (
+            self.env._("WhatsApp message"), who, message.body or f"[{message.message_type}]")
+        attachments = [(a.name, a.raw) for a in message.attachment_ids]
+        self.partner_id.sudo().message_post(body=body, attachments=attachments, subtype_xmlid='mail.mt_note',
+                                            author_id=self.env.user.partner_id.id)
+        return True
+
+    def _send_text(self, text, client_token=None, user=None, is_auto=False, reply_to=None):
         """Create the message, send it through WAHA and record the outcome (idempotent on ``client_token``)."""
         self.ensure_one()
         Message = self.env['elblasy.waha.message']
@@ -495,9 +627,12 @@ class WahaConversation(models.Model):
             'date': fields.Datetime.now(), 'delivery_status': 'pending', 'client_token': client_token,
             'sender_identifier': user.name if user else self.env._("Auto-reply"),
             'user_id': user.id if user else False, 'is_auto': is_auto,
+            'quoted_remote_id': reply_to.remote_message_id if reply_to else False,
+            'quoted_body': ((reply_to.body or f"[{reply_to.message_type}]")[:250]) if reply_to else False,
         })
         client = session.sudo().server_id._get_client()
-        message._deliver(lambda: client.send_text(session.session_name, self.remote_chat_id, text))
+        message._deliver(lambda: client.send_text(session.session_name, self.remote_chat_id, text,
+                                                  reply_to=reply_to.remote_message_id if reply_to else None))
         return message
 
     MAX_FILE_BYTES = 15 * 1024 * 1024

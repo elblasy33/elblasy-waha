@@ -1084,6 +1084,63 @@ class TestGroups(TransactionCase):
             Dashboard.with_user(self.user).get_data()
 
 
+    def test_57_message_actions_like_whatsapp(self):
+        self.session.status = 'WORKING'
+        incoming = self._msg('act1', body='Can you send the price?')
+        conv = incoming.conversation_id.with_user(self.user)
+        partner = self.env['res.partner'].create({'name': 'Action Customer'})
+        conv.sudo().partner_id = partner
+        # reply (quoted)
+        with patch(f'{CLIENT}.send_text', return_value={'id': 'true_reply1'}) as send:
+            ui = conv.inbox_send_text('100 EGP', 'tok-reply', reply_to_id=incoming.id)
+        self.assertEqual(send.call_args.kwargs['reply_to'], incoming.remote_message_id)
+        self.assertEqual(ui['quoted'], 'Can you send the price?')
+        mine = self.env['elblasy.waha.message'].browse(ui['id'])
+        # react / remove reaction
+        with patch(f'{CLIENT}.put', return_value={}) as put:
+            self.assertEqual(conv.inbox_react(incoming.id, '👍')['reactions'], [{'emoji': '👍', 'count': 1, 'mine': True}])
+            conv.inbox_react(incoming.id, '')
+        self.assertEqual(put.call_args.args, ('/api/reaction', {'session': 'main', 'messageId': incoming.remote_message_id,
+                                                                'reaction': ''}))
+        self.assertFalse(incoming.reactions)
+        # star / pin
+        with patch(f'{CLIENT}.put', return_value={}):
+            self.assertTrue(conv.inbox_star(incoming.id, True)['starred'])
+        with patch(f'{CLIENT}.post', return_value={}) as post:
+            self.assertTrue(conv.inbox_pin(incoming.id, True, 86400)['pinned'])
+        self.assertEqual(post.call_args.args[1], {'duration': 86400})
+        self.assertTrue(post.call_args.args[0].endswith('/pin'))
+        # edit: own recent text only
+        self.assertTrue(mine._to_ui()['editable'])
+        with patch(f'{CLIENT}.put', return_value={}):
+            self.assertEqual(conv.inbox_edit(mine.id, '90 EGP')['body'], '90 EGP')
+        self.assertTrue(mine.is_edited)
+        with self.assertRaises(UserError):
+            conv.inbox_edit(incoming.id, 'not mine')
+        # forward to another chat of the same number
+        other = self.env['elblasy.waha.conversation'].create({'session_id': self.session.id,
+                                                              'remote_chat_id': '201001239555@c.us'})
+        with patch(f'{CLIENT}.post', return_value={'id': 'true_fwd'}) as post:
+            self.assertEqual(conv.inbox_forward(mine.id, [other.id]), 1)
+        self.assertEqual(post.call_args.args[0], '/api/forwardMessage')
+        copy = other.message_ids
+        self.assertEqual((copy.body, copy.is_forwarded, copy.remote_message_id), ('90 EGP', True, 'true_fwd'))
+        # add to the contact's notes
+        conv.inbox_add_note(incoming.id)
+        self.assertIn('Can you send the price?', partner.message_ids[0].body)
+        self.assertEqual(partner.message_ids[0].author_id, self.user.partner_id)
+        # delete for me hides it from the inbox only; for everyone needs the author (or a manager)
+        conv.inbox_delete(incoming.id, 'me')
+        self.assertNotIn(incoming.id, [m['id'] for m in conv.inbox_messages()['messages']])
+        self.assertTrue(incoming.exists())
+        with self.assertRaises(UserError):
+            conv.inbox_delete(incoming.id, 'everyone')  # received messages cannot be deleted for everyone
+        with patch(f'{CLIENT}._request', return_value={}) as request:
+            conv.inbox_delete(mine.id, 'everyone')
+        self.assertEqual(request.call_args.args[0], 'DELETE')
+        self.assertTrue(mine.is_revoked)
+
+
 def fields_dt_sub_minutes(minutes):
     from odoo import fields
     return fields.Datetime.subtract(fields.Datetime.now(), minutes=minutes)

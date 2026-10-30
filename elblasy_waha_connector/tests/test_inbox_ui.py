@@ -29,6 +29,12 @@ const wait = async (selector, count = 1) => {
                             ".o_waha_revoked", ".o_waha_pending", ".o_waha_archived_row", ".o_waha_tick_read", ".o_waha_text b", ".o_waha_space", ".o_waha_meta", ".o_waha_composer textarea"]) {
         await wait(selector);
     }
+    // message menu: open it on a received message and start a reply
+    document.querySelector(".o_waha_bubble.o_in .o_waha_msg_menu_btn").click();
+    await wait(".o_waha_msg_menu .o_waha_quick_reactions");
+    document.querySelector(".o_waha_msg_menu .o_waha_act_reply").click();
+    await wait(".o_waha_composer_bar");
+    document.querySelector(".o_waha_composer_bar .o_waha_icon_btn").click();
     document.querySelector(".o_waha_chip:nth-child(3)").click(); // "Groups"
     (await wait(".o_waha_conv .o_waha_avatar_group"))[0].closest(".o_waha_conv").click();
     await wait(".o_waha_author");
@@ -108,3 +114,16 @@ class TestInboxUi(HttpCase):
                 })().catch((e) => console.error(e.message));
             """ % (selector, selector, action)
             self.browser_js(f'/odoo/action-elblasy_waha_connector.{action}', code, login='admin', timeout=60)
+
+
+@tagged('post_install', '-at_install')
+class TestStyles(HttpCase):
+
+    def test_style_sheets_compile(self):
+        """A SCSS error does not fail a page: Odoo silently serves the previous styles with a red banner.
+        Build the bundles that contain our styles (left-to-right, right-to-left for Arabic, dark) and fail loudly."""
+        IrQweb = self.env['ir.qweb']
+        for name, rtl in (('web.assets_web', False), ('web.assets_web', True), ('web.assets_web_dark', False)):
+            bundle = IrQweb._get_asset_bundle(name, js=False, rtl=rtl)
+            bundle.preprocess_css()
+            self.assertFalse(bundle.css_errors, f"{name} (rtl={rtl}): {bundle.css_errors}")

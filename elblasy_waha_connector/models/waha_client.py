@@ -104,8 +104,11 @@ class WahaClient:
         return self._request('GET', f'/api/{name}/auth/qr')
 
     # -- messages
-    def send_text(self, session, chat_id, text):
-        return self._request('POST', '/api/sendText', json={'session': session, 'chatId': chat_id, 'text': text})
+    def send_text(self, session, chat_id, text, reply_to=None):
+        payload = {'session': session, 'chatId': chat_id, 'text': text}
+        if reply_to:
+            payload['reply_to'] = reply_to  # quoted reply, like swiping a message on the phone
+        return self._request('POST', '/api/sendText', json=payload)
 
     def get(self, path, params=None):
         return self._request('GET', path, params=params)

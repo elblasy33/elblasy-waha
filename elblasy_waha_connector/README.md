@@ -48,6 +48,16 @@ light and dark themes, one pane at a time on phones. A chat known by its phone n
 one conversation. Reactions, edits and deletions need the session webhook to include the new events: press
 **Connect** once on existing sessions after upgrading (WAHA restarts the session, no new QR needed).
 
+## Message actions
+Each bubble has WhatsApp Web's menu (hover, then the arrow): quick reactions and the emoji picker, message info,
+reply (quoted), copy, edit (own text messages, 15 minutes), forward (up to 5 chats of the same number), pin (1, 7 or
+30 days), star, add to the contact's notes (chatter note with the files) and delete: *for everyone* (sent messages,
+author or WhatsApp manager) or *for me* (hidden in the inbox only; reports keep it).
+
+## Languages
+English source with a full Arabic translation (`i18n/ar.po`) of both addons: menus, fields, views, inbox, dashboard
+and messages. The inbox follows right-to-left layouts.
+
 ## Chat list, groups and media
 The chat list mirrors the phone (*WAHA: mirror the WhatsApp chat list*, every 5 minutes and when the inbox is open):
 WhatsApp's order, pinned first, archived chats in their own list, names, pictures, unread counts and the last message

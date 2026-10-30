@@ -1,7 +1,6 @@
 import { Component, markup, onMounted, onWillDestroy, onWillStart, proxy, signal, useProps } from "@odoo/owl";
 import { useEmojiPicker } from "@web/core/emoji_picker/emoji_picker";
 import { deserializeDateTime } from "@web/core/l10n/dates";
-import { localization } from "@web/core/l10n/localization";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
 import { useService } from "@web/core/utils/hooks";
@@ -68,6 +67,8 @@ export class WahaInbox extends Component {
     fileRef = signal.ref();
     composerRef = signal.ref();
     emojiRef = signal.ref();
+    reactRef = signal.ref();
+    rootRef = signal.ref();
 
     setup() {
         this.orm = useService("orm");
@@ -82,6 +83,13 @@ export class WahaInbox extends Component {
             archivedCount: 0,
             historyDone: false,
             downloading: {},
+            menuFor: 0, // message whose action menu is open
+            replyTo: null,
+            editing: null,
+            dialog: null, // { kind: 'delete' | 'forward' | 'info', message }
+            forwardIds: [],
+            forwardSearch: "",
+            uiRtl: false, // the layout direction really applied (Odoo.sh mirrors Arabic with rtlcss)
             conversations: [],
             current: null,
             messages: [],
@@ -94,6 +102,11 @@ export class WahaInbox extends Component {
             labelsOpen: false,
             expanded: {},
         });
+        this.reactPicker = useEmojiPicker(
+            this.reactRef,
+            { onSelect: (codepoints) => this.react(this._reactTarget, codepoints) },
+            { position: "bottom-start" }
+        );
         this.emojiPicker = useEmojiPicker(
             this.emojiRef,
             { onSelect: (codepoints) => this.insertText(codepoints) },
@@ -120,6 +133,17 @@ export class WahaInbox extends Component {
         const onSession = async () => {
             this.state.sessions = await this.orm.call(MODEL, "inbox_sessions", []);
         };
+        const closeMenu = (ev) => {
+            if (this.state.menuFor && !ev.target.closest?.(".o_waha_msg_menu, .o_waha_msg_menu_btn")) {
+                this.state.menuFor = 0;
+            }
+        };
+        onMounted(() => {
+            document.addEventListener("click", closeMenu, true);
+            const root = this.rootRef();
+            this.state.uiRtl = !!root && getComputedStyle(root).direction === "rtl";
+        });
+        onWillDestroy(() => document.removeEventListener("click", closeMenu, true));
         onMounted(() => {
             this.bus.subscribe("elblasy_waha/message", onMessage);
             this.bus.subscribe("elblasy_waha/session", onSession);
@@ -469,6 +493,9 @@ export class WahaInbox extends Component {
         if (!text || this.state.sending || !this.state.current) {
             return;
         }
+        if (this.state.editing) {
+            return this.saveEdit(text);
+        }
         this.state.sending = true;
         // one token per click: a retried/duplicated request cannot create two messages
         const token = newClientToken();
@@ -476,7 +503,9 @@ export class WahaInbox extends Component {
             await this.orm.call(MODEL, "inbox_send_text", [[this.state.current.id]], {
                 text,
                 client_token: token,
+                reply_to_id: this.state.replyTo?.id || null,
             });
+            this.state.replyTo = null;
             this.resetComposer();
             await this.loadMessages();
             await this.loadConversations();
@@ -487,6 +516,173 @@ export class WahaInbox extends Component {
         } finally {
             this.state.sending = false;
         }
+    }
+
+    // ------------------------------------------------------------------ message menu (like WhatsApp Web)
+    get quickReactions() {
+        return ["👍", "❤️", "😂", "😮", "😢", "🙏"];
+    }
+
+    toggleMenu(m) {
+        this.state.menuFor = this.state.menuFor === m.id ? 0 : m.id;
+        this._reactTarget = m;
+    }
+
+    async messageCall(method, m, kwargs = {}, done = "") {
+        this.state.menuFor = 0;
+        try {
+            const result = await this.orm.call(MODEL, method, [[this.state.current.id]], { message_id: m.id, ...kwargs });
+            if (result && typeof result === "object" && result.id === m.id) {
+                Object.assign(m, result);
+            }
+            if (done) {
+                this.notification.add(done, { type: "success" });
+            }
+            return result;
+        } catch (error) {
+            this.notification.add(error?.data?.message || _t("WhatsApp refused the action."), { type: "danger" });
+        }
+    }
+
+    react(m, emoji) {
+        if (!m) {
+            return;
+        }
+        const mine = m.reactions.find((r) => r.mine);
+        // clicking my current reaction again removes it, like WhatsApp
+        return this.messageCall("inbox_react", m, { emoji: mine && mine.emoji === emoji ? "" : emoji });
+    }
+
+    startReply(m) {
+        this.state.menuFor = 0;
+        this.state.editing = null;
+        this.state.replyTo = m;
+        this.composerRef()?.focus();
+    }
+
+    startEdit(m) {
+        this.state.menuFor = 0;
+        this.state.replyTo = null;
+        this.state.editing = m;
+        this.state.draft = m.body;
+        const el = this.composerRef();
+        if (el) {
+            el.value = m.body;
+            el.focus();
+            this.autoGrow(el);
+        }
+    }
+
+    cancelComposerMode() {
+        if (this.state.editing) {
+            this.resetComposer();
+        }
+        this.state.replyTo = null;
+        this.state.editing = null;
+    }
+
+    async saveEdit(text) {
+        const m = this.state.editing;
+        this.state.sending = true;
+        try {
+            await this.messageCall("inbox_edit", m, { text });
+            this.state.editing = null;
+            this.resetComposer();
+        } finally {
+            this.state.sending = false;
+        }
+    }
+
+    async copyText(m) {
+        this.state.menuFor = 0;
+        try {
+            await navigator.clipboard.writeText(m.body || "");
+            this.notification.add(_t("Copied"), { type: "success" });
+        } catch {
+            this.notification.add(_t("The browser did not allow copying."), { type: "warning" });
+        }
+    }
+
+    toggleStar(m) {
+        return this.messageCall("inbox_star", m, { star: !m.starred });
+    }
+
+    togglePin(m) {
+        return this.messageCall("inbox_pin", m, { pin: !m.pinned });
+    }
+
+    addNote(m) {
+        return this.messageCall("inbox_add_note", m, {}, _t("Added to the contact's notes."));
+    }
+
+    openDialog(kind, m) {
+        this.state.menuFor = 0;
+        this.state.forwardIds = [];
+        this.state.forwardSearch = "";
+        this.state.dialog = { kind, message: m };
+    }
+
+    closeDialog() {
+        this.state.dialog = null;
+    }
+
+    async deleteMessage(scope) {
+        const m = this.state.dialog.message;
+        this.closeDialog();
+        const ok = await this.messageCall("inbox_delete", m, { scope });
+        if (ok) {
+            await this.loadMessages({ keepScroll: true });
+            await this.loadConversations();
+        }
+    }
+
+    get forwardTargets() {
+        const current = this.state.current;
+        const search = this.state.forwardSearch.toLowerCase();
+        return this.state.conversations.filter(
+            (c) =>
+                c.id !== current.id &&
+                c.session_id === current.session_id &&
+                (!search || (c.name || "").toLowerCase().includes(search) || (c.phone || "").includes(search))
+        );
+    }
+
+    toggleForward(conv) {
+        const ids = this.state.forwardIds;
+        const index = ids.indexOf(conv.id);
+        if (index >= 0) {
+            ids.splice(index, 1);
+        } else if (ids.length < 5) {
+            ids.push(conv.id);
+        }
+    }
+
+    async forward() {
+        const m = this.state.dialog.message;
+        const ids = [...this.state.forwardIds];
+        this.closeDialog();
+        const count = await this.messageCall("inbox_forward", m, { conversation_ids: ids });
+        if (count) {
+            this.notification.add(_t("Forwarded to %s chat(s).", count), { type: "success" });
+            await this.loadConversations();
+        }
+    }
+
+    get pinned() {
+        return [...this.state.messages].reverse().find((m) => m.pinned && !m.revoked);
+    }
+
+    scrollToMessage(m) {
+        document.getElementById(`o_waha_msg_${m.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    statusText(m) {
+        return this.tickTitle(m.status) || (m.direction === "in" ? _t("Received") : "");
+    }
+
+    fullDate(value) {
+        const dt = this.toLocal(value);
+        return dt ? dt.toLocaleString(DateTime.DATETIME_MED) : "";
     }
 
     // ------------------------------------------------------------------ display helpers
@@ -651,7 +847,7 @@ export class WahaInbox extends Component {
      */
     spaceAtStart(text) {
         const rtlText = RTL_FIRST_STRONG.test(text || "");
-        return rtlText !== (localization.direction === "rtl");
+        return rtlText !== this.state.uiRtl;
     }
 
     spaceStyle(m) {

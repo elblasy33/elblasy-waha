@@ -518,6 +518,125 @@
     }
     .o_waha_row:has(.o_waha_reactions) { margin-bottom: 18px; }
 
+    // ------------------------------------------------------------ message menu
+    .o_waha_msg_menu_btn {
+        position: absolute;
+        top: 2px;
+        inset-inline-end: 2px;
+        z-index: 2;
+        display: none;
+        width: 26px;
+        height: 22px;
+        padding: 0;
+        border: 0;
+        border-radius: 0 6px 0 12px;
+        background: inherit;
+        color: var(--waha-muted);
+        .oi { font-size: 20px; }
+    }
+    .o_waha_bubble:hover .o_waha_msg_menu_btn { display: block; }
+    .o_waha_msg_menu {
+        position: absolute;
+        top: 24px;
+        inset-inline-start: 0;
+        z-index: 30;
+        min-width: 230px;
+        border-radius: 12px;
+        background: var(--waha-panel);
+        box-shadow: 0 6px 24px rgba(11, 20, 26, 0.3);
+        overflow: hidden;
+        &.o_waha_menu_out { inset-inline-start: auto; inset-inline-end: 0; }
+        button {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            width: 100%;
+            padding: 9px 18px;
+            border: 0;
+            background: transparent;
+            color: var(--waha-text);
+            text-align: start;
+            font-size: 14.5px;
+            &:hover { background: var(--waha-hover); }
+            .oi { font-size: 20px; color: var(--waha-muted); }
+        }
+    }
+    .o_waha_quick_reactions {
+        display: flex;
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--waha-border);
+        button {
+            justify-content: center;
+            width: auto;
+            flex: 1;
+            padding: 4px;
+            font-size: 22px;
+            border-radius: 50%;
+        }
+    }
+    .o_waha_menu_items { padding: 6px 0; }
+    .o_waha_menu_sep { margin: 4px 0; border-top: 1px solid var(--waha-border); }
+    .o_waha_menu_danger { color: #ea0038 !important; .oi { color: #ea0038 !important; } }
+    .o_waha_pinned_bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 18px;
+        background: var(--waha-panel);
+        border-bottom: 1px solid var(--waha-border);
+        color: var(--waha-muted);
+        cursor: pointer;
+        .oi { color: var(--waha-muted); }
+    }
+    .o_waha_composer_bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px 0;
+        background: var(--waha-header);
+    }
+    .o_waha_composer_quote {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 6px 10px;
+        border-left: 4px solid var(--waha-green-dark);
+        border-radius: 6px;
+        background: var(--waha-quote);
+        color: var(--waha-muted);
+        font-size: 13px;
+    }
+    .o_waha_composer_quote_title { color: var(--waha-green-dark); font-weight: 600; }
+    .o_waha_modal {
+        position: absolute;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(11, 20, 26, 0.45);
+    }
+    .o_waha_modal_box {
+        width: unquote("min(420px, 92%)");
+        max-height: 85%;
+        overflow: auto;
+        padding: 20px 22px;
+        border-radius: 10px;
+        background: var(--waha-panel);
+        color: var(--waha-text);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+        .table { color: var(--waha-text); --bs-table-bg: transparent; }
+    }
+    .o_waha_forward_list { max-height: 300px; overflow: auto; }
+    .o_waha_forward_item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 6px;
+        cursor: pointer;
+        border-bottom: 1px solid var(--waha-border);
+        &:hover { background: var(--waha-hover); }
+    }
+
     // ticks drawn with two check marks, grey or blue like WhatsApp
     .o_waha_tick {
         display: inline-block;
@@ -607,8 +726,12 @@
     }
 }
 
-// RTL interface: Odoo's RTL bundle already mirrors sides and radii, only the tail shapes need swapping
-.o_rtl .o_waha_inbox {
+// the send arrow points the reading way
+.o_waha_inbox.o_waha_rtl .o_waha_send .oi { transform: scaleX(-1); }
+
+// RTL interface: Odoo's RTL bundle (rtlcss) already mirrors sides and radii, only the tail shapes need swapping.
+// Keyed on the direction really applied, not on the language: without rtlcss Odoo stays left-to-right.
+.o_waha_inbox.o_waha_rtl {
     .o_waha_bubble.o_tail.o_in::before { clip-path: polygon(0 0, 100% 0, 0 100%); }
     .o_waha_bubble.o_tail.o_out::before { clip-path: polygon(0 0, 100% 0, 100% 100%); }
 }

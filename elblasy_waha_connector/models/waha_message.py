@@ -45,6 +45,10 @@ class WahaMessage(models.Model):
     is_forwarded = fields.Boolean("Forwarded", readonly=True)
     is_edited = fields.Boolean("Edited", readonly=True)
     is_revoked = fields.Boolean("Deleted for everyone", readonly=True)
+    is_starred = fields.Boolean("Starred", readonly=True)
+    is_pinned = fields.Boolean("Pinned", readonly=True)
+    hidden = fields.Boolean("Deleted for me", readonly=True,
+                            help="Removed from the inbox by a user; kept in the reports for the record.")
     date = fields.Datetime(required=True, default=fields.Datetime.now, index=True)
     delivery_status = fields.Selection(
         [('pending', "Sending"), ('sent', "Sent"), ('delivered', "Delivered"), ('read', "Read"),
@@ -79,6 +83,14 @@ class WahaMessage(models.Model):
     def _preview(self):
         self.ensure_one()
         return (self.body or f"[{self.message_type}]")[:120]
+
+    EDIT_MINUTES = 15  # WhatsApp lets people edit their messages for 15 minutes
+
+    def _can_edit(self):
+        self.ensure_one()
+        return (self.direction == 'out' and self.message_type == 'text' and not self.is_revoked and not self.is_auto
+                and bool(self.remote_message_id) and self.delivery_status != 'failed'
+                and (fields.Datetime.now() - self.date).total_seconds() < self.EDIT_MINUTES * 60)
 
     def _set_reaction(self, sender, emoji):
         """WhatsApp keeps one reaction per person; an empty emoji removes it."""
@@ -136,6 +148,8 @@ class WahaMessage(models.Model):
             'author': self.author_name or '', 'media_pending': self.media_pending,
             'quoted': self.quoted_body or '', 'forwarded': self.is_forwarded, 'edited': self.is_edited,
             'revoked': self.is_revoked, 'reactions': list(counts.values()),
+            'starred': self.is_starred, 'pinned': self.is_pinned, 'remote': bool(self.remote_message_id),
+            'user': self.user_id.name or '', 'editable': self._can_edit(),
             'location': {'lat': self.latitude, 'lng': self.longitude} if self.message_type == 'location' else False,
             'attachments': [{'id': a.id, 'name': a.name, 'mimetype': a.mimetype or '', 'size': a.file_size,
                              'image': (a.mimetype or '').startswith('image/')}

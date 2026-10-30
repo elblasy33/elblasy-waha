@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="elblasy_waha_connector.Inbox">
-        <div class="o_waha_inbox" t-att-class="{ 'o_waha_has_current': this.state.current }">
+        <div class="o_waha_inbox" t-ref="this.rootRef"
+             t-att-class="{ 'o_waha_has_current': this.state.current, 'o_waha_rtl': this.state.uiRtl }">
             <!-- ============================================================ chat list -->
             <div class="o_waha_list">
                 <div class="o_waha_list_header">
@@ -93,7 +94,7 @@
                             <div class="o_waha_thread_sub">
                                 <t t-if="this.sessionDisconnected"><i class="oi text-warning" data-icon="link_off"/> WhatsApp number offline</t>
                                 <t t-elif="cur.is_group">Group</t>
-                                <t t-elif="cur.phone and this.displayName(cur) !== '+' + cur.phone" t-out="'+' + cur.phone"/>
+                                <span t-elif="cur.phone and this.displayName(cur) !== '+' + cur.phone" dir="ltr" t-out="'+' + cur.phone"/>
                                 <t t-if="this.state.sessions.length > 1"> · <t t-out="cur.session_name"/></t>
                             </div>
                         </div>
@@ -119,6 +120,10 @@
                         </div>
                     </div>
 
+                    <div t-if="this.pinned" class="o_waha_pinned_bar" t-on-click="() => this.scrollToMessage(this.pinned)">
+                        <i class="oi" data-icon="push_pin"/>
+                        <span class="text-truncate" dir="auto" t-out="this.pinned.body or this.pendingLabel(this.pinned)"/>
+                    </div>
                     <div class="o_waha_messages" t-ref="this.threadRef" t-on-scroll="this.onThreadScroll">
                         <div t-if="this.state.hasMore or this.state.loadingOlder" class="text-center my-2">
                             <span class="o_waha_day"><i t-if="this.state.loadingOlder" class="oi oi-spin me-1" data-icon="progress_activity"/>Scroll up for older messages</span>
@@ -128,11 +133,42 @@
                             <t t-else="">
                                 <t t-set="m" t-value="row.message"/>
                                 <div class="o_waha_row" t-att-class="{ o_waha_row_out: m.direction === 'out', o_waha_row_first: row.first }">
-                                    <div class="o_waha_bubble"
+                                    <div class="o_waha_bubble" t-att-id="'o_waha_msg_' + m.id"
                                          t-att-class="{
                                             o_out: m.direction === 'out', o_in: m.direction === 'in', o_tail: row.first,
                                             o_waha_sticker_bubble: m.type === 'sticker' and !m.revoked,
                                             o_waha_media_bubble: this.isBareMedia(m) }">
+                                        <button class="o_waha_msg_menu_btn" title="Menu" t-on-click="() => this.toggleMenu(m)">
+                                            <i class="oi" data-icon="keyboard_arrow_down"/>
+                                        </button>
+                                        <div t-if="this.state.menuFor === m.id" class="o_waha_msg_menu"
+                                             t-att-class="{ o_waha_menu_out: m.direction === 'out' }">
+                                            <div t-if="m.remote and !m.revoked" class="o_waha_quick_reactions">
+                                                <button t-foreach="this.quickReactions" t-as="emoji" t-key="emoji" t-on-click="() => this.react(m, emoji)"
+                                                        t-out="emoji"/>
+                                                <button class="o_waha_more_reactions" t-ref="this.reactRef" title="More reactions">
+                                                    <i class="oi" data-icon="add"/>
+                                                </button>
+                                            </div>
+                                            <div class="o_waha_menu_items">
+                                                <button t-on-click="() => this.openDialog('info', m)"><i class="oi" data-icon="info"/>Message info</button>
+                                                <t t-if="!m.revoked">
+                                                    <button t-if="m.remote" class="o_waha_act_reply" t-on-click="() => this.startReply(m)"><i class="oi" data-icon="reply"/>Reply</button>
+                                                    <button t-if="m.body" t-on-click="() => this.copyText(m)"><i class="oi" data-icon="content_copy"/>Copy</button>
+                                                    <button t-if="m.editable" t-on-click="() => this.startEdit(m)"><i class="oi" data-icon="edit"/>Edit</button>
+                                                    <button t-if="m.remote" t-on-click="() => this.openDialog('forward', m)"><i class="oi" data-icon="forward"/>Forward</button>
+                                                    <button t-if="m.remote" t-on-click="() => this.togglePin(m)">
+                                                        <i class="oi" data-icon="push_pin"/><t t-if="m.pinned">Unpin</t><t t-else="">Pin</t>
+                                                    </button>
+                                                    <button t-if="m.remote" t-on-click="() => this.toggleStar(m)">
+                                                        <i class="oi" data-icon="star"/><t t-if="m.starred">Unstar</t><t t-else="">Star</t>
+                                                    </button>
+                                                    <button t-if="cur.partner_id" t-on-click="() => this.addNote(m)"><i class="oi" data-icon="sticky_note_2"/>Add to the contact's notes</button>
+                                                </t>
+                                                <div class="o_waha_menu_sep"/>
+                                                <button class="o_waha_menu_danger" t-on-click="() => this.openDialog('delete', m)"><i class="oi" data-icon="delete"/>Delete</button>
+                                            </div>
+                                        </div>
                                         <div t-if="cur.is_group and m.direction === 'in' and row.first" class="o_waha_author"
                                              t-att-style="'color:' + this.authorColor(m.sender)">
                                             <span dir="auto" t-out="m.author or m.sender"/>
@@ -191,6 +227,8 @@
                                         </t>
                                         <div t-if="this.needsMetaLine(m)" class="o_waha_meta_space"/>
                                         <span class="o_waha_meta">
+                                            <i t-if="m.starred" class="oi me-1" data-icon="star" title="Starred"/>
+                                            <i t-if="m.pinned" class="oi me-1" data-icon="push_pin" title="Pinned"/>
                                             <span t-if="m.edited" class="me-1">Edited</span>
                                             <i t-if="m.is_auto" class="oi me-1" data-icon="autorenew" title="Automatic reply"/>
                                             <span t-att-title="m.sender" t-out="this.timeOf(m.date)"/>
@@ -212,6 +250,18 @@
                     <div t-if="this.sessionDisconnected" class="o_waha_offline">
                         <i class="oi me-1" data-icon="link_off"/>The WhatsApp number is not connected. Messages cannot be sent.
                     </div>
+                    <div t-if="this.state.replyTo or this.state.editing" class="o_waha_composer_bar">
+                        <t t-set="target" t-value="this.state.replyTo or this.state.editing"/>
+                        <div class="o_waha_composer_quote">
+                            <div class="o_waha_composer_quote_title">
+                                <t t-if="this.state.editing">Edit message</t>
+                                <t t-elif="target.direction === 'out'">Reply to yourself</t>
+                                <t t-else="">Reply to <t t-out="target.author or this.displayName(cur)"/></t>
+                            </div>
+                            <div class="text-truncate" dir="auto" t-out="target.body or this.pendingLabel(target)"/>
+                        </div>
+                        <button class="btn o_waha_icon_btn" title="Cancel" t-on-click="this.cancelComposerMode"><i class="oi" data-icon="close"/></button>
+                    </div>
                     <div class="o_waha_composer">
                         <input type="file" class="d-none" t-ref="this.fileRef" t-on-change="this.onFileChange"/>
                         <button class="btn o_waha_icon_btn" title="Emoji" t-ref="this.emojiRef" t-att-disabled="this.sessionDisconnected">
@@ -228,6 +278,54 @@
                                 t-att-disabled="this.state.sending or this.sessionDisconnected or !this.state.draft.trim()">
                             <i class="oi" t-att-class="{ 'oi-spin': this.state.sending }" t-att-data-icon="this.state.sending ? 'progress_activity' : 'send'"/>
                         </button>
+                    </div>
+                    <div t-if="this.state.dialog" class="o_waha_modal" t-on-click.self="this.closeDialog">
+                        <t t-set="dm" t-value="this.state.dialog.message"/>
+                        <div class="o_waha_modal_box">
+                            <t t-if="this.state.dialog.kind === 'delete'">
+                                <h5>Delete message?</h5>
+                                <p class="text-muted small">"Delete for me" only hides it in Odoo (reports keep it).</p>
+                                <div class="d-flex flex-column gap-2">
+                                    <button t-if="dm.direction === 'out' and dm.remote and !dm.revoked" class="btn btn-danger"
+                                            t-on-click="() => this.deleteMessage('everyone')">Delete for everyone</button>
+                                    <button class="btn btn-outline-danger" t-on-click="() => this.deleteMessage('me')">Delete for me</button>
+                                    <button class="btn btn-secondary" t-on-click="this.closeDialog">Cancel</button>
+                                </div>
+                            </t>
+                            <t t-elif="this.state.dialog.kind === 'forward'">
+                                <h5>Forward message to</h5>
+                                <input class="form-control mb-2" type="search" placeholder="Search…"
+                                       t-on-input="(ev) => this.state.forwardSearch = ev.target.value"/>
+                                <div class="o_waha_forward_list">
+                                    <label t-foreach="this.forwardTargets" t-as="fc" t-key="fc.id" class="o_waha_forward_item">
+                                        <input type="checkbox" t-att-checked="this.state.forwardIds.includes(fc.id)" t-on-change="() => this.toggleForward(fc)"/>
+                                        <span dir="auto" t-out="this.displayName(fc)"/>
+                                    </label>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <small class="text-muted"><t t-out="this.state.forwardIds.length"/> / 5</small>
+                                    <div>
+                                        <button class="btn btn-secondary me-2" t-on-click="this.closeDialog">Cancel</button>
+                                        <button class="btn btn-primary" t-att-disabled="!this.state.forwardIds.length" t-on-click="this.forward">
+                                            <i class="oi me-1" data-icon="send"/>Forward
+                                        </button>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <h5>Message info</h5>
+                                <table class="table table-sm mb-3">
+                                    <tr><th>Date</th><td t-out="this.fullDate(dm.date)"/></tr>
+                                    <tr><th>Direction</th><td><t t-if="dm.direction === 'out'">Sent</t><t t-else="">Received</t></td></tr>
+                                    <tr t-if="dm.direction === 'out'"><th>Status</th><td t-out="this.statusText(dm)"/></tr>
+                                    <tr t-if="dm.user"><th>Sent by</th><td t-out="dm.user"/></tr>
+                                    <tr t-if="dm.is_auto"><th>Automatic</th><td>Yes</td></tr>
+                                    <tr t-if="dm.author"><th>Group member</th><td dir="auto" t-out="dm.author"/></tr>
+                                    <tr t-if="dm.failure"><th>Error</th><td class="text-danger" t-out="dm.failure"/></tr>
+                                </table>
+                                <div class="text-end"><button class="btn btn-secondary" t-on-click="this.closeDialog">Close</button></div>
+                            </t>
+                        </div>
                     </div>
                 </t>
                 <div t-else="" class="o_waha_welcome">
