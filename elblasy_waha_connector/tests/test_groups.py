@@ -727,7 +727,8 @@ class TestGroups(TransactionCase):
         self.env.cr.execute("UPDATE elblasy_waha_webhook_event SET create_date = now() - interval '31 days' WHERE id = %s",
                             [bad.id])
         bad.invalidate_recordset()
-        self.env['elblasy.waha.webhook.event']._cron_retry_failed()
+        with patch.object(type(self.env['ir.cron']), '_commit_progress', return_value=60.0):
+            self.env['elblasy.waha.webhook.event']._cron_retry_failed()
         self.assertFalse(bad.exists())  # failed events do not pile up forever
 
     def test_40_store_event_only_swallows_real_duplicates(self):
@@ -749,7 +750,7 @@ class TestGroups(TransactionCase):
 
             def json(self):
                 return {'error': 'Session status is not as expected', 'status': 'FAILED'}
-        with patch('requests.request', return_value=Resp()):
+        with patch('requests.Session.request', return_value=Resp()):
             with self.assertRaises(WahaError) as cm:
                 WahaClient('http://waha.test', 'K').get_session('main')
         self.assertIn('Session status is not as expected', str(cm.exception))
@@ -761,6 +762,51 @@ class TestGroups(TransactionCase):
             with self.assertRaises(UserError):
                 self.session.with_user(self.manager).action_refresh_status()
         self.assertIn('Session status', store.call_args.args[1])
+
+    # ------------------------------------------------------------------ background webhook processing
+    def test_42_cron_processes_events_in_arrival_order(self):
+        import json
+        Event = self.env['elblasy.waha.webhook.event']
+        msg = {'id': 'true_201001234567@c.us_ORD', 'from': '201001234567@c.us', 'fromMe': False,
+               'body': 'first', 'timestamp': 1700000000}
+        events = Event
+        for key, etype, payload in (('o1', 'message.any', msg),
+                                    ('o2', 'message.ack', {'id': msg['id'], 'ack': 3})):
+            data = {'id': key, 'event': etype, 'session': self.session.session_name, 'payload': payload}
+            events |= Event._store_event(self.session, json.dumps(data).encode(), data)
+        self.assertEqual(set(events.mapped('state')), {'pending'})  # stored only; nothing done in the request
+        with patch.object(type(self.env['ir.cron']), '_commit_progress', return_value=60.0) as progress:
+            Event._cron_retry_failed()
+        self.assertEqual(events.mapped('state'), ['done', 'done'])
+        message = self.env['elblasy.waha.message'].search([('remote_message_id', '=', msg['id'])])
+        self.assertEqual(message.delivery_status, 'read')  # the ack found its message: same batch, id order
+        self.assertEqual(progress.call_count, 3)  # one commit for the count, one after each event
+
+    def test_43_disabled_cron_falls_back_to_inline_processing(self):
+        import json
+        self.env.ref('elblasy_waha_connector.cron_waha_retry_events').active = False
+        data = {'id': 'inline-1', 'event': 'session.status', 'session': self.session.session_name,
+                'payload': {'status': 'WORKING'}}
+        event = self.env['elblasy.waha.webhook.event']._store_event(self.session, json.dumps(data).encode(), data)
+        event._schedule_processing()
+        self.assertEqual(event.state, 'done')
+
+    # ------------------------------------------------------------------ phone numbers
+    def test_44_national_numbers_get_the_country_code(self):
+        from odoo.addons.elblasy_waha_connector.models.res_partner import wa_digits
+        egypt, italy = self.env.ref('base.eg'), self.env.ref('base.it')
+        self.assertEqual(wa_digits('010 1234 5678', egypt), '201012345678')
+        self.assertEqual(wa_digits('+20 10 1234 5678', egypt), '201012345678')
+        self.assertEqual(wa_digits('0020-10-1234-5678', egypt), '201012345678')
+        self.assertEqual(wa_digits('201012345678', egypt), '201012345678')
+        self.assertEqual(wa_digits('010 1234 5678'), '01012345678')  # unknown country: untouched
+        self.assertEqual(wa_digits('06 1234 5678', italy), '0612345678')  # Italy keeps its leading 0
+        partner = self.env['res.partner'].create({'name': 'Local', 'phone': '01012345678', 'country_id': egypt.id})
+        self.assertEqual(partner._waha_phone(), '201012345678')
+        with patch(f'{CLIENT}.check_exists', return_value=(True, None)), \
+                patch(f'{CLIENT}.post', return_value={'id': 'true_201012345678@c.us_L'}) as post:
+            self.env['elblasy.waha.group.post'].send_to_partner(partner, self.session, 'hi')
+        self.assertEqual(post.call_args[0][1]['chatId'], '201012345678@c.us')
 
 
 def fields_dt_sub_minutes(minutes):

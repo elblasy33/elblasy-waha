@@ -7,7 +7,7 @@ from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError
 from odoo.tools import BinaryBytes
 
-from .res_partner import digits_only
+from .res_partner import digits_only, wa_digits
 from .waha_client import WahaError
 
 _logger = logging.getLogger(__name__)
@@ -52,12 +52,11 @@ class WahaConversation(models.Model):
         for vals in vals_list:
             if vals.get('remote_chat_id'):
                 continue
-            phone = digits_only(vals.get('remote_phone'))
+            phone = wa_digits(vals.get('remote_phone'), self.env.company.country_id)
             if not phone and vals.get('partner_id'):
-                phone = digits_only(self.env['res.partner'].browse(vals['partner_id']).phone)
+                phone = self.env['res.partner'].browse(vals['partner_id'])._waha_phone()
             if not phone:
                 raise UserError(self.env._("Enter a phone number (with country code) or choose a contact that has one."))
-            phone = phone[2:] if phone.startswith('00') else phone  # 00 = international prefix
             vals['remote_chat_id'] = f"{phone}@c.us"
             vals['remote_phone'] = phone
         return super().create(vals_list)

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
     <record id="cron_waha_retry_events" model="ir.cron">
-        <field name="name">WAHA: retry failed webhook events</field>
+        <field name="name">WAHA: process webhook events</field>
         <field name="model_id" ref="model_elblasy_waha_webhook_event"/>
         <field name="state">code</field>
         <field name="code">model._cron_retry_failed()</field>
-        <field name="interval_number">10</field>
+        <field name="interval_number">5</field>
         <field name="interval_type">minutes</field>
     </record>
 

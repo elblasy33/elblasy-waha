@@ -3,8 +3,28 @@ import re
 from odoo import api, fields, models
 
 
+# countries whose national numbers keep their leading 0 after the country code (no trunk prefix)
+NO_TRUNK_PREFIX = {'39', '378', '379'}
+
+
 def digits_only(value):
     return re.sub(r'\D', '', value or '')
+
+
+def wa_digits(phone, country=None):
+    """A phone number as WhatsApp expects it: digits in international form, without + or 00.
+
+    A national number written with its trunk 0 (``010 1234 5678``) gets the country code of
+    ``country`` (``201012345678``); numbers already in international form are kept as they are.
+    """
+    digits = digits_only(phone)
+    if digits.startswith('00'):
+        return digits[2:]
+    code = country and country.phone_code and str(country.phone_code)
+    if code and digits.startswith('0') and not (phone or '').lstrip().startswith('+') \
+            and code not in NO_TRUNK_PREFIX:
+        return code + digits[1:]
+    return digits
 
 
 class ResPartner(models.Model):
@@ -21,6 +41,12 @@ class ResPartner(models.Model):
     def _compute_waha_phone_digits(self):
         for partner in self:
             partner.waha_phone_digits = digits_only(partner.phone) or False
+
+    def _waha_phone(self):
+        """The contact's phone in WhatsApp international form (national numbers use its country)."""
+        self.ensure_one()
+        country = self.country_id or self.company_id.country_id or self.env.company.country_id
+        return wa_digits(self.phone, country)
 
     def _compute_waha_conversation_count(self):
         data = self.env['elblasy.waha.conversation']._read_group(

@@ -40,9 +40,16 @@ Items are sent at most once: an item is committed as *Interrupted while sending*
 gets its final state afterwards. If the server stops in between, the item stays *Interrupted*: check the chat, then
 use **Retry** if needed. *Send now* only triggers the queue cron; sending never runs inside a user request.
 
+## Webhook processing
+The webhook only checks the signature, stores the event once and answers WAHA immediately. The cron
+*WAHA: process webhook events* is woken up at once and handles events in arrival order (media download,
+auto-replies, the native WhatsApp bridge); failed events are retried after 2 minutes, up to 5 times. Keep that cron
+active: if it is archived (Odoo.sh staging neutralizes crons) events are processed inside the webhook request instead.
+
 ## Limits
 Inbox sends text and files (max 15 MB); inbound media is stored and displayed. Auto-sync is a polling fallback (about 1 minute delay), not a replacement for the webhook. WEBJS is unofficial:
-avoid bulk campaigns. Numbers need the country code. LID-only chats are not matched to contacts automatically.
+avoid bulk campaigns. National numbers written with a leading 0 get the country code of the contact (or the company);
+other numbers need the country code. LID-only chats are not matched to contacts automatically.
 The inbox JavaScript is covered by manual testing only (no JS test suite).
 
 ## Tests

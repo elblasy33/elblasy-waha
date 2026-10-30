@@ -1,7 +1,7 @@
-import re
-
 from odoo import fields, models
 from odoo.exceptions import UserError
+
+from odoo.addons.elblasy_waha_connector.models.res_partner import wa_digits
 
 
 class WhatsappAccount(models.Model):
@@ -19,8 +19,7 @@ class WhatsappAccount(models.Model):
         With WAHA there is no template / 24h restriction, so the conversation can start with a free text.
         """
         self.ensure_one()
-        digits = re.sub(r'\D', '', number or (partner and partner.phone) or '')
-        digits = digits[2:] if digits.startswith('00') else digits
+        digits = wa_digits(number, self.env.company.country_id) if number else (partner._waha_phone() if partner else '')
         if len(digits) < 7:
             raise UserError(self.env._("Enter a valid phone number with the country code."))
         Channel = self.env['discuss.channel']

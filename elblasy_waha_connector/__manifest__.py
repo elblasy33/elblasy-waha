@@ -1,6 +1,6 @@
 {
     'name': 'Elblasy WhatsApp (WAHA)',
-    'version': '20.0.3.1.0',
+    'version': '20.0.3.2.0',
     'author': 'Elblasy.app',
     'website': 'https://elblasy.app',
     'category': 'Productivity/Discuss',

@@ -34,5 +34,6 @@ class WahaWebhook(http.Controller):
             return request.make_json_response({'error': 'invalid payload'}, status=400)
         event = request.env['elblasy.waha.webhook.event'].sudo()._store_event(session, raw, data)
         if event:
-            event._process_event()  # light work only; failures are stored and retried by cron
+            # answer WAHA at once; media downloads, auto-replies and the bridge run in the cron worker
+            event._schedule_processing()
         return request.make_json_response({'ok': True})

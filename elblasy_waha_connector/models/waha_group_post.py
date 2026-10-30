@@ -1,6 +1,5 @@
 import base64
 import mimetypes
-import re
 import uuid
 
 from markupsafe import Markup
@@ -9,6 +8,7 @@ from odoo import api, fields, models
 from odoo.exceptions import AccessError, UserError
 
 from odoo.addons.elblasy_waha_connector.models.waha_client import WahaError
+from odoo.addons.elblasy_waha_connector.models.res_partner import wa_digits
 from odoo.addons.elblasy_waha_connector.models.waha_message import extract_message_id
 
 USER = 'elblasy_waha_connector.group_waha_user'
@@ -70,15 +70,14 @@ class WahaGroupPost(models.Model):
     @api.model
     def send_to_partner(self, partner, session, body, attachments=None, res_model=None, res_id=None,
                         client_token=None):
-        return self.send_to_number(partner.phone, session, body, attachments, res_model, res_id, client_token,
+        return self.send_to_number(partner._waha_phone(), session, body, attachments, res_model, res_id, client_token,
                                    partner=partner)
 
     @api.model
     def send_to_number(self, phone, session, body, attachments=None, res_model=None, res_id=None,
                        client_token=None, partner=None):
         """Send to a private WhatsApp chat (phone in international format)."""
-        digits = re.sub(r'\D', '', phone or '')
-        digits = digits[2:] if digits.startswith('00') else digits
+        digits = wa_digits(phone, session.company_id.country_id)
         if len(digits) < 7:
             raise UserError(self.env._("Invalid phone number (use the international format with country code)."))
         if not self.env.context.get('waha_ignore_optout') and \

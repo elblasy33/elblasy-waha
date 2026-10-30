@@ -1,5 +1,3 @@
-import re
-
 from odoo import fields, models
 from odoo.exceptions import UserError
 
@@ -22,8 +20,7 @@ class WahaGroupCreate(models.TransientModel):
         self.session_id._check_manager()
         participants = []
         for partner in self.partner_ids:
-            digits = re.sub(r'\D', '', partner.phone or '')
-            digits = digits[2:] if digits.startswith('00') else digits
+            digits = partner._waha_phone()
             if len(digits) < 7:
                 raise UserError(self.env._("%s has no valid phone number.", partner.name))
             participants.append({'id': f"{digits}@c.us"})

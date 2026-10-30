@@ -57,19 +57,19 @@ class TestClient(TransactionCase):
         return WahaClient('http://waha.test', 'SECRETKEY')
 
     def test_01_success(self):
-        with patch('requests.request', return_value=FakeResponse(200, [])) as req:
+        with patch('requests.Session.request', return_value=FakeResponse(200, [])) as req:
             self.assertEqual(self._client().list_sessions(), [])
             self.assertEqual(req.call_args.kwargs['headers']['X-Api-Key'], 'SECRETKEY')
 
     def test_02_bad_api_key(self):
-        with patch('requests.request', return_value=FakeResponse(401, {})):
+        with patch('requests.Session.request', return_value=FakeResponse(401, {})):
             with self.assertRaises(WahaError) as cm:
                 self._client().list_sessions()
         self.assertEqual(cm.exception.kind, 'auth')
 
     def test_03_unreachable_no_secret_leak(self):
         import requests
-        with patch('requests.request', side_effect=requests.exceptions.ConnectionError('http://waha.test X-Api-Key SECRETKEY')):
+        with patch('requests.Session.request', side_effect=requests.exceptions.ConnectionError('http://waha.test X-Api-Key SECRETKEY')):
             with self.assertRaises(WahaError) as cm:
                 self._client().list_sessions()
         self.assertEqual(cm.exception.kind, 'network')
@@ -79,7 +79,7 @@ class TestClient(TransactionCase):
         class Bad(FakeResponse):
             def json(self):
                 raise ValueError
-        with patch('requests.request', return_value=Bad(200, 'x')):
+        with patch('requests.Session.request', return_value=Bad(200, 'x')):
             with self.assertRaises(WahaError) as cm:
                 self._client().list_sessions()
         self.assertEqual(cm.exception.kind, 'response')
@@ -265,6 +265,10 @@ class TestWebhookHttp(WahaCommon, HttpCase):
     def test_01_webhook(self):
         self.assertEqual(self._post(self._incoming()).status_code, 200)
         self.assertEqual(self._post(self._incoming()).status_code, 200)  # replay
+        events = self.env['elblasy.waha.webhook.event'].search([('session_id', '=', self.session.id)])
+        self.assertEqual(events.mapped('state'), ['pending'])  # acknowledged at once, processed by the cron
+        with patch.object(type(self.env['ir.cron']), '_commit_progress', return_value=60.0):
+            self.env['elblasy.waha.webhook.event']._cron_retry_failed()
         self.assertEqual(self.env['elblasy.waha.message'].search_count([('session_id', '=', self.session.id)]), 1)
 
     def test_02_webhook_rejections(self):

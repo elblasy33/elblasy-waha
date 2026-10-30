@@ -1,5 +1,4 @@
 import logging
-import re
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
@@ -138,8 +137,7 @@ class WahaGroup(models.Model):
         self.ensure_one()
         ids = []
         for partner in partners:
-            digits = re.sub(r'\D', '', partner.phone or '')
-            digits = digits[2:] if digits.startswith('00') else digits
+            digits = partner._waha_phone()
             if len(digits) < 7:
                 raise UserError(self.env._("%s has no valid phone number.", partner.name))
             ids.append(f"{digits}@c.us")

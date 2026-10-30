@@ -13,6 +13,8 @@ from .waha_message import ACK_MAP, ACK_NAME_MAP, ts_to_datetime
 
 _logger = logging.getLogger(__name__)
 MAX_ATTEMPTS = 5
+BATCH_SIZE = 500
+RETRY_DELAY = timedelta(minutes=2)  # lets an ack that overtook its message wait for it
 IGNORED_SUFFIXES = ('g.us', 'broadcast', 'newsletter')
 
 
@@ -48,6 +50,14 @@ class WahaWebhookEvent(models.Model):
                 })
         except psycopg2.errors.UniqueViolation:
             return self.browse()  # the same event arrived twice at the same time; any other error must surface
+
+    def _schedule_processing(self):
+        """Wake the cron worker up; process inline only when that cron was disabled."""
+        cron = self.env.ref('elblasy_waha_connector.cron_waha_retry_events', raise_if_not_found=False)
+        if cron and cron.sudo().active:
+            cron.sudo()._trigger()
+        else:
+            self._process_event()
 
     def _process_event(self):
         for event in self:
@@ -251,11 +261,23 @@ class WahaWebhookEvent(models.Model):
 
     @api.model
     def _cron_retry_failed(self):
-        events = self.search([('state', 'in', ('failed', 'pending')), ('attempts', '<', MAX_ATTEMPTS)],
-                             order='id', limit=200)
-        events._process_event()
+        """Process new events in arrival order, retry failed ones after a short delay, then purge."""
+        Cron = self.env['ir.cron']
         now = fields.Datetime.now()
-        self.search([('state', 'in', ('done', 'ignored')), ('create_date', '<', now - timedelta(days=14))],
-                    limit=1000).unlink()
-        # failed events stay a month for investigation, then go (raw payloads may contain message content)
-        self.search([('state', '=', 'failed'), ('create_date', '<', now - timedelta(days=30))], limit=1000).unlink()
+        events = self.search([('state', '=', 'pending')], order='id', limit=BATCH_SIZE)
+        events |= self.search([('state', '=', 'failed'), ('attempts', '<', MAX_ATTEMPTS),
+                               ('write_date', '<', now - RETRY_DELAY)], order='id', limit=200)
+        events = events.sorted('id')
+        Cron._commit_progress(remaining=len(events))
+        for event in events:
+            event._process_event()
+            if not Cron._commit_progress(1):
+                break  # out of time: the cron runs again for the rest
+        if len(events) < BATCH_SIZE:
+            self.search([('state', 'in', ('done', 'ignored')), ('create_date', '<', now - timedelta(days=14))],
+                        limit=1000).unlink()
+            # failed events stay a month for investigation, then go (raw payloads may contain message content)
+            self.search([('state', '=', 'failed'), ('create_date', '<', now - timedelta(days=30))],
+                        limit=1000).unlink()
+        elif self.search_count([('state', '=', 'pending')], limit=1):
+            self.env.ref('elblasy_waha_connector.cron_waha_retry_events')._trigger()

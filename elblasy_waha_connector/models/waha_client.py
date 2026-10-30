@@ -26,6 +26,7 @@ class WahaClient:
         self._api_key = api_key or ''
         self.timeout = (timeout_connect, timeout_read)
         self.verify = bool(verify_ssl)
+        self._http = requests.Session()  # keep-alive across the calls of one operation (sync, picture crons)
 
     def _request(self, method, path, json=None, params=None, accept_json=True):
         if not self.base_url:
@@ -34,7 +35,7 @@ class WahaClient:
         if self._api_key:
             headers['X-Api-Key'] = self._api_key
         try:
-            resp = requests.request(
+            resp = self._http.request(
                 method, self.base_url + path, json=json, params=params,
                 headers=headers, timeout=self.timeout, verify=self.verify,
             )
@@ -161,7 +162,7 @@ class WahaClient:
             raise WahaError('response', "Invalid media URL.")
         headers = {'X-Api-Key': self._api_key} if self._api_key else {}
         try:
-            resp = requests.get(self.base_url + path, headers=headers, timeout=self.timeout, verify=self.verify)
+            resp = self._http.get(self.base_url + path, headers=headers, timeout=self.timeout, verify=self.verify)
         except requests.exceptions.RequestException:
             raise WahaError('network', "The WAHA server could not be reached.")
         if resp.status_code in (401, 403):
