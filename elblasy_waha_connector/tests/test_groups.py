@@ -312,7 +312,8 @@ class TestGroups(TransactionCase):
         self.assertEqual((message.message_type, len(message.attachment_ids)), ('image', 1))
         self.assertEqual(bytes(message.attachment_ids.raw), b'JPEGDATA-0123456789')
         ui = message._to_ui()
-        self.assertEqual(ui['attachments'], [{'id': message.attachment_ids.id, 'name': 'p.jpg', 'image': True}])
+        self.assertEqual(ui['attachments'], [{'id': message.attachment_ids.id, 'name': 'p.jpg', 'image': True,
+                                              'mimetype': 'image/jpeg', 'size': message.attachment_ids.file_size}])
         # users of the inbox can open it, others cannot
         self.assertTrue(message.with_user(self.user).attachment_ids.read(['name']))
 
@@ -492,15 +493,19 @@ class TestGroups(TransactionCase):
         conv = self.env['elblasy.waha.conversation'].create({
             'session_id': self.session.id, 'remote_chat_id': '201001235000@c.us'})
         with patch(f'{CLIENT}.picture_url', return_value='https://pps.whatsapp.net/c.jpg'), \
-                patch(f'{CLIENT}.download_picture', return_value=png):
+                patch(f'{CLIENT}.download_picture', return_value=png), \
+                patch(f'{CLIENT}.contact_name', return_value='Saved Name') as contact_name:
             self.env['elblasy.waha.conversation']._cron_sync_pictures()
         self.assertTrue(conv.image_128)
+        self.assertEqual(conv.name, 'Saved Name')  # WhatsApp name instead of the bare number
+        self.assertEqual(contact_name.call_count, 1)
         row = self.env['elblasy.waha.conversation'].with_user(self.user).inbox_conversations(session_id=self.session.id)
         self.assertTrue(next(r for r in row if r['id'] == conv.id)['has_image'])
         # an unreachable server stops the batch instead of hammering it
         conv2 = self.env['elblasy.waha.conversation'].create({
             'session_id': self.session.id, 'remote_chat_id': '201001235001@c.us'})
-        with patch(f'{CLIENT}.picture_url', side_effect=WahaError('network', 'down')) as url:
+        with patch(f'{CLIENT}.picture_url', side_effect=WahaError('network', 'down')) as url, \
+                patch(f'{CLIENT}.contact_name', return_value=False):
             self.env['elblasy.waha.conversation']._cron_sync_pictures()
         self.assertEqual(url.call_count, 1)
         self.assertFalse(conv2.picture_synced_at)
@@ -807,6 +812,97 @@ class TestGroups(TransactionCase):
                 patch(f'{CLIENT}.post', return_value={'id': 'true_201012345678@c.us_L'}) as post:
             self.env['elblasy.waha.group.post'].send_to_partner(partner, self.session, 'hi')
         self.assertEqual(post.call_args[0][1]['chatId'], '201012345678@c.us')
+
+
+    # ------------------------------------------------------------------ WhatsApp Web like inbox
+    def _msg(self, key, **extra):
+        payload = {'id': f'false_201001239000@c.us_{key}', 'from': '201001239000@c.us', 'fromMe': False,
+                   'timestamp': 1700000000, **extra}
+        self._event('message.any', payload, f'evt-{key}')
+        return self.env['elblasy.waha.message'].search([('remote_message_id', '=', payload['id'])])
+
+    def test_45_message_kinds_like_whatsapp(self):
+        self.assertFalse(self._msg('e2e', _data={'type': 'e2e_notification'}))  # system notice: no bubble
+        loc = self._msg('loc', body='/9j/4AAQSkZJRgABAQ', _data={'type': 'location'},
+                        location={'latitude': '30.0444', 'longitude': '31.2357', 'description': 'Cairo'})
+        self.assertEqual((loc.message_type, loc.body), ('location', 'Cairo'))  # thumbnail never shown as text
+        self.assertAlmostEqual(loc.latitude, 30.0444, places=4)
+        card = self._msg('vc', _data={'type': 'vcard'},
+                         vCards=['BEGIN:VCARD\nVERSION:3.0\nFN:Ali Hassan\nTEL;type=CELL:+20 100 123 4567\nEND:VCARD'])
+        self.assertEqual((card.message_type, card.body), ('contact', 'Ali Hassan\n+20 100 123 4567'))
+        poll = self._msg('poll', _data={'type': 'poll_creation', 'pollName': 'Lunch?',
+                                        'pollOptions': [{'name': 'Yes'}, {'name': 'No'}]})
+        self.assertEqual((poll.message_type, poll.body), ('poll', 'Lunch?\n• Yes\n• No'))
+        sticker = self._msg('st', hasMedia=True, _data={'type': 'sticker'})
+        self.assertEqual(sticker.message_type, 'sticker')
+        voice = self._msg('ptt', hasMedia=True, _data={'type': 'ptt'}, media={'mimetype': 'audio/ogg; codecs=opus'})
+        self.assertEqual(voice.message_type, 'audio')
+        reply = self._msg('rep', body='yes', replyTo={'id': 'x', 'body': 'Are you coming?'},
+                          _data={'type': 'chat', 'isForwarded': True})
+        ui = reply._to_ui()
+        self.assertEqual((ui['quoted'], ui['forwarded'], ui['type']), ('Are you coming?', True, 'text'))
+
+    def test_46_reactions_edits_and_deletes(self):
+        message = self._msg('base', body='Hello')
+        self._event('message.reaction', {'id': 'r1', 'from': '201001239000@c.us', 'fromMe': False,
+                                         'reaction': {'text': '❤️', 'messageId': message.remote_message_id}}, 'r1')
+        self._event('message.reaction', {'id': 'r2', 'fromMe': True,
+                                         'reaction': {'text': '❤️', 'messageId': message.remote_message_id}}, 'r2')
+        self.assertEqual(message._to_ui()['reactions'], [{'emoji': '❤️', 'count': 2, 'mine': True}])
+        self._event('message.reaction', {'id': 'r3', 'fromMe': True,
+                                         'reaction': {'text': '', 'messageId': message.remote_message_id}}, 'r3')
+        self.assertEqual(message._to_ui()['reactions'], [{'emoji': '❤️', 'count': 1, 'mine': False}])
+        self._event('message.edited', {'id': 'e1', 'body': 'Hello there', 'editedMessageId': message.remote_message_id},
+                    'e1')
+        self.assertEqual((message.body, message.is_edited), ('Hello there', True))
+        self._event('message.revoked', {'revokedMessageId': message.remote_message_id, 'before': {}}, 'd1')
+        self.assertTrue(message._to_ui()['revoked'])
+        self.assertEqual(message.body, 'Hello there')  # kept in Odoo for the record
+        unknown = self._event('message.reaction', {'id': 'r4', 'reaction': {'text': '👍', 'messageId': 'nope'}}, 'r4')
+        self.assertEqual(unknown.state, 'ignored')
+
+    def test_47_one_chat_per_person_phone_and_hidden_id(self):
+        Conv = self.env['elblasy.waha.conversation']
+        phone_chat = Conv._get_or_create(self.session, '201001239100@c.us')
+        with patch(f'{CLIENT}.lid_to_phone', return_value='201001239100'):
+            same = Conv._get_or_create(self.session, '77001@lid')
+        self.assertEqual(same, phone_chat)
+        self.assertEqual(phone_chat.lid_chat_id, '77001@lid')
+        self.assertEqual(Conv._get_or_create(self.session, '77001@lid'), phone_chat)  # no WAHA call needed now
+        # a chat first known by its hidden id switches to the phone id once WhatsApp gives it
+        with patch(f'{CLIENT}.lid_to_phone', return_value='201001239200'):
+            lid_chat = Conv._get_or_create(self.session, '77002@lid')
+        self.assertEqual(Conv._get_or_create(self.session, '201001239200@c.us'), lid_chat)
+        self.assertEqual((lid_chat.remote_chat_id, lid_chat.lid_chat_id), ('201001239200@c.us', '77002@lid'))
+
+    def test_48_merge_existing_duplicates(self):
+        Conv = self.env['elblasy.waha.conversation']
+        a = Conv.create({'session_id': self.session.id, 'remote_chat_id': '201001239300@c.us',
+                         'remote_phone': '201001239300'})
+        b = Conv.create({'session_id': self.session.id, 'remote_chat_id': '88001@lid', 'remote_phone': '201001239300',
+                         'display_name_remote': 'Mona'})
+        Message = self.env['elblasy.waha.message']
+        Message.create({'conversation_id': a.id, 'direction': 'in', 'body': 'old', 'remote_message_id': 'm-a',
+                        'date': '2026-10-01 10:00:00'})
+        Message.create({'conversation_id': b.id, 'direction': 'in', 'body': 'new', 'remote_message_id': 'm-b',
+                        'date': '2026-10-02 10:00:00'})
+        self.assertEqual(Conv._merge_duplicates(), 1)
+        self.assertFalse(b.exists())
+        self.assertEqual(a.message_ids.mapped('body'), ['new', 'old'])
+        self.assertEqual((a.lid_chat_id, a.display_name_remote, a.last_message_preview, a.unread_count),
+                         ('88001@lid', 'Mona', 'new', 2))
+
+    def test_49_inbox_list_like_whatsapp(self):
+        self.session.phone_number = '201001239900'
+        Conv = self.env['elblasy.waha.conversation']
+        me = Conv._get_or_create(self.session, '201001239900@c.us')
+        photo = self._msg('pic', hasMedia=True, media={'mimetype': 'image/jpeg'})
+        rows = {r['id']: r for r in Conv.with_user(self.user).inbox_conversations(session_id=self.session.id)}
+        self.assertTrue(rows[me.id]['is_me'])
+        row = rows[photo.conversation_id.id]
+        self.assertEqual((row['last_type'], row['last_direction']), ('image', 'in'))
+        unread = Conv.with_user(self.user).inbox_conversations(session_id=self.session.id, unread=True)
+        self.assertEqual([r['id'] for r in unread], [photo.conversation_id.id])
 
 
 def fields_dt_sub_minutes(minutes):

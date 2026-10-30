@@ -40,6 +40,14 @@ Items are sent at most once: an item is committed as *Interrupted while sending*
 gets its final state afterwards. If the server stops in between, the item stays *Interrupted*: check the chat, then
 use **Retry** if needed. *Send now* only triggers the queue cron; sending never runs inside a user request.
 
+## Inbox
+Looks and behaves like WhatsApp Web: chat list with filters (All, Unread, labels), WhatsApp names, avatars and
+ticks; day separators, bubbles with time and grey/blue ticks, replies (quotes), reactions, edited and deleted
+messages, photos, stickers, voice notes, videos, document cards, locations, contact cards and polls; emoji picker,
+light and dark themes, one pane at a time on phones. A chat known by its phone number and by its hidden id (LID) is
+one conversation. Reactions, edits and deletions need the session webhook to include the new events: press
+**Connect** once on existing sessions after upgrading (WAHA restarts the session, no new QR needed).
+
 ## Webhook processing
 The webhook only checks the signature, stores the event once and answers WAHA immediately. The cron
 *WAHA: process webhook events* is woken up at once and handles events in arrival order (media download,
@@ -50,7 +58,7 @@ active: if it is archived (Odoo.sh staging neutralizes crons) events are process
 Inbox sends text and files (max 15 MB); inbound media is stored and displayed. Auto-sync is a polling fallback (about 1 minute delay), not a replacement for the webhook. WEBJS is unofficial:
 avoid bulk campaigns. National numbers written with a leading 0 get the country code of the contact (or the company);
 other numbers need the country code. LID-only chats are not matched to contacts automatically.
-The inbox JavaScript is covered by manual testing only (no JS test suite).
+The inbox is checked in Chrome by `tests/test_inbox_ui.py` (every kind of message is rendered).
 
 ## Tests
 `odoo-bin -d <db> --http-port=<free port> -i elblasy_waha_connector --test-tags /elblasy_waha_connector --stop-after-init`

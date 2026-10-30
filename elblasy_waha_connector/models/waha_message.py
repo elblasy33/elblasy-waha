@@ -34,8 +34,17 @@ class WahaMessage(models.Model):
     direction = fields.Selection([('in', "Incoming"), ('out', "Outgoing")], required=True)
     message_type = fields.Selection(
         [('text', "Text"), ('image', "Image"), ('video', "Video"), ('audio', "Audio"),
-         ('document', "Document"), ('other', "Other")], required=True, default='text')
+         ('document', "Document"), ('sticker', "Sticker"), ('location', "Location"), ('contact', "Contact card"),
+         ('poll', "Poll"), ('other', "Other")], required=True, default='text')
     body = fields.Text()
+    latitude = fields.Float(digits=(10, 7))
+    longitude = fields.Float(digits=(10, 7))
+    quoted_remote_id = fields.Char("Reply to (id)", copy=False)
+    quoted_body = fields.Char("Reply to")
+    reactions = fields.Json(copy=False, help="Emoji reactions by sender: {sender: emoji}.")
+    is_forwarded = fields.Boolean("Forwarded", readonly=True)
+    is_edited = fields.Boolean("Edited", readonly=True)
+    is_revoked = fields.Boolean("Deleted for everyone", readonly=True)
     date = fields.Datetime(required=True, default=fields.Datetime.now, index=True)
     delivery_status = fields.Selection(
         [('pending', "Sending"), ('sent', "Sent"), ('delivered', "Delivered"), ('read', "Read"),
@@ -67,6 +76,17 @@ class WahaMessage(models.Model):
         self.ensure_one()
         return (self.body or f"[{self.message_type}]")[:120]
 
+    def _set_reaction(self, sender, emoji):
+        """WhatsApp keeps one reaction per person; an empty emoji removes it."""
+        self.ensure_one()
+        reactions = dict(self.reactions or {})
+        if emoji:
+            reactions[sender] = emoji
+        else:
+            reactions.pop(sender, None)
+        self.sudo().reactions = reactions
+        self._notify_bus()
+
     def _touch_conversation(self):
         self.ensure_one()
         conv = self.conversation_id.sudo()
@@ -96,11 +116,20 @@ class WahaMessage(models.Model):
 
     def _to_ui(self):
         self.ensure_one()
+        counts = {}
+        for sender, emoji in (self.reactions or {}).items():
+            entry = counts.setdefault(emoji, {'emoji': emoji, 'count': 0, 'mine': False})
+            entry['count'] += 1
+            entry['mine'] = entry['mine'] or sender == 'me'
         return {
             'id': self.id, 'direction': self.direction, 'type': self.message_type, 'body': self.body or '',
             'date': fields.Datetime.to_string(self.date), 'status': self.delivery_status,
-            'failure': self.failure_reason, 'sender': self.sender_identifier,
-            'attachments': [{'id': a.id, 'name': a.name, 'image': (a.mimetype or '').startswith('image/')}
+            'failure': self.failure_reason, 'sender': self.sender_identifier, 'is_auto': self.is_auto,
+            'quoted': self.quoted_body or '', 'forwarded': self.is_forwarded, 'edited': self.is_edited,
+            'revoked': self.is_revoked, 'reactions': list(counts.values()),
+            'location': {'lat': self.latitude, 'lng': self.longitude} if self.message_type == 'location' else False,
+            'attachments': [{'id': a.id, 'name': a.name, 'mimetype': a.mimetype or '', 'size': a.file_size,
+                             'image': (a.mimetype or '').startswith('image/')}
                             for a in self.attachment_ids],
         }
 

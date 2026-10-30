@@ -1,24 +1,584 @@
-.o_waha_inbox {
-    background: var(--body-bg, #fff);
+// Tiled background of simple line drawings (our own pattern), stroke color and opacity configurable.
+@function waha-doodle($stroke, $opacity) {
+    @return url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='#{$stroke}' stroke-opacity='#{$opacity}' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 22h26a6 6 0 0 1 6 6v12a6 6 0 0 1-6 6H30l-8 6v-6h-4a6 6 0 0 1-6-6V28a6 6 0 0 1 6-6z'/%3E%3Cpath d='M112 18l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z'/%3E%3Cpath d='M70 92c-6-6-16 2-8 10l8 7 8-7c8-8-2-16-8-10z'/%3E%3Ccircle cx='128' cy='104' r='9'/%3E%3Cpath d='M124 104l3 3 5-6'/%3E%3Cpath d='M20 122l14-8 4 14z'/%3E%3Cpath d='M92 140h20M102 130v20'/%3E%3Cpath d='M70 34c4-6 12-6 16 0'/%3E%3C/g%3E%3C/svg%3E");
+}
 
-    .o_waha_list { width: 340px; max-width: 40%; }
-    .o_waha_conv {
-        cursor: pointer;
-        &:hover, &.active { background-color: rgba(0, 0, 0, .05); }
+// WhatsApp Web inspired inbox. Colors are variables so the dark bundle (inbox.dark.scss) only swaps them.
+.o_waha_inbox {
+    --waha-panel: #ffffff;
+    --waha-header: #f0f2f5;
+    --waha-border: #e9edef;
+    --waha-hover: #f5f6f6;
+    --waha-active: #f0f2f5;
+    --waha-text: #111b21;
+    --waha-muted: #667781;
+    --waha-green: #25d366;
+    --waha-green-dark: #008069;
+    --waha-chat-bg: #efeae2;
+    --waha-in: #ffffff;
+    --waha-out: #d9fdd3;
+    --waha-quote: rgba(11, 20, 26, 0.05);
+    --waha-tick: #8696a0;
+    --waha-tick-read: #53bdeb;
+    --waha-day: #ffffff;
+    --waha-input: #ffffff;
+    --waha-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+    --waha-chip: #f0f2f5;
+    --waha-chip-active: #d9fdd3;
+    --waha-chip-active-text: #008069;
+
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+    color: var(--waha-text);
+    background: var(--waha-panel);
+    font-size: 14.2px;
+
+    // ------------------------------------------------------------ list
+    .o_waha_list {
+        display: flex;
+        flex-direction: column;
+        width: 32%;
+        min-width: 300px;
+        max-width: 460px;
+        border-inline-end: 1px solid var(--waha-border);
+        background: var(--waha-panel);
     }
-    .o_waha_label { color: #fff; font-weight: 500; }
-    .o_waha_labels_menu { position: absolute; right: 0; top: 100%; z-index: 10; min-width: 180px; background: var(--body-bg, #fff); }
-    .o_waha_label_option { cursor: pointer; &:hover { background-color: rgba(0, 0, 0, .05); } }
-    .o_waha_avatar { object-fit: cover; flex: none; }
-    .o_waha_img { max-height: 280px; }
+    .o_waha_list_header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 14px 16px 6px;
+    }
+    .o_waha_brand {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--waha-text);
+        .oi { color: var(--waha-green); vertical-align: -3px; }
+    }
+    .o_waha_session_select {
+        max-width: 50%;
+        border-radius: 18px;
+        background-color: var(--waha-header);
+        color: var(--waha-text);
+        border: 0;
+    }
+    .o_waha_search {
+        position: relative;
+        margin: 6px 12px;
+        .oi {
+            position: absolute;
+            inset-inline-start: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--waha-muted);
+        }
+        input {
+            width: 100%;
+            border: 0;
+            outline: 0;
+            border-radius: 20px;
+            padding: 8px 14px;
+            padding-inline-start: 40px;
+            background: var(--waha-header);
+            color: var(--waha-text);
+            &::placeholder { color: var(--waha-muted); }
+        }
+    }
+    .o_waha_chips {
+        display: flex;
+        gap: 6px;
+        padding: 6px 12px 10px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        border-bottom: 1px solid var(--waha-border);
+    }
+    .o_waha_chip {
+        flex: none;
+        border: 0;
+        border-radius: 16px;
+        padding: 5px 12px;
+        background: var(--waha-chip);
+        color: var(--waha-muted);
+        font-size: 13.5px;
+        white-space: nowrap;
+        &:hover { filter: brightness(0.97); }
+        &.active {
+            background: var(--waha-chip-active);
+            color: var(--waha-chip-active-text);
+            font-weight: 600;
+        }
+    }
+    .o_waha_chip_dot {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        margin-inline-end: 5px;
+    }
+    .o_waha_conv_list {
+        flex: 1 1 auto;
+        overflow-y: auto;
+    }
+    .o_waha_conv {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 12px 0 14px;
+        cursor: pointer;
+        &:hover { background: var(--waha-hover); }
+        &.active { background: var(--waha-active); }
+        .o_waha_avatar { width: 49px; height: 49px; font-size: 18px; }
+    }
+    .o_waha_conv_body {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--waha-border);
+    }
+    .o_waha_conv_top, .o_waha_conv_bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+    }
+    .o_waha_conv_name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 16px;
+        color: var(--waha-text);
+    }
+    .o_waha_conv_time {
+        flex: none;
+        font-size: 12px;
+        color: var(--waha-muted);
+        &.o_waha_unread_time { color: var(--waha-green); font-weight: 600; }
+    }
+    .o_waha_conv_preview {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--waha-muted);
+        font-size: 14px;
+        margin-top: 2px;
+        .o_waha_tick, .o_waha_tick_icon { margin-inline-end: 3px; }
+        .oi { font-size: 16px; vertical-align: -3px; }
+    }
+    .o_waha_unread_badge {
+        flex: none;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        border-radius: 10px;
+        background: var(--waha-green);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 20px;
+        text-align: center;
+    }
+    .o_waha_conv_labels { margin-top: 4px; }
+    .o_waha_label {
+        display: inline-block;
+        margin-inline-end: 4px;
+        padding: 0 7px;
+        border-radius: 4px;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 17px;
+    }
+    .o_waha_empty_list {
+        padding: 40px 16px;
+        text-align: center;
+        color: var(--waha-muted);
+    }
+
+    // ------------------------------------------------------------ avatars
+    .o_waha_avatar {
+        flex: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .o_waha_avatar_initials {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 15px;
+    }
+
+    // ------------------------------------------------------------ thread
+    .o_waha_thread {
+        position: relative;
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        min-width: 0;
+        background-color: var(--waha-chat-bg);
+    }
+    .o_waha_thread_header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 60px;
+        padding: 8px 16px;
+        background: var(--waha-header);
+        border-inline-start: 1px solid var(--waha-border);
+    }
+    .o_waha_back { display: none; color: var(--waha-muted); padding: 0 6px 0 0; }
+    .o_waha_thread_title { flex: 1 1 auto; min-width: 0; }
+    .o_waha_thread_sub {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 13px;
+        color: var(--waha-muted);
+    }
+    .o_waha_thread_actions { flex: none; display: flex; align-items: center; gap: 4px; }
+    .o_waha_icon_btn {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        color: var(--waha-muted);
+        font-size: 20px;
+        background: transparent;
+        &:hover:not(:disabled) { background: rgba(127, 127, 127, 0.15); color: var(--waha-text); }
+    }
+    .o_waha_labels_menu {
+        position: absolute;
+        inset-inline-end: 0;
+        top: 100%;
+        z-index: 20;
+        min-width: 200px;
+        padding: 6px 0;
+        border-radius: 6px;
+        background: var(--waha-panel);
+        box-shadow: 0 4px 16px rgba(11, 20, 26, 0.25);
+    }
+    .o_waha_label_option {
+        padding: 8px 16px;
+        cursor: pointer;
+        &:hover { background: var(--waha-hover); }
+    }
+
+    .o_waha_messages {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 12px 6% 8px;
+        background-color: var(--waha-chat-bg);
+        // own doodle pattern (chat bubbles, stars and hearts), tiled very lightly
+        background-image: waha-doodle("%23000000", 0.07);
+        background-size: 160px 160px;
+    }
+    .o_waha_day_row { display: flex; justify-content: center; margin: 10px 0; position: sticky; top: 4px; z-index: 2; }
+    .o_waha_day {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 8px;
+        background: var(--waha-day);
+        color: var(--waha-muted);
+        font-size: 12.5px;
+        box-shadow: var(--waha-shadow);
+    }
+
+    .o_waha_row {
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 2px;
+        &.o_waha_row_first { margin-top: 10px; }
+        &.o_waha_row_out { justify-content: flex-end; }
+    }
     .o_waha_bubble {
-        max-width: 70%;
+        position: relative;
+        max-width: unquote("min(65%, 560px)");
+        padding: 6px 7px 8px 9px;
+        border-radius: 8px;
+        box-shadow: var(--waha-shadow);
+        color: var(--waha-text);
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+        &.o_in { background: var(--waha-in); }
+        &.o_out { background: var(--waha-out); }
+        // the little tail on the first bubble of a group
+        &.o_tail.o_in { border-top-left-radius: 0; }
+        &.o_tail.o_out { border-top-right-radius: 0; }
+        &.o_tail::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            width: 8px;
+            height: 13px;
+        }
+        &.o_tail.o_in::before {
+            left: -8px;
+            background: var(--waha-in);
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+        }
+        &.o_tail.o_out::before {
+            right: -8px;
+            background: var(--waha-out);
+            clip-path: polygon(0 0, 100% 0, 0 100%);
+        }
+    }
+    .o_waha_text {
         white-space: pre-wrap;
-        word-break: break-word;
-        &.o_in { background: #f1f3f5; }
-        &.o_out { background: #d9fdd3; color: #111; }
+        a { color: #027eb5; text-decoration: underline; }
+        code {
+            font-family: SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 13px;
+            color: inherit;
+        }
+    }
+    .o_waha_space { display: inline-block; height: 1px; }
+    .o_waha_meta_space { height: 13px; }
+    .o_waha_unsupported { color: var(--waha-muted); font-style: italic; }
+    .o_waha_meta {
+        position: absolute;
+        bottom: 3px;
+        inset-inline-end: 7px;
+        font-size: 11px;
+        color: var(--waha-muted);
+        white-space: nowrap;
+        line-height: 15px;
+        .o_waha_tick, .oi { margin-inline-start: 3px; }
+        .oi { font-size: 14px; vertical-align: -3px; }
+    }
+    .o_waha_media_bubble {
+        padding: 3px;
+        .o_waha_meta {
+            bottom: 7px;
+            inset-inline-end: 9px;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+            .o_waha_tick { color: #ffffff; }
+            .o_waha_tick_read { color: var(--waha-tick-read); }
+        }
+    }
+    .o_waha_sticker_bubble {
+        background: transparent !important;
+        box-shadow: none;
+        &::before { display: none; }
+        .o_waha_meta {
+            padding: 0 6px;
+            border-radius: 8px;
+            background: var(--waha-day);
+        }
+    }
+    .o_waha_img, .o_waha_video {
+        display: block;
+        max-width: 100%;
+        width: 330px;
+        max-height: 360px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-bottom: 2px;
+    }
+    .o_waha_sticker { display: block; width: 150px; height: 150px; object-fit: contain; }
+    .o_waha_audio { display: block; width: 280px; max-width: 100%; height: 40px; margin-bottom: 4px; }
+    .o_waha_doc {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 240px;
+        margin-bottom: 4px;
+        padding: 10px;
+        border-radius: 6px;
+        background: var(--waha-quote);
+        color: var(--waha-text);
+        text-decoration: none;
+        &:hover { filter: brightness(0.97); }
+    }
+    .o_waha_doc_icon { font-size: 34px; color: var(--waha-muted); }
+    .o_waha_pdf { color: #e2414c; }
+    .o_waha_word { color: #2b6cd4; }
+    .o_waha_excel { color: #1e8e4e; }
+    .o_waha_doc_info { display: flex; flex: 1 1 auto; flex-direction: column; min-width: 0; }
+    .o_waha_doc_name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .o_waha_doc_meta { font-size: 12px; color: var(--waha-muted); }
+    .o_waha_doc_dl {
+        flex: none;
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--waha-muted);
+        border-radius: 50%;
+        color: var(--waha-muted);
+        line-height: 30px;
+        text-align: center;
+        font-size: 18px;
+    }
+    .o_waha_location, .o_waha_vcard {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 220px;
+        margin-bottom: 4px;
+        padding: 10px;
+        border-radius: 6px;
+        background: var(--waha-quote);
+        color: var(--waha-text);
+        white-space: pre-wrap;
+        text-decoration: none;
+        .oi { font-size: 32px; }
+    }
+    .o_waha_location .oi { color: #e2414c; }
+    .o_waha_vcard .oi { color: var(--waha-muted); }
+    .o_waha_quote {
+        margin-bottom: 5px;
+        padding: 5px 8px;
+        border-left: 4px solid var(--waha-green-dark);
+        border-radius: 6px;
+        background: var(--waha-quote);
+        color: var(--waha-muted);
+        font-size: 13px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        white-space: pre-wrap;
+    }
+    .o_waha_meta_line { font-size: 12.5px; font-style: italic; color: var(--waha-muted); margin-bottom: 2px; }
+    .o_waha_revoked { font-style: italic; color: var(--waha-muted); }
+    .o_waha_poll_text { white-space: pre-wrap; }
+    .o_waha_read_more {
+        display: inline;
+        margin-inline-start: 4px;
+        border: 0;
+        padding: 0;
+        background: none;
+        color: #027eb5;
+        font-weight: 600;
+    }
+    .o_waha_failure { clear: both; font-size: 12px; color: #e2414c; padding-top: 2px; }
+    .o_waha_reactions {
+        position: absolute;
+        bottom: -14px;
+        inset-inline-start: 8px;
+        display: flex;
+        gap: 2px;
+        padding: 1px 5px;
+        border-radius: 12px;
+        background: var(--waha-panel);
+        box-shadow: 0 1px 3px rgba(11, 20, 26, 0.25);
+        font-size: 13px;
+        z-index: 1;
+        .o_waha_mine { filter: drop-shadow(0 0 1px var(--waha-green)); }
+    }
+    .o_waha_row:has(.o_waha_reactions) { margin-bottom: 18px; }
+
+    // ticks drawn with two check marks, grey or blue like WhatsApp
+    .o_waha_tick {
+        display: inline-block;
+        position: relative;
+        width: 16px;
+        height: 11px;
+        color: var(--waha-tick);
+        vertical-align: -1px;
+        &::before, &::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            width: 5px;
+            height: 9px;
+            border: solid currentColor;
+            border-width: 0 1.7px 1.7px 0;
+            transform: rotate(40deg);
+        }
+        &::before { left: 3px; }
+        &::after { left: 8px; }
+        &.o_waha_tick_single { width: 11px; &::after { display: none; } }
+        &.o_waha_tick_read { color: var(--waha-tick-read); }
+    }
+
+    // ------------------------------------------------------------ composer
+    .o_waha_offline {
+        padding: 8px 16px;
+        background: #fff3cd;
+        color: #664d03;
+        font-size: 13px;
+        text-align: center;
+    }
+    .o_waha_composer {
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+        padding: 6px 12px;
+        background: var(--waha-header);
+    }
+    .o_waha_input {
+        flex: 1 1 auto;
+        min-height: 42px;
+        max-height: 140px;
+        resize: none;
+        border: 0;
+        outline: 0;
+        border-radius: 8px;
+        padding: 10px 12px;
+        background: var(--waha-input);
+        color: var(--waha-text);
+        line-height: 20px;
+        &::placeholder { color: var(--waha-muted); }
+    }
+    .o_waha_send {
+        flex: none;
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: var(--waha-green-dark);
+        color: #ffffff;
+        font-size: 17px;
+        &:disabled { background: transparent; color: var(--waha-muted); }
+        &:hover:not(:disabled) { filter: brightness(1.08); color: #ffffff; }
+    }
+
+    // ------------------------------------------------------------ welcome
+    .o_waha_welcome {
+        margin: auto;
+        padding: 24px;
+        max-width: 460px;
+        text-align: center;
+        color: var(--waha-muted);
+        h3 { color: var(--waha-text); font-weight: 300; margin: 18px 0 10px; }
+    }
+    .o_waha_welcome_icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+        border-radius: 50%;
+        background: var(--waha-header);
+        color: var(--waha-green);
+        font-size: 64px;
+        line-height: 120px;
+        .oi { font-size: 64px; vertical-align: middle; }
     }
 }
+
+// RTL interface: Odoo's RTL bundle already mirrors sides and radii, only the tail shapes need swapping
+.o_rtl .o_waha_inbox {
+    .o_waha_bubble.o_tail.o_in::before { clip-path: polygon(0 0, 100% 0, 0 100%); }
+    .o_waha_bubble.o_tail.o_out::before { clip-path: polygon(0 0, 100% 0, 100% 100%); }
+}
+
+// phones: one pane at a time, like the WhatsApp app
 @media (max-width: 767.98px) {
-    .o_waha_inbox .o_waha_list { width: 45%; }
+    .o_waha_inbox {
+        .o_waha_list { width: 100%; max-width: none; min-width: 0; border: 0; }
+        .o_waha_thread { display: none; }
+        &.o_waha_has_current {
+            .o_waha_list { display: none; }
+            .o_waha_thread { display: flex; }
+        }
+        .o_waha_back { display: inline-block; }
+        .o_waha_bubble { max-width: 85%; }
+        .o_waha_messages { padding: 8px 10px; }
+    }
 }

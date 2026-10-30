@@ -132,6 +132,14 @@ class WahaClient:
         url = data.get('url') if isinstance(data, dict) else None
         return url if isinstance(url, str) and url else False
 
+    def contact_name(self, session, chat_id):
+        """The name WhatsApp shows for a chat: saved name on the phone, else the person's own profile name."""
+        data = self._request('GET', '/api/contacts', params={'contactId': chat_id, 'session': session})
+        if not isinstance(data, dict):
+            return False
+        name = data.get('name') or data.get('pushname') or data.get('shortName')
+        return name.strip()[:128] if isinstance(name, str) and name.strip() else False
+
     def download_picture(self, url, max_bytes=1024 * 1024):
         """Download a WhatsApp CDN picture. Only https URLs of WhatsApp hosts are fetched (no SSRF)."""
         from urllib.parse import urlparse

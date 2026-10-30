@@ -9,7 +9,7 @@ HR_VIEW_XMLID = 'hr_employee_view_form_waha'
 HR_VIEW_ARCH = """<data>
     <div name="button_box" position="inside">
         <button name="elblasy_waha_connector.waha_group_send_action" type="action" class="oe_stat_button"
-                icon="fa-whatsapp" string="Send WhatsApp" groups="elblasy_waha_connector.group_waha_user"/>
+                icon="oi_whatsapp" string="Send WhatsApp" groups="elblasy_waha_connector.group_waha_user"/>
     </div>
 </data>"""
 

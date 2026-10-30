@@ -33,7 +33,7 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <div name="button_box" position="inside">
-                <button name="action_waha_discuss_chat" type="object" class="oe_stat_button" icon="fa-comments"
+                <button name="action_waha_discuss_chat" type="object" class="oe_stat_button" icon="forum"
                         string="WhatsApp Chat" groups="elblasy_waha_connector.group_waha_user"/>
             </div>
         </field>

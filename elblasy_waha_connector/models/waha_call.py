@@ -21,5 +21,6 @@ class WahaCall(models.Model):
     def _compute_partner(self):
         Conversation = self.env['elblasy.waha.conversation'].sudo()
         for call in self:
-            conv = Conversation.search([('remote_chat_id', '=', call.chat_id)], limit=1)
+            conv = Conversation.search(['|', ('remote_chat_id', '=', call.chat_id), ('lid_chat_id', '=', call.chat_id)],
+                                       limit=1)
             call.partner_id = conv.partner_id

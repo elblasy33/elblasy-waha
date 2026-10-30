@@ -30,6 +30,7 @@
                         <group>
                             <field name="remote_phone" readonly="id" placeholder="e.g. 201001234567"/>
                             <field name="remote_chat_id" readonly="id" placeholder="Filled from the phone"/>
+                            <field name="lid_chat_id" readonly="1" invisible="not lid_chat_id"/>
                             <field name="chat_type"/>
                             <field name="display_name_remote"/><field name="active"/>
                         </group>

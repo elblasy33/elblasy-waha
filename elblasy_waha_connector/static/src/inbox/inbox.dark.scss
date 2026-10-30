@@ -1,0 +1,30 @@
+// Dark theme of the WhatsApp inbox (loaded only in Odoo's dark mode bundle).
+@function waha-doodle-dark($stroke, $opacity) {
+    @return url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='#{$stroke}' stroke-opacity='#{$opacity}' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 22h26a6 6 0 0 1 6 6v12a6 6 0 0 1-6 6H30l-8 6v-6h-4a6 6 0 0 1-6-6V28a6 6 0 0 1 6-6z'/%3E%3Cpath d='M112 18l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z'/%3E%3Cpath d='M70 92c-6-6-16 2-8 10l8 7 8-7c8-8-2-16-8-10z'/%3E%3Ccircle cx='128' cy='104' r='9'/%3E%3Cpath d='M124 104l3 3 5-6'/%3E%3Cpath d='M20 122l14-8 4 14z'/%3E%3Cpath d='M92 140h20M102 130v20'/%3E%3Cpath d='M70 34c4-6 12-6 16 0'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.o_waha_inbox {
+    --waha-panel: #111b21;
+    --waha-header: #202c33;
+    --waha-border: #222d34;
+    --waha-hover: #202c33;
+    --waha-active: #2a3942;
+    --waha-text: #e9edef;
+    --waha-muted: #8696a0;
+    --waha-green-dark: #00a884;
+    --waha-chat-bg: #0b141a;
+    --waha-in: #202c33;
+    --waha-out: #005c4b;
+    --waha-quote: rgba(0, 0, 0, 0.18);
+    --waha-tick: #8696a0;
+    --waha-day: #182229;
+    --waha-input: #2a3942;
+    --waha-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.25);
+    --waha-chip: #202c33;
+    --waha-chip-active: #0a332c;
+    --waha-chip-active-text: #00a884;
+
+    .o_waha_messages { background-image: waha-doodle-dark("%23ffffff", 0.05); }
+    .o_waha_text a, .o_waha_read_more { color: #53bdeb; }
+    .o_waha_offline { background: #3d3418; color: #ffd279; }
+}

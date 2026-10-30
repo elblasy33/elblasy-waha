@@ -16,6 +16,70 @@ MAX_ATTEMPTS = 5
 BATCH_SIZE = 500
 RETRY_DELAY = timedelta(minutes=2)  # lets an ack that overtook its message wait for it
 IGNORED_SUFFIXES = ('g.us', 'broadcast', 'newsletter')
+# WhatsApp system notices (encryption banners, group notifications, call logs...): not chat messages
+SYSTEM_TYPES = {'e2e_notification', 'notification', 'notification_template', 'gp2', 'protocol', 'ciphertext',
+                'call_log', 'broadcast_notification', 'pinned_message', 'keep_in_chat'}
+
+
+def _vcard_summary(vcard):
+    """Name and phone numbers of a vCard, one per line."""
+    lines = []
+    for line in (vcard or '').splitlines():
+        key, _sep, value = line.partition(':')
+        if key.upper() == 'FN' or key.upper().startswith('TEL'):
+            lines.append(value.strip())
+    return '\n'.join(lines)
+
+
+def parse_content(p):
+    """Message kind and content fields of a WAHA message payload, or None for a system notice."""
+    data = p.get('_data') if isinstance(p.get('_data'), dict) else {}
+    wtype = data.get('type') or p.get('type')
+    if wtype in SYSTEM_TYPES:
+        return None
+    body = p.get('body') or False
+    vals = {'is_forwarded': bool(data.get('isForwarded') or p.get('isForwarded'))}
+    location = p.get('location') if isinstance(p.get('location'), dict) else None
+    if wtype == 'revoked':
+        vals.update(message_type='text', body=False, is_revoked=True)
+    elif wtype == 'location' or location:
+        location = location or {}
+        try:
+            vals.update(latitude=float(location.get('latitude') or data.get('lat') or 0),
+                        longitude=float(location.get('longitude') or data.get('lng') or 0))
+        except (TypeError, ValueError):
+            pass
+        # with WEBJS the body of a location is a base64 thumbnail, never show it
+        vals.update(message_type='location',
+                    body=location.get('description') or location.get('name') or location.get('address') or False)
+    elif wtype in ('vcard', 'multi_vcard') or p.get('vCards'):
+        cards = p.get('vCards') or ([body] if body else [])
+        vals.update(message_type='contact', body='\n\n'.join(filter(None, map(_vcard_summary, cards))) or False)
+    elif wtype in ('poll_creation', 'poll'):
+        options = [o.get('name') for o in data.get('pollOptions') or [] if isinstance(o, dict) and o.get('name')]
+        name = data.get('pollName') or body or ''
+        vals.update(message_type='poll', body='\n'.join([name] + [f"• {o}" for o in options]).strip() or False)
+    elif wtype == 'sticker':
+        vals.update(message_type='sticker', body=False)
+    elif p.get('hasMedia'):
+        media = p.get('media') if isinstance(p.get('media'), dict) else {}
+        mime = media.get('mimetype') or data.get('mimetype') or ''
+        if wtype in ('ptt', 'audio'):
+            kind = 'audio'
+        else:
+            kind = {'image': 'image', 'video': 'video', 'audio': 'audio'}.get(mime.split('/')[0], 'document')
+        vals.update(message_type=kind, body=body)
+    else:
+        vals.update(message_type='text' if body else 'other', body=body)
+    reply = p.get('replyTo') if isinstance(p.get('replyTo'), dict) else {}
+    quoted = data.get('quotedMsg') if isinstance(data.get('quotedMsg'), dict) else {}
+    if reply or quoted:
+        vals['quoted_remote_id'] = reply.get('id') or data.get('quotedStanzaID') or False
+        quoted_body = reply.get('body') or quoted.get('caption') or quoted.get('body')
+        if quoted.get('type') == 'location' or (quoted_body and len(quoted_body) > 2000):
+            quoted_body = False  # thumbnails, not text
+        vals['quoted_body'] = (quoted_body or f"[{quoted.get('type') or 'message'}]")[:250]
+    return vals
 
 
 class WahaWebhookEvent(models.Model):
@@ -108,6 +172,12 @@ class WahaWebhookEvent(models.Model):
             return self._handle_message(session, payload)
         if etype == 'message.ack':
             return self._handle_ack(session, payload)
+        if etype == 'message.reaction':
+            return self._handle_reaction(session, payload)
+        if etype == 'message.edited':
+            return self._handle_edited(session, payload)
+        if etype == 'message.revoked':
+            return self._handle_revoked(session, payload)
         if etype in ('group.v2.update', 'group.v2.participants'):
             return self._handle_group_event(session, etype, payload)
         if etype.startswith('label.'):
@@ -143,8 +213,7 @@ class WahaWebhookEvent(models.Model):
         label = Label.search([('session_id', '=', session.id), ('label_id', '=', str(p.get('labelId')))], limit=1)
         if not label and isinstance(p.get('label'), dict):
             label = Label._upsert(session, p['label'])
-        conv = self.env['elblasy.waha.conversation'].sudo().with_context(active_test=False).search(
-            [('session_id', '=', session.id), ('remote_chat_id', '=', p.get('chatId'))], limit=1)
+        conv = self.env['elblasy.waha.conversation'].sudo()._find_chat(session, p.get('chatId'))
         if not label or not conv:
             return 'ignored'  # label unknown yet or chat not in Odoo: a manual "Sync Labels" fixes both
         conv.label_ids = [(4 if etype == 'label.chat.added' else 3, label.id)]
@@ -207,25 +276,24 @@ class WahaWebhookEvent(models.Model):
             if p.get('ack') is not None and from_me:
                 existing._set_ack(ACK_MAP.get(p['ack']))
             return 'done'
+        content = parse_content(p)
+        if content is None:
+            return 'ignored'  # encryption banner, call log, group notice...
         data = p.get('_data') if isinstance(p.get('_data'), dict) else {}
         conv = self.env['elblasy.waha.conversation'].sudo()._get_or_create(
             session, chat_id, None if from_me else data.get('notifyName') or data.get('pushName'))
         media = p.get('media') if isinstance(p.get('media'), dict) else {}
-        mime = media.get('mimetype') or ''
-        if p.get('hasMedia'):
-            mtype = {'image': 'image', 'video': 'video', 'audio': 'audio'}.get(mime.split('/')[0], 'document')
-        else:
-            mtype = 'text' if p.get('body') else 'other'
         message = Message.create({
+            **content,
             'conversation_id': conv.id, 'remote_message_id': remote_id,
-            'direction': 'out' if from_me else 'in', 'message_type': mtype, 'body': p.get('body') or False,
+            'direction': 'out' if from_me else 'in',
             'date': ts_to_datetime(p.get('timestamp')),
             'delivery_status': ACK_MAP.get(p.get('ack'), 'sent') if from_me else False,
             'sender_identifier': (session.phone_number if from_me else (p.get('participant') or p.get('from'))),
             'webhook_event_id': self.id,
         })
         if p.get('hasMedia') and media.get('url'):
-            self._store_media(session, message, media, mtype)
+            self._store_media(session, message, media, content['message_type'])
         if not from_me:
             conv._after_incoming(message)
         return 'done'
@@ -245,6 +313,39 @@ class WahaWebhookEvent(models.Model):
             'name': media.get('filename') or f"{mtype}{extension}", 'raw': raw, 'mimetype': mime,
             'res_model': 'elblasy.waha.message', 'res_id': message.id,
         })
+
+    def _find_message(self, session, remote_id):
+        if not isinstance(remote_id, str) or not remote_id:
+            return self.env['elblasy.waha.message']
+        return self.env['elblasy.waha.message'].sudo().search(
+            [('session_id', '=', session.id), ('remote_message_id', '=', remote_id)], limit=1)
+
+    def _handle_reaction(self, session, p):
+        reaction = p.get('reaction') if isinstance(p.get('reaction'), dict) else {}
+        message = self._find_message(session, reaction.get('messageId'))
+        if not message:
+            return 'ignored'  # reaction to a message Odoo never had
+        sender = 'me' if p.get('fromMe') else (p.get('participant') or p.get('from') or '?')
+        message._set_reaction(sender, reaction.get('text') or False)
+        return 'done'
+
+    def _handle_edited(self, session, p):
+        message = self._find_message(session, p.get('editedMessageId'))
+        if not message or not isinstance(p.get('body'), str):
+            return 'ignored'
+        message.write({'body': p['body'], 'is_edited': True})
+        message._notify_bus()
+        return 'done'
+
+    def _handle_revoked(self, session, p):
+        before = p.get('before') if isinstance(p.get('before'), dict) else {}
+        message = self._find_message(session, p.get('revokedMessageId') or before.get('id'))
+        if not message:
+            return 'ignored'
+        # the text stays in Odoo for the record; the inbox shows the message as deleted, like WhatsApp
+        message.write({'is_revoked': True})
+        message._notify_bus()
+        return 'done'
 
     def _handle_ack(self, session, p):
         remote_id = p.get('id')

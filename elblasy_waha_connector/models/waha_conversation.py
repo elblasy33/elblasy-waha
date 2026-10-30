@@ -28,6 +28,8 @@ class WahaConversation(models.Model):
                                       "Filled automatically from the phone number when left empty.")
     chat_type = fields.Selection([('user', "Contact"), ('lid', "Hidden ID"), ('group', "Group"), ('other', "Other")],
                                  compute='_compute_chat_type', store=True)
+    lid_chat_id = fields.Char("WhatsApp hidden ID", index='btree_not_null', copy=False,
+                              help="The …@lid id of the same person when the chat is known by its phone number.")
     remote_phone = fields.Char("Phone",
                                help="Digits only; empty when the chat id does not carry a phone number.")
     display_name_remote = fields.Char("WhatsApp Name")
@@ -82,36 +84,87 @@ class WahaConversation(models.Model):
         return digits_only(local) if suffix in ('c.us', 's.whatsapp.net') else False
 
     @api.model
+    def _find_chat(self, session, chat_id):
+        return self.with_context(active_test=False).search(
+            [('session_id', '=', session.id), '|', ('remote_chat_id', '=', chat_id), ('lid_chat_id', '=', chat_id)],
+            limit=1)
+
+    @api.model
     def _get_or_create(self, session, chat_id, display_name=None):
-        conv = self.with_context(active_test=False).search(
-            [('session_id', '=', session.id), ('remote_chat_id', '=', chat_id)], limit=1)
+        """One conversation per person: WhatsApp may name the same chat by phone (…@c.us) or hidden id (…@lid)."""
+        conv = self._find_chat(session, chat_id)
+        is_lid = chat_id.endswith('@lid')
+        phone = self._lid_phone(session, chat_id) if not conv and is_lid else self._phone_from_chat_id(chat_id)
+        if not conv and phone:
+            conv = self.with_context(active_test=False).search(
+                [('session_id', '=', session.id), ('remote_phone', '=', phone), ('chat_type', 'in', ('user', 'lid'))],
+                order='id', limit=1)
+            if conv:
+                if is_lid:
+                    conv.lid_chat_id = chat_id
+                elif conv.chat_type == 'lid':
+                    # the phone chat id is now known: prefer it for sending, remember the hidden id
+                    conv.write({'lid_chat_id': conv.remote_chat_id, 'remote_chat_id': chat_id})
         if conv:
             if display_name and not conv.display_name_remote:
                 conv.display_name_remote = display_name
             return conv
-        phone = self._phone_from_chat_id(chat_id)
         conv = self.create({
-            'session_id': session.id, 'remote_chat_id': chat_id, 'remote_phone': phone,
+            'session_id': session.id, 'remote_chat_id': chat_id, 'remote_phone': phone or False,
             'display_name_remote': display_name or False,
         })
-        if conv.chat_type == 'lid':
-            conv._resolve_lid_phone()
         partner = conv._match_partner()
         if partner:
             conv.partner_id = partner
         return conv
 
-    def _resolve_lid_phone(self):
+    @api.model
+    def _lid_phone(self, session, lid):
         """Ask WAHA which phone number hides behind a ``@lid`` chat (when it knows it)."""
-        self.ensure_one()
         try:
-            phone = self.session_id.sudo().server_id._get_client().lid_to_phone(
-                self.session_id.session_name, self.remote_chat_id)
+            return session.sudo().server_id._get_client().lid_to_phone(session.session_name, lid) or False
         except WahaError:
             return False  # the chat stays reachable through its LID; matching can be retried later
+
+    def _resolve_lid_phone(self):
+        self.ensure_one()
+        phone = self._lid_phone(self.session_id, self.remote_chat_id)
         if phone:
             self.sudo().remote_phone = phone
         return bool(phone)
+
+    @api.model
+    def _merge_duplicates(self):
+        """Merge the chats of the same person (phone chat + hidden-id chat) created before they were linked."""
+        Conv = self.sudo().with_context(active_test=False)
+        groups = Conv._read_group([('chat_type', 'in', ('user', 'lid')), ('remote_phone', '!=', False)],
+                                  ['session_id', 'remote_phone'], ['id:recordset'], having=[('__count', '>', 1)])
+        merged = 0
+        for _session, _phone, convs in groups:
+            keep = convs.sorted(lambda c: (c.chat_type != 'user', -(c.last_message_date or c.create_date).timestamp()))[0]
+            for other in convs - keep:
+                other.message_ids.write({'conversation_id': keep.id, 'client_token': False})
+                vals = {
+                    'unread_count': keep.unread_count + other.unread_count,
+                    'label_ids': [(4, label.id) for label in other.label_ids],
+                    'lid_chat_id': keep.lid_chat_id or (other.remote_chat_id if other.chat_type == 'lid'
+                                                        else other.lid_chat_id),
+                }
+                for field in ('partner_id', 'display_name_remote', 'image_128'):
+                    if not keep[field] and other[field]:
+                        vals[field] = other[field]
+                keep.write(vals)
+                other.unlink()
+                merged += 1
+            keep._refresh_last_message()
+        return merged
+
+    def _refresh_last_message(self):
+        for conv in self:
+            last = self.env['elblasy.waha.message'].sudo().search(
+                [('conversation_id', '=', conv.id)], order='date desc, id desc', limit=1)
+            conv.sudo().write({'last_message_id': last.id, 'last_message_date': last.date,
+                               'last_message_preview': last._preview() if last else False})
 
     PICTURE_REFRESH_DAYS = 7
 
@@ -122,6 +175,14 @@ class WahaConversation(models.Model):
         vals = {'picture_synced_at': fields.Datetime.now()}
         if url:
             vals['image_128'] = BinaryBytes(client.download_picture(url))
+        if not self.display_name_remote:
+            # the name WhatsApp shows (saved name on the phone, else the person's own profile name)
+            try:
+                name = client.contact_name(self.session_id.session_name, self.remote_chat_id)
+            except WahaError:
+                name = False  # the name is a nicety: never block the picture
+            if name:
+                vals['display_name_remote'] = name
         self.sudo().write(vals)
         return bool(url)
 
@@ -199,26 +260,36 @@ class WahaConversation(models.Model):
         self.check_access('read')
 
     @api.model
-    def inbox_conversations(self, session_id=None, search=None, limit=40, offset=0, label_id=None):
+    def inbox_conversations(self, session_id=None, search=None, limit=40, offset=0, label_id=None, unread=False):
         self._check_user()
         domain = [('chat_type', '!=', 'group')]
         if session_id:
             domain.append(('session_id', '=', session_id))
         if label_id:
             domain.append(('label_ids', 'in', [label_id]))
+        if unread:
+            domain.append(('unread_count', '>', 0))
         if search:
             domain += ['|', '|', ('name', 'ilike', search), ('remote_phone', 'ilike', search),
                        ('partner_id.name', 'ilike', search)]
         convs = self.search(domain, limit=limit, offset=offset)
-        return [{
-            'id': c.id, 'name': c.name, 'phone': c.remote_phone, 'partner_id': c.partner_id.id,
-            'partner_name': c.partner_id.name, 'session_id': c.session_id.id,
-            'session_name': c.session_id.name, 'session_status': c.session_id.status,
-            'last_message': c.last_message_preview, 'last_date': fields.Datetime.to_string(c.last_message_date),
-            'unread': c.unread_count, 'has_image': bool(c.image_128),
-            'labels': [{'id': l.id, 'name': l.name, 'color': l.color_hex} for l in c.label_ids],
-            'image_ts': fields.Datetime.to_string(c.picture_synced_at) or '',
-        } for c in convs]
+        result = []
+        for c in convs:
+            last = c.last_message_id.sudo()
+            result.append({
+                'id': c.id, 'name': c.name, 'phone': c.remote_phone, 'partner_id': c.partner_id.id,
+                'partner_name': c.partner_id.name, 'session_id': c.session_id.id,
+                'session_name': c.session_id.name, 'session_status': c.session_id.status,
+                'is_me': bool(c.remote_phone and c.remote_phone == c.session_id.phone_number),
+                'last_message': c.last_message_preview, 'last_date': fields.Datetime.to_string(c.last_message_date),
+                'last_type': last.message_type or '', 'last_body': (last.body or '')[:200] if last else '',
+                'last_direction': last.direction or '', 'last_status': last.delivery_status or '',
+                'last_revoked': last.is_revoked,
+                'unread': c.unread_count, 'has_image': bool(c.image_128),
+                'labels': [{'id': l.id, 'name': l.name, 'color': l.color_hex} for l in c.label_ids],
+                'image_ts': fields.Datetime.to_string(c.picture_synced_at) or '',
+            })
+        return result
 
     @api.model
     def inbox_sessions(self):

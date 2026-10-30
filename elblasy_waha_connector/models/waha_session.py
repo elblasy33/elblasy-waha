@@ -132,7 +132,8 @@ class WahaSession(models.Model):
 
     def _webhook_events(self):
         self.ensure_one()
-        events = ['session.status', 'message.any', 'message.ack', 'group.v2.update', 'group.v2.participants',
+        events = ['session.status', 'message.any', 'message.ack', 'message.reaction', 'message.edited',
+                  'message.revoked', 'group.v2.update', 'group.v2.participants',
                   'label.upsert', 'label.deleted', 'label.chat.added', 'label.chat.deleted']
         if self.sudo().reject_calls:
             events.append('call.received')
@@ -214,7 +215,7 @@ class WahaSession(models.Model):
         if not limited:
             return False
         known = self.env['elblasy.waha.conversation'].sudo().search_count(
-            [('session_id', '=', session.id), ('remote_chat_id', '=', chat_id)]) or \
+            [('session_id', '=', session.id), '|', ('remote_chat_id', '=', chat_id), ('lid_chat_id', '=', chat_id)]) or \
             self.env['elblasy.waha.group.post'].sudo().search_count(
                 [('session_id', '=', session.id), ('chat_id', '=', chat_id), ('state', '=', 'sent')])
         if known:
