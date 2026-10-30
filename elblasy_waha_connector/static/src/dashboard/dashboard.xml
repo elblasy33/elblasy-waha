@@ -82,7 +82,7 @@
                         <div class="col-lg-6">
                             <div class="card h-100">
                                 <div class="card-body">
-                                    <h5 class="card-title">Waiting for a reply <span class="badge text-bg-warning ms-1" t-if="d.waiting_count" t-out="d.waiting_count"/></h5>
+                                    <h5 class="card-title">Waiting for a reply <span class="o_waha_wait_badge o_waha_wait_count ms-1" t-if="d.waiting_count" t-out="d.waiting_count"/></h5>
                                     <div t-if="!d.waiting.length" class="text-muted py-3"><i class="oi me-1 text-success" data-icon="check_circle"/>Nobody is waiting.</div>
                                     <div t-foreach="d.waiting" t-as="w" t-key="w.id" class="o_waha_wait d-flex align-items-center gap-2"
                                          t-on-click="() => this.openChat(w)">
@@ -91,7 +91,7 @@
                                             <b dir="auto" t-out="w.name"/>
                                             <div class="small text-muted text-truncate" dir="auto" t-out="w.preview"/>
                                         </div>
-                                        <span class="badge text-bg-light" t-out="this.waited(w.minutes)"/>
+                                        <span class="o_waha_wait_badge" t-out="this.waited(w.minutes)"/>
                                     </div>
                                 </div>
                             </div>

@@ -33,3 +33,16 @@
     }
     .o_waha_click { cursor: pointer; }
 }
+.o_waha_dashboard {
+    .o_waha_wait_badge {
+        flex: none;
+        padding: 2px 10px;
+        border-radius: 10px;
+        background: rgba(240, 173, 78, 0.18);
+        color: #b26b00;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .o_waha_wait_count { font-size: 13px; vertical-align: middle; }
+}
