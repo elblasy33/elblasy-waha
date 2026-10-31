@@ -46,6 +46,9 @@ class WahaConversation(models.Model):
     wa_pinned = fields.Boolean("Pinned", readonly=True)
     wa_archived = fields.Boolean("Archived on WhatsApp", readonly=True)
     wa_muted = fields.Boolean("Muted", readonly=True)
+    notes = fields.Text("Notes", help="Notes about the customer, shown in the chat's contact info (kept in Odoo).")
+    about = fields.Char("About", readonly=True, help="The person's WhatsApp \"About\" text.")
+    about_synced_at = fields.Datetime(readonly=True)
     last_autoreply_date = fields.Datetime(readonly=True)
     active = fields.Boolean(default=True)
     message_ids = fields.One2many('elblasy.waha.message', 'conversation_id')
@@ -322,6 +325,116 @@ class WahaConversation(models.Model):
         return {'type': 'ir.actions.client', 'tag': 'elblasy_waha_inbox', 'name': self.env._("WhatsApp Inbox"),
                 'context': {'waha_conversation_id': self.id}}
 
+    # ------------------------------------------------------------------
+    # contact info panel (WhatsApp's right drawer)
+    # ------------------------------------------------------------------
+    URL_PATTERN = r'https?://[^\s<>"]+'
+
+    def _fetch_about(self):
+        """The WhatsApp "About" text, asked at most once a day (it rarely changes)."""
+        self.ensure_one()
+        recent = fields.Datetime.subtract(fields.Datetime.now(), days=1)
+        session = self.session_id.sudo()
+        if self.chat_type == 'group' or session.status != 'WORKING' or (
+                self.about_synced_at and self.about_synced_at > recent):
+            return
+        vals = {'about_synced_at': fields.Datetime.now()}
+        try:
+            data = session.server_id._get_client().get('/api/contacts/about', {
+                'contactId': self.remote_chat_id, 'session': session.session_name})
+            about = data.get('about') if isinstance(data, dict) else None
+            if isinstance(about, str):
+                vals['about'] = about.strip()[:250] or False
+        except WahaError as e:
+            _logger.info("About of chat %s unavailable: %s", self.id, e)
+        self.sudo().write(vals)
+
+    def inbox_contact_info(self):
+        """Everything the contact info drawer shows."""
+        import re
+        self.ensure_one()
+        self._check_user()
+        self._fetch_about()
+        Message = self.env['elblasy.waha.message'].sudo()
+        Attachment = self.env['ir.attachment'].sudo()
+        messages = Message.search([('conversation_id', '=', self.id), ('hidden', '=', False)])
+        attachments = Attachment.search([('res_model', '=', Message._name), ('res_id', 'in', messages.ids)],
+                                        order='id desc')
+        images = attachments.filtered(lambda a: (a.mimetype or '').startswith(('image/', 'video/')))
+        docs = attachments - images - attachments.filtered(lambda a: (a.mimetype or '').startswith('audio/'))
+        links = []
+        for message in messages.filtered(lambda m: m.body and 'http' in m.body).sorted('date', reverse=True):
+            for url in re.findall(self.URL_PATTERN, message.body):
+                links.append({'url': url, 'message_id': message.id, 'date': fields.Datetime.to_string(message.date)})
+        partner = self.partner_id.sudo()
+        members = []
+        if self.chat_type == 'group':
+            group = self.env['elblasy.waha.group'].sudo().search(
+                [('session_id', '=', self.session_id.id), ('chat_id', '=', self.remote_chat_id)], limit=1)
+            members = [{'id': m.id, 'name': m.partner_id.name or (f"+{m.phone}" if m.phone else m.wa_id),
+                        'role': m.role} for m in group.member_ids[:200]] if group else []
+        documents = []
+        if partner:
+            commercial = partner.commercial_partner_id
+            for tracked in self.env['elblasy.waha.tracked.model'].sudo().search([]):
+                if tracked.model not in self.env:
+                    continue
+                domain = tracked._parsed_domain() + [(tracked.partner_field_id.name, 'child_of', commercial.id)]
+                try:
+                    count = self.env[tracked.model].search_count(domain)
+                except Exception:  # noqa: BLE001 - no access to that app: simply not shown
+                    continue
+                if count:
+                    documents.append({'name': tracked.name, 'model': tracked.model, 'count': count, 'domain': domain})
+        return {
+            **self._inbox_row(),
+            'about': self.about or '', 'notes': self.notes or '', 'archived': self.wa_archived,
+            'partner': {'id': partner.id, 'name': partner.name, 'email': partner.email or '',
+                        'phone': partner.phone or '', 'company': partner.parent_id.name or ''} if partner else False,
+            'media': [{'id': a.id, 'video': (a.mimetype or '').startswith('video/')} for a in images[:12]],
+            'media_count': len(images),
+            'docs': [{'id': a.id, 'name': a.name, 'size': a.file_size} for a in docs[:20]], 'docs_count': len(docs),
+            'links': links[:30], 'links_count': len(links),
+            'members': members, 'documents': documents,
+        }
+
+    def inbox_set_notes(self, notes):
+        self.ensure_one()
+        self._check_user()
+        self.sudo().notes = (notes or '').strip() or False
+        return True
+
+    def inbox_archive(self, archive=True):
+        """Archive / unarchive the chat on WhatsApp (and in the inbox)."""
+        self.ensure_one()
+        self._check_user()
+        session = self.session_id.sudo()
+        action = 'archive' if archive else 'unarchive'
+        self._client_call('post', f'/api/{session.session_name}/chats/{self.remote_chat_id}/{action}', {})
+        self.sudo().wa_archived = bool(archive)
+        return True
+
+    def inbox_mark_unread(self):
+        self.ensure_one()
+        self._check_user()
+        session = self.session_id.sudo()
+        self._client_call('post', f'/api/{session.session_name}/chats/{self.remote_chat_id}/unread', {})
+        self.sudo().unread_count = max(self.unread_count, 1)
+        return True
+
+    def inbox_search(self, query, limit=40):
+        """Messages of this chat containing ``query``, newest first."""
+        self.ensure_one()
+        self._check_user()
+        query = (query or '').strip()
+        if len(query) < 2:
+            return []
+        found = self.env['elblasy.waha.message'].sudo().search(
+            [('conversation_id', '=', self.id), ('hidden', '=', False), ('body', 'ilike', query)],
+            order='date desc, id desc', limit=limit)
+        return [{'id': m.id, 'date': fields.Datetime.to_string(m.date), 'direction': m.direction,
+                 'body': (m.body or '')[:160]} for m in found]
+
     @api.model
     def inbox_archived_count(self, session_id=None):
         self._check_user()
@@ -412,16 +525,26 @@ class WahaConversation(models.Model):
         return [{'id': s.id, 'name': s.name, 'status': s.status}
                 for s in self.env['elblasy.waha.session'].search([])]
 
-    def inbox_messages(self, before_id=None, limit=30):
-        """Newest ``limit`` messages (older than ``before_id``), returned oldest first."""
+    def inbox_messages(self, before_id=None, limit=30, around_id=None):
+        """Newest ``limit`` messages (older than ``before_id``), returned oldest first.
+        ``around_id``: the messages around one message (search results), up to the newest one."""
         self.ensure_one()
         self._check_user()
+        Message = self.env['elblasy.waha.message']
         domain = [('conversation_id', '=', self.id), ('hidden', '=', False)]
-        oldest = self.env['elblasy.waha.message'].browse(before_id).exists() if before_id else None
+        target = Message.browse(around_id).exists() if around_id else None
+        if target:
+            before = ['|', ('date', '<', target.date), '&', ('date', '=', target.date), ('id', '<', target.id)]
+            older = Message.search(domain + before, order='date desc, id desc', limit=limit)
+            newer = Message.search(domain + [('id', 'not in', older.ids)] + ['!'] + before,
+                                   order='date asc, id asc', limit=300)
+            return {'messages': [m._to_ui() for m in reversed(older)] + [m._to_ui() for m in newer],
+                    'has_more': len(older) == limit}
+        oldest = Message.browse(before_id).exists() if before_id else None
         if oldest:
             # by date, not id: history imported later has newer ids than the messages it precedes
             domain += ['|', ('date', '<', oldest.date), '&', ('date', '=', oldest.date), ('id', '<', oldest.id)]
-        msgs = self.env['elblasy.waha.message'].search(domain, order='date desc, id desc', limit=limit)
+        msgs = Message.search(domain, order='date desc, id desc', limit=limit)
         return {
             'messages': [m._to_ui() for m in reversed(msgs)],
             'has_more': len(msgs) == limit,

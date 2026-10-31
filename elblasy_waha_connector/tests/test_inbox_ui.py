@@ -35,6 +35,18 @@ const wait = async (selector, count = 1) => {
     document.querySelector(".o_waha_msg_menu .o_waha_act_reply").click();
     await wait(".o_waha_composer_bar");
     document.querySelector(".o_waha_composer_bar .o_waha_icon_btn").click();
+    // contact info drawer and search in the chat
+    document.querySelector(".o_waha_thread_title").click();
+    await wait(".o_waha_info .o_waha_info_actions");
+    document.querySelector(".o_waha_info_actions button").click(); // Search
+    const box = (await wait(".o_waha_info_search input"))[0];
+    box.value = "team";
+    box.dispatchEvent(new Event("input"));
+    (await wait(".o_waha_info_body .o_waha_info_row"))[0].click();
+    await wait(".o_waha_flash");
+    document.querySelector(".o_waha_info_header .o_waha_icon_btn").click(); // back
+    document.querySelector(".o_waha_info_header .o_waha_icon_btn").click(); // close
+    await wait(".o_waha_voice");
     document.querySelector(".o_waha_chip:nth-child(3)").click(); // "Groups"
     (await wait(".o_waha_conv .o_waha_avatar_group"))[0].closest(".o_waha_conv").click();
     await wait(".o_waha_author");
@@ -77,6 +89,7 @@ class TestInboxUi(HttpCase):
         message('c1', message_type='contact', body='Ali\n+20 100 123 4567')
         message('q1', message_type='poll', body='Lunch?\n• Yes\n• No')
         message('m1', message_type='video', media_pending=True)
+        message('v1', message_type='audio', media_pending=True, is_voice=True, media_duration=14)
         message('r1', body='oops', is_revoked=True, date='2026-10-30 08:00:00')
         Conv = self.env['elblasy.waha.conversation']
         group = Conv.create({'session_id': session.id, 'remote_chat_id': '120300@g.us', 'display_name_remote': 'Team'})

@@ -17,7 +17,7 @@
                     <i class="oi" data-icon="search"/>
                     <input type="search" placeholder="Search or start a new chat" t-on-input="this.onSearchInput"/>
                 </div>
-                <div class="o_waha_chips">
+                <div class="o_waha_chips" t-on-wheel="this.onChipsWheel">
                     <button class="o_waha_chip" t-att-class="{ active: this.isFilter('all') }" t-on-click="() => this.setFilter('all')">All</button>
                     <button class="o_waha_chip" t-att-class="{ active: this.isFilter('unread') }" t-on-click="() => this.setFilter('unread')">Unread</button>
                     <button class="o_waha_chip" t-att-class="{ active: this.isFilter('groups') }" t-on-click="() => this.setFilter('groups')">
@@ -77,7 +77,7 @@
             </div>
 
             <!-- ============================================================ thread -->
-            <div class="o_waha_thread">
+            <div class="o_waha_thread" t-att-class="{ o_waha_with_info: this.state.info }">
                 <t t-if="this.state.current">
                     <t t-set="cur" t-value="this.state.current"/>
                     <div class="o_waha_thread_header">
@@ -89,7 +89,7 @@
                         <span t-elif="cur.is_group" class="o_waha_avatar o_waha_avatar_initials o_waha_avatar_group"><i class="oi" data-icon="group"/></span>
                         <span t-else="" class="o_waha_avatar o_waha_avatar_initials" t-att-style="'background-color:' + this.avatarColor(cur.id)"
                               t-out="this.initials(cur.name)"/>
-                        <div class="o_waha_thread_title">
+                        <div class="o_waha_thread_title" t-on-click="() => this.openInfo()" title="Contact info">
                             <div class="o_waha_conv_name"><span dir="auto" t-out="this.displayName(cur)"/><t t-if="cur.is_me"> (You)</t></div>
                             <div class="o_waha_thread_sub">
                                 <t t-if="this.sessionDisconnected"><i class="oi text-warning" data-icon="link_off"/> WhatsApp number offline</t>
@@ -99,6 +99,9 @@
                             </div>
                         </div>
                         <div class="o_waha_thread_actions">
+                            <button class="btn o_waha_icon_btn" title="Search" t-on-click="() => this.openInfo('search')">
+                                <i class="oi" data-icon="search"/>
+                            </button>
                             <div class="position-relative d-inline-block">
                                 <button t-if="this.currentSessionLabels.length" class="btn o_waha_icon_btn" title="Labels" t-on-click="this.toggleLabelsMenu">
                                     <i class="oi" data-icon="label"/>
@@ -137,7 +140,7 @@
                                          t-att-class="{
                                             o_out: m.direction === 'out', o_in: m.direction === 'in', o_tail: row.first,
                                             o_waha_sticker_bubble: m.type === 'sticker' and !m.revoked,
-                                            o_waha_media_bubble: this.isBareMedia(m) }">
+                                            o_waha_media_bubble: this.isBareMedia(m), o_waha_flash: this.state.flashId === m.id }">
                                         <button class="o_waha_msg_menu_btn" title="Menu" t-on-click="() => this.toggleMenu(m)">
                                             <i class="oi" data-icon="keyboard_arrow_down"/>
                                         </button>
@@ -185,8 +188,7 @@
                                                 </a>
                                                 <video t-elif="kind === 'video'" class="o_waha_video" controls="controls" preload="metadata"
                                                        t-att-src="'/web/content/' + a.id"/>
-                                                <audio t-elif="kind === 'audio'" class="o_waha_audio" controls="controls" preload="none"
-                                                       t-att-src="'/web/content/' + a.id"/>
+                                                <span t-elif="kind === 'audio'" class="d-none"/>
                                                 <a t-else="" class="o_waha_doc" t-att-href="'/web/content/' + a.id + '?download=true'">
                                                     <i t-attf-class="oi o_waha_doc_icon {{ this.fileIcon(a.name)[1] }}" t-att-data-icon="this.fileIcon(a.name)[0]"/>
                                                     <span class="o_waha_doc_info">
@@ -199,6 +201,23 @@
                                                     <i class="oi o_waha_doc_dl" data-icon="download"/>
                                                 </a>
                                             </t>
+                                            <div t-if="this.isVoiceBubble(m)" class="o_waha_voice">
+                                                <button class="o_waha_voice_play" t-on-click="() => this.togglePlay(m)"
+                                                        t-att-disabled="this.state.downloading[m.id]">
+                                                    <i class="oi" t-att-class="{ 'oi-spin': this.state.downloading[m.id] }"
+                                                       t-att-data-icon="this.state.downloading[m.id] ? 'progress_activity' : (this.state.playing === m.id ? 'pause' : 'play_arrow')"/>
+                                                </button>
+                                                <div class="o_waha_voice_body">
+                                                    <div class="o_waha_voice_track" t-on-click="(ev) => this.seekAudio(m, ev)">
+                                                        <div class="o_waha_voice_fill" t-att-style="'width:' + ((this.state.audio[m.id] and this.state.audio[m.id].progress) or 0) + '%'"/>
+                                                    </div>
+                                                    <span class="o_waha_voice_time" t-out="this.voiceTime(m)"/>
+                                                </div>
+                                                <i class="oi o_waha_voice_mic" data-icon="mic" t-if="m.voice"/>
+                                                <audio t-if="this.audioAttachment(m)" class="d-none" preload="metadata" t-att-id="'o_waha_audio_' + m.id"
+                                                       t-att-src="'/web/content/' + this.audioAttachment(m).id"
+                                                       t-on-timeupdate="(ev) => this.onAudioTime(m, ev)" t-on-ended="() => this.onAudioEnded(m)"/>
+                                            </div>
                                             <button t-if="this.isMediaWithoutFile(m)" class="o_waha_pending"
                                                     t-on-click="() => this.downloadMedia(m)" t-att-disabled="this.state.downloading[m.id]">
                                                 <i class="oi o_waha_pending_type" t-att-data-icon="this.pendingIcon(m)"/>
@@ -223,7 +242,7 @@
                                                 <div class="o_waha_poll_text" dir="auto" t-out="m.body"/>
                                             </div>
                                             <span t-elif="m.body" class="o_waha_text" dir="auto"><span t-if="this.spaceAtStart(m.body)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/><t t-out="this.bodyHtml(m)"/><button t-if="this.isLong(m)" class="o_waha_read_more" t-on-click="() => this.expand(m)">Read more</button><span t-if="!this.spaceAtStart(m.body)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/></span>
-                                            <span t-elif="!m.attachments.length and !this.isMediaWithoutFile(m)" class="o_waha_text o_waha_unsupported"><span t-if="this.spaceAtStart(this.unsupportedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/><t t-out="this.unsupportedLabel"/><span t-if="!this.spaceAtStart(this.unsupportedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/></span>
+                                            <span t-elif="!m.attachments.length and !this.isMediaWithoutFile(m) and !this.isVoiceBubble(m)" class="o_waha_text o_waha_unsupported"><span t-if="this.spaceAtStart(this.unsupportedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/><t t-out="this.unsupportedLabel"/><span t-if="!this.spaceAtStart(this.unsupportedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/></span>
                                         </t>
                                         <div t-if="this.needsMetaLine(m)" class="o_waha_meta_space"/>
                                         <span class="o_waha_meta">
@@ -278,6 +297,134 @@
                                 t-att-disabled="this.state.sending or this.sessionDisconnected or !this.state.draft.trim()">
                             <i class="oi" t-att-class="{ 'oi-spin': this.state.sending }" t-att-data-icon="this.state.sending ? 'progress_activity' : 'send'"/>
                         </button>
+                    </div>
+                    <div t-if="this.state.info" class="o_waha_info">
+                        <t t-set="info" t-value="this.state.info"/>
+                        <div class="o_waha_info_header">
+                            <button t-if="this.state.infoView !== 'main'" class="btn o_waha_icon_btn" title="Back" t-on-click="() => this.setInfoView('main')">
+                                <i class="oi" data-icon="arrow_back"/>
+                            </button>
+                            <button t-else="" class="btn o_waha_icon_btn" title="Close" t-on-click="this.closeInfo"><i class="oi" data-icon="close"/></button>
+                            <span class="o_waha_info_title">
+                                <t t-if="this.state.infoView === 'media'">Media</t>
+                                <t t-elif="this.state.infoView === 'docs'">Docs</t>
+                                <t t-elif="this.state.infoView === 'links'">Links</t>
+                                <t t-elif="this.state.infoView === 'search'">Search messages</t>
+                                <t t-elif="info.is_group">Group info</t>
+                                <t t-else="">Contact info</t>
+                            </span>
+                        </div>
+                        <div class="o_waha_info_body">
+                            <!-- search -->
+                            <t t-if="this.state.infoView === 'search'">
+                                <div class="o_waha_search o_waha_info_search">
+                                    <i class="oi" data-icon="search"/>
+                                    <input type="search" placeholder="Search…" t-on-input="this.onSearchMessages"/>
+                                </div>
+                                <div t-foreach="this.state.searchResults" t-as="r" t-key="r.id" class="o_waha_info_row o_waha_click"
+                                     t-on-click="() => this.jumpTo(r.id)">
+                                    <div class="small text-muted"><t t-out="this.listDate(r.date)"/><t t-if="r.direction === 'out'"> · You</t></div>
+                                    <div class="text-truncate" dir="auto" t-out="r.body"/>
+                                </div>
+                            </t>
+                            <!-- media / docs / links -->
+                            <div t-elif="this.state.infoView === 'media'" class="o_waha_media_grid">
+                                <a t-foreach="info.media" t-as="pic" t-key="pic.id" t-att-href="'/web/content/' + pic.id" target="_blank">
+                                    <img t-if="!pic.video" t-att-src="'/web/image/' + pic.id + '/200x200?crop=1'" alt="" loading="lazy"/>
+                                    <span t-else="" class="o_waha_media_video"><i class="oi" data-icon="videocam"/></span>
+                                </a>
+                            </div>
+                            <t t-elif="this.state.infoView === 'docs'">
+                                <a t-foreach="info.docs" t-as="doc" t-key="doc.id" class="o_waha_doc" t-att-href="'/web/content/' + doc.id + '?download=true'">
+                                    <i t-attf-class="oi o_waha_doc_icon {{ this.fileIcon(doc.name)[1] }}" t-att-data-icon="this.fileIcon(doc.name)[0]"/>
+                                    <span class="o_waha_doc_info"><span class="o_waha_doc_name" t-out="doc.name"/>
+                                        <span class="o_waha_doc_meta"><t t-out="this.fileExt(doc.name)"/> · <t t-out="this.fileSize(doc.size)"/></span></span>
+                                </a>
+                            </t>
+                            <t t-elif="this.state.infoView === 'links'">
+                                <div t-foreach="info.links" t-as="link" t-key="link_index" class="o_waha_info_row">
+                                    <a t-att-href="link.url" target="_blank" rel="noopener noreferrer" class="o_waha_link" t-out="link.url"/>
+                                    <button class="btn btn-link btn-sm p-0" t-on-click="() => this.jumpTo(link.message_id)">Show in chat</button>
+                                </div>
+                            </t>
+                            <!-- main -->
+                            <t t-else="">
+                                <div class="o_waha_info_card text-center">
+                                    <img t-if="info.has_image" class="o_waha_info_avatar" alt=""
+                                         t-att-src="'/web/image/elblasy.waha.conversation/' + info.id + '/image_128?unique=' + info.image_ts"/>
+                                    <span t-elif="info.is_group" class="o_waha_info_avatar o_waha_avatar_initials o_waha_avatar_group"><i class="oi" data-icon="group"/></span>
+                                    <span t-else="" class="o_waha_info_avatar o_waha_avatar_initials" t-att-style="'background-color:' + this.avatarColor(info.id)" t-out="this.initials(info.name)"/>
+                                    <div class="o_waha_info_name" dir="auto" t-out="this.displayName(info)"/>
+                                    <div t-if="info.phone" class="o_waha_info_sub" dir="ltr" t-out="'+' + info.phone"/>
+                                    <div t-if="info.is_group" class="o_waha_info_sub">Group · <t t-out="info.members.length"/> members</div>
+                                    <div class="o_waha_info_actions">
+                                        <button t-on-click="() => this.setInfoView('search')"><i class="oi" data-icon="search"/><span>Search</span></button>
+                                        <button t-if="info.partner" t-on-click="this.openPartner"><i class="oi" data-icon="contact_page"/><span>Contact</span></button>
+                                        <button t-elif="!info.is_group" t-on-click="this.createPartner"><i class="oi" data-icon="person_add"/><span>Add contact</span></button>
+                                        <button t-on-click="this.toggleArchive"><i class="oi" t-att-data-icon="info.archived ? 'unarchive' : 'archive'"/>
+                                            <span><t t-if="info.archived">Unarchive</t><t t-else="">Archive</t></span></button>
+                                    </div>
+                                </div>
+                                <div t-if="info.about" class="o_waha_info_card">
+                                    <div class="o_waha_info_label">About</div>
+                                    <div dir="auto" t-out="info.about"/>
+                                </div>
+                                <div class="o_waha_info_card">
+                                    <div class="o_waha_info_label d-flex justify-content-between">
+                                        <span>Notes about the customer</span>
+                                        <button t-if="this.state.notesDraft === null" class="btn btn-link btn-sm p-0" t-on-click="this.startNotes"><i class="oi" data-icon="edit"/></button>
+                                    </div>
+                                    <t t-if="this.state.notesDraft !== null">
+                                        <textarea class="o_waha_input w-100" rows="3" dir="auto" t-att-value="this.state.notesDraft"
+                                                  t-on-input="(ev) => this.state.notesDraft = ev.target.value"/>
+                                        <div class="text-end mt-2">
+                                            <button class="btn btn-secondary btn-sm me-1" t-on-click="() => this.state.notesDraft = null">Cancel</button>
+                                            <button class="btn btn-primary btn-sm" t-on-click="this.saveNotes">Save</button>
+                                        </div>
+                                    </t>
+                                    <div t-elif="info.notes" class="o_waha_notes" dir="auto" t-out="info.notes"/>
+                                    <div t-else="" class="text-muted small">Add notes about your customer (kept in Odoo).</div>
+                                </div>
+                                <div t-if="info.partner" class="o_waha_info_card">
+                                    <div class="o_waha_info_label">In Odoo</div>
+                                    <div class="o_waha_info_row o_waha_click" t-on-click="this.openPartner">
+                                        <b t-out="info.partner.name"/>
+                                        <div class="small text-muted" t-out="this.partnerLine(info.partner)"/>
+                                    </div>
+                                    <div t-foreach="info.documents" t-as="doc" t-key="doc.model" class="o_waha_info_row o_waha_click d-flex justify-content-between"
+                                         t-on-click="() => this.openDocuments(doc)">
+                                        <span t-out="doc.name"/><span class="o_waha_count" t-out="doc.count"/>
+                                    </div>
+                                </div>
+                                <div class="o_waha_info_card">
+                                    <div class="o_waha_info_row o_waha_click d-flex justify-content-between" t-on-click="() => this.setInfoView('media')">
+                                        <span><i class="oi me-2" data-icon="image"/>Media</span><span class="text-muted" t-out="info.media_count"/>
+                                    </div>
+                                    <div t-if="info.media.length" class="o_waha_media_strip">
+                                        <a t-foreach="info.media.slice(0, 4)" t-as="pic" t-key="pic.id" t-att-href="'/web/content/' + pic.id" target="_blank">
+                                            <img t-if="!pic.video" t-att-src="'/web/image/' + pic.id + '/160x160?crop=1'" alt="" loading="lazy"/>
+                                            <span t-else="" class="o_waha_media_video"><i class="oi" data-icon="videocam"/></span>
+                                        </a>
+                                    </div>
+                                    <div class="o_waha_info_row o_waha_click d-flex justify-content-between" t-on-click="() => this.setInfoView('docs')">
+                                        <span><i class="oi me-2" data-icon="description"/>Docs</span><span class="text-muted" t-out="info.docs_count"/>
+                                    </div>
+                                    <div class="o_waha_info_row o_waha_click d-flex justify-content-between" t-on-click="() => this.setInfoView('links')">
+                                        <span><i class="oi me-2" data-icon="link"/>Links</span><span class="text-muted" t-out="info.links_count"/>
+                                    </div>
+                                </div>
+                                <div t-if="info.members.length" class="o_waha_info_card">
+                                    <div class="o_waha_info_label"><t t-out="info.members.length"/> members</div>
+                                    <div t-foreach="info.members" t-as="member" t-key="member.id" class="o_waha_info_row d-flex justify-content-between">
+                                        <span dir="auto" t-out="member.name"/>
+                                        <span t-if="this.roleLabel(member.role)" class="o_waha_role" t-out="this.roleLabel(member.role)"/>
+                                    </div>
+                                </div>
+                                <div class="o_waha_info_card">
+                                    <div class="o_waha_info_row o_waha_click" t-on-click="this.markUnread"><i class="oi me-2" data-icon="chat_bubble"/>Mark as unread</div>
+                                </div>
+                            </t>
+                        </div>
                     </div>
                     <div t-if="this.state.dialog" class="o_waha_modal" t-on-click.self="this.closeDialog">
                         <t t-set="dm" t-value="this.state.dialog.message"/>

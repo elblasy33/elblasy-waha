@@ -66,6 +66,8 @@ powered by the [WAHA](https://waha.devlike.pro) server **you** control.
 - **Every kind of message**: text with `*bold*` / `_italic_` / links, photos, stickers, voice notes, videos, PDF/document cards, locations (open in Maps), contact cards, polls.
 - **Real conversations**: quoted replies, reactions, *Edited*, *This message was deleted*, *Forwarded*, day separators, read more, pinned banner, grey and blue ticks.
 - **History on demand**: opening a chat imports what Odoo missed; scrolling up loads older messages from WhatsApp.
+- **Contact info panel** (click the chat header): big photo, *About*, notes about the customer, media / links / docs, search in the chat with jump to the message, group members, archive, mark as unread, and the customer's documents in Odoo.
+- **Voice notes** played in the bubble (progress, duration); pictures and voice notes load by themselves within the media size limit.
 - Emoji picker · dark theme · Arabic RTL · one pane at a time on phones · live updates.
 </details>
 
@@ -267,7 +269,7 @@ Yes — <i>Reporting ▸ Business from WhatsApp</i>, for any model you add in <i
 
 **Elblasy WhatsApp (WAHA)** يربط أودو 20 بخادم WAHA الخاص بك، فيعمل فريقك على واتساب من داخل أودو كما يعمل على واتساب ويب.
 
-- **صندوق الوارد:** نفس قائمة محادثات الهاتف وبنفس الترتيب (المثبتة، المؤرشفة، المكتومة، الأسماء والصور وغير المقروء)، كل أنواع الرسائل، الردود والتفاعلات والتعديل والحذف وعلامات القراءة.
+- **صندوق الوارد:** لوحة معلومات جهة الاتصال (النبذة، الملاحظات، الوسائط والروابط والمستندات، البحث داخل الدردشة، الأرشفة)، رسائل صوتية تُشغَّل داخل الفقاعة، ونفس قائمة محادثات الهاتف وبنفس الترتيب (المثبتة، المؤرشفة، المكتومة، الأسماء والصور وغير المقروء)، كل أنواع الرسائل، الردود والتفاعلات والتعديل والحذف وعلامات القراءة.
 - **قائمة كل رسالة:** تفاعل، رد، نسخ، تعديل، إعادة توجيه، تثبيت، نجمة، إضافة لملاحظات جهة الاتصال، حذف للجميع أو لي.
 - **المجموعات:** في صندوق الوارد باسم كاتب كل رسالة، مزامنة وإنشاء وإدارة الأعضاء وربطها بالعملاء.
 - **الإرسال من أي مكان:** عروض الأسعار والفواتير وأي مستند مع ملف PDF، وقواعد أتمتة بطابور آمن لا يرسل مرتين.

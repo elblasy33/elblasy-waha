@@ -50,6 +50,13 @@ def parse_content(p):
     if looks_like_thumbnail(body):
         body = False
     vals = {'is_forwarded': bool(data.get('isForwarded') or p.get('isForwarded'))}
+    if p.get('hasMedia') or wtype in MEDIA_TYPES:
+        try:
+            vals['media_size'] = int(data.get('size') or 0)
+            vals['media_duration'] = int(float(data.get('duration') or 0))
+        except (TypeError, ValueError):
+            pass
+        vals['is_voice'] = wtype == 'ptt'
     location = p.get('location') if isinstance(p.get('location'), dict) else None
     if wtype == 'revoked':
         vals.update(message_type='text', body=False, is_revoked=True)

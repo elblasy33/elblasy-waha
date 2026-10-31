@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 14:46+0000\n"
-"PO-Revision-Date: 2026-10-30 14:46+0000\n"
+"POT-Creation-Date: 2026-10-31 12:00+0000\n"
+"PO-Revision-Date: 2026-10-31 12:00+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -156,6 +156,18 @@ msgid "API Key"
 msgstr "مفتاح API"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__about
+msgid "About"
+msgstr "نبذة"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__about_synced_at
+msgid "About Synced At"
+msgstr "آخر تحديث للنبذة"
+
+#. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__action_id
 msgid "Action"
 msgstr "إجراء"
@@ -191,6 +203,12 @@ msgid "Add Members"
 msgstr "إضافة أعضاء"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Add contact"
+msgstr "إضافة جهة اتصال"
+
+#. module: elblasy_waha_connector
 #. odoo-python
 #: code:addons/elblasy_waha_connector/models/waha_group.py:0
 msgid "Add members"
@@ -200,6 +218,12 @@ msgstr "إضافة أعضاء"
 #: model:ir.model,name:elblasy_waha_connector.model_elblasy_waha_group_members
 msgid "Add members to a WhatsApp group"
 msgstr "إضافة أعضاء إلى مجموعة واتساب"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Add notes about your customer (kept in Odoo)."
+msgstr "أضف ملاحظات عن عميلك (تُحفظ في أودو)."
 
 #. module: elblasy_waha_connector
 #: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_group_create__link_to_partners
@@ -219,6 +243,8 @@ msgid "Added to the contact's notes."
 msgstr "تمت الإضافة إلى ملاحظات جهة الاتصال."
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_member__role__admin
 msgid "Admin"
 msgstr "مشرف"
@@ -311,6 +337,12 @@ msgid ""
 msgstr ""
 "يبقى العنصر في حالة «توقف أثناء الإرسال» إذا توقف الخادم أثناء تشغيله: افحص "
 "الدردشة قبل إعادة المحاولة، فقد يكون قد تم تسليمه بالفعل."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Archive"
+msgstr "أرشفة"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
@@ -527,9 +559,21 @@ msgid "Chat Type"
 msgstr "نوع الدردشة"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "Chat archived"
+msgstr "تمت أرشفة الدردشة"
+
+#. module: elblasy_waha_connector
 #: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
 msgid "Chat type"
 msgstr "نوع الدردشة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "Chat unarchived"
+msgstr "تم إلغاء أرشفة الدردشة"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
@@ -640,6 +684,7 @@ msgstr "الاتصال سليم (%s جلسة على الخادم)."
 #. module: elblasy_waha_connector
 #. odoo-javascript
 #: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
 #: model:ir.model,name:elblasy_waha_connector.model_res_partner
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__partner_id
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__partner_id
@@ -657,6 +702,12 @@ msgstr "جهة اتصال"
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__contact
 msgid "Contact card"
 msgstr "بطاقة جهة اتصال"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Contact info"
+msgstr "معلومات جهة الاتصال"
 
 #. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_members__partner_ids
@@ -982,6 +1033,12 @@ msgstr "عدم الرد مجددًا خلال (د)"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Docs"
+msgstr "المستندات"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
 #: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
 #: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_business__record_name
@@ -1063,6 +1120,11 @@ msgstr "طلب إرسال مكرر."
 #: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_webhook_event_dedupe_uniq
 msgid "Duplicate webhook event."
 msgstr "حدث Webhook مكرر."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__media_duration
+msgid "Duration (s)"
+msgstr "المدة (ث)"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
@@ -1183,6 +1245,11 @@ msgstr ""
 "Webhook الوصول إلى Odoo (تثبيت محلي)؛ وإذا كان Webhook يعمل فاتركه معطلًا."
 
 #. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__media_size
+msgid "File size"
+msgstr "حجم الملف"
+
+#. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__attachment_ids
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__media_count
 msgid "Files"
@@ -1290,6 +1357,12 @@ msgstr "منشورات المجموعة"
 #. module: elblasy_waha_connector
 #. odoo-javascript
 #: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Group info"
+msgstr "معلومات المجموعة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_message__author_name
 msgid "Group member"
 msgstr "عضو المجموعة"
@@ -1298,6 +1371,12 @@ msgstr "عضو المجموعة"
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__name
 msgid "Group name"
 msgstr "اسم المجموعة"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Group ·"
+msgstr "مجموعة ·"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
@@ -1445,6 +1524,12 @@ msgstr "صورة 128"
 #: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
 msgid "Import recent incoming messages from WAHA (no webhook needed)."
 msgstr "استيراد الرسائل الواردة الأخيرة من WAHA (بدون الحاجة إلى Webhook)."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "In Odoo"
+msgstr "في أودو"
 
 #. module: elblasy_waha_connector
 #: model:ir.ui.menu,name:elblasy_waha_connector.menu_waha_inbox
@@ -1698,6 +1783,12 @@ msgstr "ربط بجهات الاتصال هذه"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Links"
+msgstr "الروابط"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
 #: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__location
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__location
@@ -1740,11 +1831,19 @@ msgid "Mark as read on the phone"
 msgstr "تعليم كمقروءة على الهاتف"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Mark as unread"
+msgstr "تمييز كغير مقروءة"
+
+#. module: elblasy_waha_connector
 #: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_tracked_model_action
 msgid "Measure any document against WhatsApp"
 msgstr "قِس أي مستند عبر واتساب"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_message__message_type__media
 msgid "Media"
 msgstr "الوسائط"
@@ -2005,6 +2104,24 @@ msgid "Not sent to: %s"
 msgstr "لم يُرسل إلى: %s"
 
 #. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_conversation__notes
+msgid "Notes"
+msgstr "ملاحظات"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Notes about the customer"
+msgstr "ملاحظات عن العميل"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_conversation__notes
+msgid ""
+"Notes about the customer, shown in the chat's contact info (kept in Odoo)."
+msgstr ""
+"ملاحظات عن العميل تظهر في معلومات جهة الاتصال في الدردشة (تُحفظ في أودو)."
+
+#. module: elblasy_waha_connector
 #. odoo-javascript
 #: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
 msgid "Nothing sent today."
@@ -2194,6 +2311,8 @@ msgid "Outside business hours"
 msgstr "خارج ساعات العمل"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_group_member__role__superadmin
 msgid "Owner"
 msgstr "المالك"
@@ -2595,6 +2714,12 @@ msgid "Saturday"
 msgstr "السبت"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Save"
+msgstr "حفظ"
+
+#. module: elblasy_waha_connector
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__status__scan_qr_code
 msgid "Scan QR Code"
 msgstr "مسح رمز QR"
@@ -2611,6 +2736,12 @@ msgid "Scroll up for older messages"
 msgstr "مرّر لأعلى لعرض الرسائل الأقدم"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Search"
+msgstr "بحث"
+
+#. module: elblasy_waha_connector
 #: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_report_action
 msgid ""
 "Search by phone number, contact, chat, agent or text; group by contact, "
@@ -2618,6 +2749,12 @@ msgid ""
 msgstr ""
 "ابحث برقم الهاتف أو جهة الاتصال أو الدردشة أو الموظف أو النص؛ وجمّع حسب جهة "
 "الاتصال أو يوم الأسبوع أو الساعة."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Search messages"
+msgstr "البحث في الرسائل"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
@@ -2863,6 +3000,12 @@ msgstr "الجلسات"
 msgid ""
 "Show WhatsApp groups and their messages in the inbox, like WhatsApp Web."
 msgstr "عرض مجموعات واتساب ورسائلها في صندوق الوارد، مثل واتساب Web."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Show in chat"
+msgstr "عرض في الدردشة"
 
 #. module: elblasy_waha_connector
 #: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
@@ -3158,6 +3301,11 @@ msgid "The message is empty."
 msgstr "الرسالة فارغة."
 
 #. module: elblasy_waha_connector
+#: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_conversation__about
+msgid "The person's WhatsApp \"About\" text."
+msgstr "نص \"النبذة\" الخاص بالشخص في واتساب."
+
+#. module: elblasy_waha_connector
 #: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_conversation__lid_chat_id
 msgid ""
 "The …@lid id of the same person when the chat is known by its phone number."
@@ -3351,6 +3499,12 @@ msgstr ""
 "web.base.url."
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Unarchive"
+msgstr "إلغاء الأرشفة"
+
+#. module: elblasy_waha_connector
 #. odoo-python
 #: code:addons/elblasy_waha_connector/models/waha_server.py:0
 msgid "Unexpected response"
@@ -3425,6 +3579,11 @@ msgstr "التحقق من الأرقام"
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__video
 msgid "Video"
 msgstr "فيديو"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__is_voice
+msgid "Voice note"
+msgstr "رسالة صوتية"
 
 #. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_server__base_url
@@ -3993,6 +4152,12 @@ msgstr "https://waha.example.com"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "members"
+msgstr "أعضاء"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
 #: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.js:0
 msgid "min"
 msgstr "د"
@@ -4030,6 +4195,12 @@ msgstr "تم الإرسال"
 #: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_autoreply__reply_text
 msgid "{name} is replaced by the customer's name."
 msgstr "يتم استبدال {name} باسم العميل."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "· You"
+msgstr "· أنت"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript

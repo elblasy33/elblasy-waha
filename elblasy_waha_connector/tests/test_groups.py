@@ -1152,6 +1152,40 @@ class TestGroups(TransactionCase):
         self.assertEqual(captioned.quoted_body, 'Invoice 12')
 
 
+    def test_59_contact_info_panel(self):
+        self.session.status = 'WORKING'
+        first = self._msg('ci1', body='see https://elblasy.app/catalogue please')
+        conv = first.conversation_id
+        partner = self.env['res.partner'].create({'name': 'Info Customer', 'email': 'info@example.com'})
+        conv.sudo().partner_id = partner
+        self.env['ir.attachment'].create({'name': 'p.png', 'raw': b'img', 'mimetype': 'image/png',
+                                          'res_model': first._name, 'res_id': first.id})
+        voice = self._msg('ci2', hasMedia=True, _data={'type': 'ptt', 'size': 9000, 'duration': '14'},
+                          media={'mimetype': 'audio/ogg'})
+        self.assertEqual((voice.is_voice, voice.media_duration, voice.media_size), (True, 14, 9000))
+        self.assertTrue(voice._to_ui()['auto'])  # a small voice note loads by itself, like on the phone
+        with patch(f'{CLIENT}.get', return_value={'about': 'Busy building things'}) as get:
+            info = conv.with_user(self.user).inbox_contact_info()
+            conv.with_user(self.user).inbox_contact_info()
+        self.assertEqual(get.call_count, 1)  # "About" asked once a day
+        self.assertEqual((info['about'], info['partner']['email'], info['media_count'], info['links_count']),
+                         ('Busy building things', 'info@example.com', 1, 1))
+        conv.with_user(self.user).inbox_set_notes('Prefers delivery after 5 pm')
+        self.assertEqual(conv.notes, 'Prefers delivery after 5 pm')
+        found = conv.with_user(self.user).inbox_search('catalogue')
+        self.assertEqual([r['id'] for r in found], [first.id])
+        around = conv.with_user(self.user).inbox_messages(around_id=first.id)
+        self.assertIn(first.id, [m['id'] for m in around['messages']])
+        with patch(f'{CLIENT}.post', return_value={}) as post:
+            conv.with_user(self.user).inbox_archive(True)
+            self.assertTrue(conv.wa_archived)
+            conv.with_user(self.user).inbox_archive(False)
+            conv.with_user(self.user).inbox_mark_unread()
+        self.assertEqual([c.args[0].rsplit('/', 1)[1] for c in post.call_args_list], ['archive', 'unarchive', 'unread'])
+        self.assertFalse(conv.wa_archived)
+        self.assertGreaterEqual(conv.unread_count, 1)
+
+
 def fields_dt_sub_minutes(minutes):
     from odoo import fields
     return fields.Datetime.subtract(fields.Datetime.now(), minutes=minutes)

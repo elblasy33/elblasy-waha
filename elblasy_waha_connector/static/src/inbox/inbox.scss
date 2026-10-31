@@ -87,7 +87,9 @@
             &::placeholder { color: var(--waha-muted); }
         }
     }
+    .o_waha_list_header, .o_waha_search { flex: none; }
     .o_waha_chips {
+        flex: none;
         display: flex;
         gap: 6px;
         padding: 6px 12px 10px;
@@ -635,6 +637,153 @@
         cursor: pointer;
         border-bottom: 1px solid var(--waha-border);
         &:hover { background: var(--waha-hover); }
+    }
+
+    // ------------------------------------------------------------ voice notes
+    .o_waha_voice {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 250px;
+        padding: 6px 4px 14px;
+    }
+    .o_waha_voice_play {
+        flex: none;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--waha-muted);
+        .oi { font-size: 30px; }
+    }
+    .o_waha_voice_body { flex: 1 1 auto; position: relative; }
+    .o_waha_voice_track {
+        height: 4px;
+        border-radius: 2px;
+        background: rgba(134, 150, 160, 0.45);
+        cursor: pointer;
+        margin: 10px 0 6px;
+    }
+    .o_waha_voice_fill { height: 100%; border-radius: 2px; background: var(--waha-green-dark); }
+    .o_waha_voice_time { position: absolute; font-size: 11px; color: var(--waha-muted); }
+    .o_waha_voice_mic { flex: none; font-size: 22px; color: var(--waha-green-dark); }
+    .o_waha_flash { animation: o_waha_flash 1.2s ease-in-out 2; }
+    @keyframes o_waha_flash { 50% { filter: brightness(0.82); } }
+
+    // ------------------------------------------------------------ contact info drawer
+    .o_waha_info {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        inset-inline-end: 0;
+        z-index: 40;
+        display: flex;
+        flex-direction: column;
+        width: 400px;
+        max-width: 100%;
+        background: var(--waha-header);
+        border-inline-start: 1px solid var(--waha-border);
+        box-shadow: -4px 0 18px rgba(11, 20, 26, 0.18);
+    }
+    .o_waha_info_header {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 60px;
+        padding: 8px 14px;
+        background: var(--waha-header);
+    }
+    .o_waha_info_title { font-size: 16px; color: var(--waha-text); }
+    .o_waha_info_body { flex: 1 1 auto; overflow-y: auto; padding-bottom: 20px; }
+    .o_waha_info_card {
+        margin-bottom: 10px;
+        padding: 16px 22px;
+        background: var(--waha-panel);
+        color: var(--waha-text);
+    }
+    .o_waha_info_avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        font-size: 52px;
+        margin: 8px auto 14px;
+    }
+    .o_waha_info_name { font-size: 22px; color: var(--waha-text); }
+    .o_waha_info_sub { color: var(--waha-muted); font-size: 15px; margin-top: 2px; }
+    .o_waha_info_actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 16px;
+        button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 96px;
+            padding: 12px 6px;
+            border: 1px solid var(--waha-border);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--waha-text);
+            font-size: 13px;
+            .oi { font-size: 22px; color: var(--waha-green-dark); }
+            &:hover { background: var(--waha-hover); }
+        }
+    }
+    .o_waha_info_label { font-size: 13.5px; color: var(--waha-muted); margin-bottom: 8px; }
+    .o_waha_info_row {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--waha-border);
+        &:last-child { border-bottom: 0; }
+        &.o_waha_click { cursor: pointer; &:hover { background: var(--waha-hover); } }
+    }
+    .o_waha_info_search { margin: 10px 16px; }
+    .o_waha_info_body > .o_waha_info_row { padding: 10px 22px; background: var(--waha-panel); }
+    .o_waha_notes { white-space: pre-wrap; }
+    .o_waha_count, .o_waha_role {
+        padding: 0 8px;
+        border-radius: 10px;
+        background: var(--waha-chip-active);
+        color: var(--waha-chip-active-text);
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .o_waha_media_strip, .o_waha_media_grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        margin: 6px 0 10px;
+        img, .o_waha_media_video {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+    }
+    .o_waha_media_grid { grid-template-columns: repeat(3, 1fr); padding: 12px 16px; }
+    .o_waha_media_video {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        background: #233138;
+        color: #ffffff;
+        .oi { font-size: 30px; }
+    }
+    .o_waha_info_body > .o_waha_doc { margin: 8px 16px; }
+    .o_waha_link { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #027eb5; }
+    .o_waha_thread_title { cursor: pointer; }
+    // wide screens: the chat moves aside for the drawer, like WhatsApp Web
+    @media (min-width: 1100px) {
+        .o_waha_thread.o_waha_with_info > :not(.o_waha_info):not(.o_waha_modal) { margin-inline-end: 400px; }
     }
 
     // ticks drawn with two check marks, grey or blue like WhatsApp

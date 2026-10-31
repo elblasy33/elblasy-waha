@@ -89,6 +89,14 @@ export class WahaInbox extends Component {
             dialog: null, // { kind: 'delete' | 'forward' | 'info', message }
             forwardIds: [],
             forwardSearch: "",
+            info: null, // contact info drawer data
+            infoView: "main", // main | media | docs | links | search
+            infoLoading: false,
+            notesDraft: null,
+            searchResults: [],
+            flashId: 0,
+            playing: 0,
+            audio: {}, // message id -> { progress, time }
             uiRtl: false, // the layout direction really applied (Odoo.sh mirrors Arabic with rtlcss)
             conversations: [],
             current: null,
@@ -203,6 +211,7 @@ export class WahaInbox extends Component {
         if (!keepScroll || nearBottom) {
             this.scrollBottom();
         }
+        this.autoDownload();
     }
 
     async loadOlder() {
@@ -219,6 +228,7 @@ export class WahaInbox extends Component {
             });
             this.state.messages = [...res.messages, ...this.state.messages];
             this.state.hasMore = res.has_more;
+            this.autoDownload();
             setTimeout(() => {
                 if (el) {
                     el.scrollTop = el.scrollHeight - previousHeight; // stay on the message that was on top
@@ -248,6 +258,13 @@ export class WahaInbox extends Component {
         return this.loadConversations();
     }
 
+    onChipsWheel(ev) {
+        if (Math.abs(ev.deltaY) > Math.abs(ev.deltaX)) {
+            ev.currentTarget.scrollLeft += this.state.uiRtl ? -ev.deltaY : ev.deltaY;
+            ev.preventDefault();
+        }
+    }
+
     setFilter(filter, labelId = 0) {
         this.state.filter = filter;
         this.state.labelFilter = labelId;
@@ -266,6 +283,7 @@ export class WahaInbox extends Component {
 
     // ------------------------------------------------------------------ conversation
     async openConversation(conv) {
+        this.closeInfo();
         this.state.current = conv;
         this.state.messages = [];
         this.state.labelsOpen = false;
@@ -308,7 +326,7 @@ export class WahaInbox extends Component {
         }
     }
 
-    async downloadMedia(m) {
+    async downloadMedia(m, { silent = false } = {}) {
         if (this.state.downloading[m.id]) {
             return;
         }
@@ -319,9 +337,11 @@ export class WahaInbox extends Component {
             });
             Object.assign(m, fresh);
         } catch (error) {
-            this.notification.add(error?.data?.message || _t("The file could not be downloaded."), {
-                type: "danger",
-            });
+            if (!silent) {
+                this.notification.add(error?.data?.message || _t("The file could not be downloaded."), {
+                    type: "danger",
+                });
+            }
         } finally {
             delete this.state.downloading[m.id];
         }
@@ -331,6 +351,197 @@ export class WahaInbox extends Component {
         const listed = this.state.conversations.find((c) => c.id === convId);
         const conv = listed || (await this.orm.call(MODEL, "inbox_conversation", [[convId]]));
         await this.openConversation(conv);
+    }
+
+    // ------------------------------------------------------------------ media like WhatsApp
+    /** Pictures, stickers and voice notes within the media policy load by themselves, like on the phone. */
+    async autoDownload() {
+        if (this._autoRunning) {
+            return;
+        }
+        this._autoRunning = true;
+        try {
+            const conv = this.state.current;
+            const queue = this.state.messages.filter((m) => m.auto && !m.attachments.length).slice(-15).reverse();
+            for (const m of queue) {
+                if (this.state.current !== conv) {
+                    break;
+                }
+                m.auto = false; // one attempt: a failure leaves the download card
+                await this.downloadMedia(m, { silent: true });
+            }
+        } finally {
+            this._autoRunning = false;
+        }
+    }
+
+    audioAttachment(m) {
+        return m.attachments.find((a) => (a.mimetype || "").startsWith("audio/"));
+    }
+
+    isVoiceBubble(m) {
+        return !m.revoked && (m.type === "audio" || !!this.audioAttachment(m));
+    }
+
+    async togglePlay(m) {
+        if (!this.audioAttachment(m)) {
+            await this.downloadMedia(m);
+            if (!this.audioAttachment(m)) {
+                return;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 50));
+        }
+        const el = document.getElementById(`o_waha_audio_${m.id}`);
+        if (!el) {
+            return;
+        }
+        if (this.state.playing && this.state.playing !== m.id) {
+            document.getElementById(`o_waha_audio_${this.state.playing}`)?.pause();
+        }
+        if (el.paused) {
+            await el.play();
+            this.state.playing = m.id;
+        } else {
+            el.pause();
+            this.state.playing = 0;
+        }
+    }
+
+    onAudioTime(m, ev) {
+        const el = ev.target;
+        this.state.audio[m.id] = {
+            progress: el.duration ? (100 * el.currentTime) / el.duration : 0,
+            time: el.currentTime,
+        };
+    }
+
+    onAudioEnded(m) {
+        this.state.playing = 0;
+        this.state.audio[m.id] = { progress: 0, time: 0 };
+    }
+
+    seekAudio(m, ev) {
+        const el = document.getElementById(`o_waha_audio_${m.id}`);
+        if (el && el.duration) {
+            const rect = ev.currentTarget.getBoundingClientRect();
+            const ratio = (ev.clientX - rect.left) / rect.width;
+            el.currentTime = el.duration * Math.min(Math.max(this.state.uiRtl ? 1 - ratio : ratio, 0), 1);
+        }
+    }
+
+    clock(seconds) {
+        const total = Math.max(Math.round(seconds || 0), 0);
+        return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+    }
+
+    voiceTime(m) {
+        const state = this.state.audio[m.id];
+        return this.clock(state && state.time ? state.time : m.duration);
+    }
+
+    // ------------------------------------------------------------------ contact info drawer
+    async openInfo(view = "main") {
+        if (!this.state.current) {
+            return;
+        }
+        this.state.infoView = view;
+        this.state.infoLoading = true;
+        this.state.notesDraft = null;
+        try {
+            this.state.info = await this.orm.call(MODEL, "inbox_contact_info", [[this.state.current.id]]);
+        } finally {
+            this.state.infoLoading = false;
+        }
+        if (view === "search") {
+            setTimeout(() => document.querySelector(".o_waha_info_search input")?.focus(), 50);
+        }
+    }
+
+    closeInfo() {
+        this.state.info = null;
+        this.state.infoView = "main";
+        this.state.searchResults = [];
+    }
+
+    setInfoView(view) {
+        this.state.infoView = view;
+    }
+
+    startNotes() {
+        this.state.notesDraft = this.state.info.notes || "";
+    }
+
+    async saveNotes() {
+        const notes = this.state.notesDraft;
+        await this.orm.call(MODEL, "inbox_set_notes", [[this.state.current.id]], { notes });
+        this.state.info.notes = (notes || "").trim();
+        this.state.notesDraft = null;
+    }
+
+    async toggleArchive() {
+        const archive = !this.state.info.archived;
+        try {
+            await this.orm.call(MODEL, "inbox_archive", [[this.state.current.id]], { archive });
+            this.state.info.archived = archive;
+            this.notification.add(archive ? _t("Chat archived") : _t("Chat unarchived"), { type: "success" });
+            await this.loadConversations();
+        } catch (error) {
+            this.notification.add(error?.data?.message || _t("WhatsApp refused the action."), { type: "danger" });
+        }
+    }
+
+    async markUnread() {
+        try {
+            await this.orm.call(MODEL, "inbox_mark_unread", [[this.state.current.id]]);
+            this.closeInfo();
+            this.closeConversation();
+            await this.loadConversations();
+        } catch (error) {
+            this.notification.add(error?.data?.message || _t("WhatsApp refused the action."), { type: "danger" });
+        }
+    }
+
+    onSearchMessages(ev) {
+        const query = ev.target.value;
+        clearTimeout(this._msgSearchTimer);
+        this._msgSearchTimer = setTimeout(async () => {
+            this.state.searchResults = query.trim().length < 2 ? [] : await this.orm.call(
+                MODEL, "inbox_search", [[this.state.current.id]], { query }
+            );
+        }, 300);
+    }
+
+    /** Show a message in the conversation (search result, link...) and highlight it. */
+    async jumpTo(messageId) {
+        if (!this.state.messages.some((m) => m.id === messageId)) {
+            const res = await this.orm.call(MODEL, "inbox_messages", [[this.state.current.id]], { around_id: messageId });
+            this.state.messages = res.messages;
+            this.state.hasMore = res.has_more;
+        }
+        this.state.flashId = messageId;
+        setTimeout(() => {
+            document.getElementById(`o_waha_msg_${messageId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 60);
+        setTimeout(() => {
+            if (this.state.flashId === messageId) {
+                this.state.flashId = 0;
+            }
+        }, 2500);
+    }
+
+    openDocuments(doc) {
+        return this.action.doAction({
+            type: "ir.actions.act_window", name: doc.name, res_model: doc.model,
+            views: [[false, "list"], [false, "form"]], domain: doc.domain,
+        });
+    }
+
+    partnerLine(partner) {
+        return [partner.company, partner.email, partner.phone].filter((part) => part).join(" · ");
+    }
+
+    roleLabel(role) {
+        return { admin: _t("Admin"), superadmin: _t("Owner") }[role] || "";
     }
 
     closeConversation() {
@@ -389,6 +600,9 @@ export class WahaInbox extends Component {
         const partnerId = await this.orm.call(MODEL, "action_create_partner", [[conv.id]]);
         conv.partner_id = partnerId;
         await this.loadConversations();
+        if (this.state.info) {
+            await this.openInfo(this.state.infoView);
+        }
     }
 
     openPartner() {
@@ -940,6 +1154,7 @@ export class WahaInbox extends Component {
         return (
             !m.revoked &&
             !m.attachments.length &&
+            !this.isVoiceBubble(m) &&
             (m.media_pending || ["image", "video", "audio", "document", "sticker"].includes(m.type))
         );
     }
