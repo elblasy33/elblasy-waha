@@ -3,6 +3,7 @@ import { useEmojiPicker } from "@web/core/emoji_picker/emoji_picker";
 import { deserializeDateTime } from "@web/core/l10n/dates";
 import { registry } from "@web/core/registry";
 import { _t } from "@web/core/l10n/translation";
+import { user } from "@web/core/user";
 import { useService } from "@web/core/utils/hooks";
 import { standardActionServiceProps } from "@web/webclient/actions/action_plugin";
 
@@ -97,6 +98,7 @@ export class WahaInbox extends Component {
             flashId: 0,
             playing: 0,
             audio: {}, // message id -> { progress, time }
+            drafts: {}, // conversation id -> { text, replyTo, linkDismissed } (WhatsApp keeps a draft per chat)
             linkPreview: null, // { url, title, description, image, site } of the first link of the draft
             linkDismissed: "",
             linkLoading: false,
@@ -124,6 +126,7 @@ export class WahaInbox extends Component {
             { onSelect: (codepoints) => this.insertText(codepoints) },
             { position: "top-start" }
         );
+        this.state.drafts = this.loadDrafts();
         onWillStart(async () => {
             this.state.sessions = await this.orm.call(MODEL, "inbox_sessions", []);
             await this.loadLabels();
@@ -184,6 +187,7 @@ export class WahaInbox extends Component {
             this.bus.unsubscribe?.("elblasy_waha/session", onSession);
             clearTimeout(this._searchTimer);
             clearInterval(this._refreshTimer);
+            this.stashDraft(); // leaving the inbox keeps what was typed
         });
     }
 
@@ -306,7 +310,9 @@ export class WahaInbox extends Component {
     // ------------------------------------------------------------------ conversation
     async openConversation(conv) {
         this.closeInfo();
+        this.stashDraft();
         this.state.current = conv;
+        this.restoreDraft(conv);
         this.state.messages = [];
         this.state.labelsOpen = false;
         this.state.expanded = {};
@@ -652,8 +658,83 @@ export class WahaInbox extends Component {
     }
 
     closeConversation() {
+        this.stashDraft();
         this.state.current = null;
         this.state.messages = [];
+    }
+
+    // ------------------------------------------------------------------ drafts per chat, like WhatsApp
+    get draftsKey() {
+        return `elblasy_waha_drafts_${user.userId}`;
+    }
+
+    loadDrafts() {
+        try {
+            return JSON.parse(localStorage.getItem(this.draftsKey) || "{}") || {};
+        } catch {
+            return {};
+        }
+    }
+
+    saveDrafts() {
+        try {
+            localStorage.setItem(this.draftsKey, JSON.stringify(this.state.drafts));
+        } catch {
+            // private window / storage full: drafts simply live until the page is closed
+        }
+    }
+
+    /** Keep what was typed in the chat we leave (an edit in progress is not a draft). */
+    stashDraft() {
+        const conv = this.state.current;
+        if (!conv) {
+            return;
+        }
+        const text = this.state.editing ? "" : this.state.draft;
+        if (text.trim() || (!this.state.editing && this.state.replyTo)) {
+            this.state.drafts[conv.id] = {
+                text,
+                replyTo: this.state.replyTo ? { id: this.state.replyTo.id, body: this.state.replyTo.body,
+                                                type: this.state.replyTo.type, author: this.state.replyTo.author,
+                                                direction: this.state.replyTo.direction, media_pending: false,
+                                                attachments: [] } : null,
+                linkDismissed: this.state.linkDismissed,
+            };
+        } else {
+            delete this.state.drafts[conv.id];
+        }
+        this.saveDrafts();
+    }
+
+    restoreDraft(conv) {
+        const draft = this.state.drafts[conv.id];
+        this.state.editing = null;
+        this.state.replyTo = draft ? draft.replyTo : null;
+        this.state.linkDismissed = draft ? draft.linkDismissed || "" : "";
+        this.state.linkPreview = null;
+        this.state.draft = draft ? draft.text : "";
+        clearTimeout(this._linkTimer);
+        setTimeout(() => {
+            const el = this.composerRef();
+            if (el) {
+                el.value = this.state.draft;
+                this.autoGrow(el);
+            }
+            this.watchLink();
+        }, 0);
+    }
+
+    clearDraft(convId) {
+        if (this.state.drafts[convId]) {
+            delete this.state.drafts[convId];
+            this.saveDrafts();
+        }
+    }
+
+    draftOf(conv) {
+        const current = this.state.current;
+        const draft = (!current || current.id !== conv.id) && this.state.drafts[conv.id];
+        return draft && draft.text.trim() ? draft.text : "";
     }
 
     onThreadScroll(ev) {
@@ -854,6 +935,7 @@ export class WahaInbox extends Component {
                 caption: this.state.draft.trim() || null,
                 client_token: newClientToken(),
             });
+            this.clearDraft(this.state.current.id);
             this.resetComposer();
             await this.loadMessages();
             await this.loadConversations();
@@ -884,6 +966,7 @@ export class WahaInbox extends Component {
                 reply_to_id: this.state.replyTo?.id || null,
                 link_preview: this.linkPreviewValue(text),
             });
+            this.clearDraft(this.state.current.id);
             this.state.replyTo = null;
             this.state.linkPreview = null;
             this.state.linkDismissed = "";

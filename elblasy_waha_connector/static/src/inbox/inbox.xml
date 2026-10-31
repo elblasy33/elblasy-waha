@@ -54,7 +54,10 @@
                                 <span class="o_waha_conv_time" t-att-class="{ o_waha_unread_time: c.unread }" t-out="this.listDate(c.last_date)"/>
                             </div>
                             <div class="o_waha_conv_bottom">
-                                <span class="o_waha_conv_preview" dir="auto">
+                                <span t-if="this.draftOf(c)" class="o_waha_conv_preview" dir="auto">
+                                    <span class="o_waha_draft_label">Draft:</span> <t t-out="this.draftOf(c)"/>
+                                </span>
+                                <span t-else="" class="o_waha_conv_preview" dir="auto">
                                     <i t-if="c.last_direction === 'out' and !c.last_revoked" t-att-class="this.tickClass(c.last_status)" t-att-data-icon="this.tickIcon(c.last_status)"/>
                                     <t t-set="pv" t-value="this.preview(c)"/>
                                     <t t-if="c.is_group and c.last_author"><span dir="auto" t-out="c.last_author"/>: </t>

@@ -62,9 +62,23 @@ const wait = async (selector, count = 1) => {
     document.querySelector(".o_waha_info_header .o_waha_icon_btn").click(); // back
     document.querySelector(".o_waha_info_header .o_waha_icon_btn").click(); // close
     await wait(".o_waha_voice");
+    // a draft per chat, like WhatsApp
+    const box1 = document.querySelector(".o_waha_composer textarea");
+    box1.value = "draft for Mona";
+    box1.dispatchEvent(new Event("input"));
     document.querySelector(".o_waha_chip:nth-child(3)").click(); // "Groups"
     (await wait(".o_waha_conv .o_waha_avatar_group"))[0].closest(".o_waha_conv").click();
     await wait(".o_waha_author");
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    if (document.querySelector(".o_waha_composer textarea").value) throw new Error("the other chat got the draft");
+    document.querySelector(".o_waha_chip:nth-child(1)").click(); // "All"
+    const mona = (await wait(".o_waha_conv .o_waha_draft_label"))[0].closest(".o_waha_conv");
+    mona.click();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    if (document.querySelector(".o_waha_composer textarea").value !== "draft for Mona") throw new Error("draft lost");
+    const box2 = document.querySelector(".o_waha_composer textarea");
+    box2.value = "";
+    box2.dispatchEvent(new Event("input"));
     document.querySelector(".o_waha_chip:nth-child(2)").click(); // "Unread": the chat was just read
     await new Promise((resolve) => setTimeout(resolve, 500));
     console.log("test successful");

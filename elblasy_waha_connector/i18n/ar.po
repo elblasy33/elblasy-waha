@@ -4280,3 +4280,8 @@ msgstr "· أنت"
 #: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
 msgid "· last 30 days"
 msgstr "· آخر 30 يومًا"
+
+#. module: elblasy_waha_connector
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Draft:"
+msgstr "مسودة:"

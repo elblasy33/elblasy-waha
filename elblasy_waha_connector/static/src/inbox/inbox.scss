@@ -170,6 +170,7 @@
         .o_waha_tick, .o_waha_tick_icon { margin-inline-end: 3px; }
         .oi { font-size: 16px; vertical-align: -3px; }
     }
+    .o_waha_draft_label { color: var(--waha-green-dark); font-weight: 600; }
     .o_waha_unread_badge {
         flex: none;
         min-width: 20px;
