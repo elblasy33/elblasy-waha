@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 12:36+0000\n"
-"PO-Revision-Date: 2026-10-31 12:36+0000\n"
+"POT-Creation-Date: 2026-10-31 19:15+0000\n"
+"PO-Revision-Date: 2026-10-31 19:15+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -40,6 +40,57 @@ msgstr ""
 #: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
 msgid "\"Delete for me\" only hides it in Odoo (reports keep it)."
 msgstr "«الحذف لدي» يخفيها في Odoo فقط (وتبقى في التقارير)."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid ""
+"\"WAHA: mirror the WhatsApp chat list\" is archived: the chat list only "
+"refreshes when the inbox is open."
+msgstr ""
+"المهمة \"WAHA: mirror the WhatsApp chat list\" مؤرشفة: قائمة الدردشات تتحدث "
+"فقط عند فتح صندوق الوارد."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid ""
+"%(url)s answered HTTP %(code)s: check the reverse proxy (domain, port, SSL)."
+msgstr ""
+"العنوان %(url)s رد بـ HTTP %(code)s: راجع البروكسي العكسي (الدومين، المنفذ، "
+"SSL)."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid ""
+"%(url)s answers (HTTP %(code)s for the test call): the proxy forwards it to "
+"this database."
+msgstr ""
+"العنوان %(url)s يستجيب (HTTP %(code)s لطلب الاختبار): البروكسي يوصله إلى "
+"قاعدة البيانات هذه."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid ""
+"%(url)s cannot be reached from the server (%(error)s): check DNS, the "
+"reverse proxy and SSL."
+msgstr ""
+"تعذر الوصول إلى %(url)s من الخادم (%(error)s): راجع DNS والبروكسي العكسي "
+"وشهادة SSL."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid ""
+"%s answers \"not found\": the proxy reaches an Odoo, but not this database "
+"(set dbfilter or a single database for this domain) or the module is not "
+"installed there."
+msgstr ""
+"العنوان %s يرد \"غير موجود\": البروكسي يصل إلى أودو لكن ليس إلى قاعدة "
+"البيانات هذه (اضبط dbfilter أو قاعدة واحدة لهذا الدومين) أو أن الموديول غير "
+"مثبت هناك."
 
 #. module: elblasy_waha_connector
 #. odoo-python
@@ -77,6 +128,16 @@ msgstr "%s س"
 #: code:addons/elblasy_waha_connector/wizard/waha_group_create.py:0
 msgid "%s has no valid phone number."
 msgstr "%s ليس لديه رقم هاتف صالح."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid ""
+"%s is not HTTPS: messages travel unencrypted. Use your domain with SSL in "
+"\"Odoo Public URL\"."
+msgstr ""
+"العنوان %s ليس HTTPS: الرسائل تنتقل بدون تشفير. استخدم الدومين مع SSL في "
+"\"Odoo Public URL\"."
 
 #. module: elblasy_waha_connector
 #. odoo-python
@@ -583,6 +644,11 @@ msgid "Chats"
 msgstr "الدردشات"
 
 #. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Check Connection"
+msgstr "فحص الاتصال"
+
+#. module: elblasy_waha_connector
 #. odoo-python
 #: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
 msgid "Choose at least one other chat of the same WhatsApp number."
@@ -680,6 +746,14 @@ msgstr "الاتصال"
 #: code:addons/elblasy_waha_connector/models/waha_server.py:0
 msgid "Connection OK (%s session(s) on server)."
 msgstr "الاتصال سليم (%s جلسة على الخادم)."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__check_report
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Connection check"
+msgstr "فحص الاتصال"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
@@ -1117,6 +1191,12 @@ msgid "Download media"
 msgstr "تنزيل الوسائط"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Draft:"
+msgstr "مسودة:"
+
+#. module: elblasy_waha_connector
 #: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_group_post_client_token_uniq
 #: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_message_client_token_uniq
 msgid "Duplicate send request."
@@ -1206,6 +1286,12 @@ msgid "Event Type"
 msgstr "نوع الحدث"
 
 #. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Events received"
+msgstr "الأحداث المستلمة"
+
+#. module: elblasy_waha_connector
 #: model_terms:ir.actions.act_window,help:elblasy_waha_connector.waha_report_document_action
 msgid ""
 "Every document sent on WhatsApp, from any app: \"Send to WhatsApp\", automations\n"
@@ -1213,6 +1299,12 @@ msgid ""
 msgstr ""
 "كل مستند أُرسل عبر واتساب، من أي تطبيق: «إرسال إلى واتساب»، والأتمتة\n"
 "            وقوالب واتساب في Odoo."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Everything is fine."
+msgstr "كل شيء يعمل بشكل سليم."
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
@@ -1277,6 +1369,15 @@ msgstr "يُملأ من الهاتف"
 #: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_conversation_view_form
 msgid "Find phone number"
 msgstr "البحث عن رقم الهاتف"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid ""
+"Find why messages do not arrive: WAHA, webhook address, reverse proxy, "
+"scheduled jobs."
+msgstr ""
+"اكتشف سبب عدم وصول الرسائل: WAHA، عنوان الـ Webhook، البروكسي العكسي، المهام"
+" المجدولة."
 
 #. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__first_date
@@ -1741,6 +1842,17 @@ msgid "Last Updated on"
 msgstr "آخر تحديث في"
 
 #. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__check_date
+msgid "Last check"
+msgstr "آخر فحص"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Last event: %(date)s. Failed events: %(failed)s."
+msgstr "آخر حدث: %(date)s. الأحداث الفاشلة: %(failed)s."
+
+#. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_report_chat__last_date
 #: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
 msgid "Last message"
@@ -1820,6 +1932,12 @@ msgstr "الروابط"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Lists"
+msgstr "القوائم"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
 #: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_message__message_type__location
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__message_type__location
@@ -1845,6 +1963,11 @@ msgstr "خط الطول"
 #: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_group__chat_id
 msgid "Looks like 123456789@g.us"
 msgstr "مثال: 123456789@g.us"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Make WAHA send this session's messages to this Odoo."
+msgstr "اجعل WAHA يرسل رسائل هذه الجلسة إلى أودو هذا."
 
 #. module: elblasy_waha_connector
 #: model:res.groups,name:elblasy_waha_connector.group_waha_manager
@@ -2089,6 +2212,12 @@ msgid "No chats found."
 msgstr "لم يتم العثور على دردشات."
 
 #. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "No event has ever reached this database."
+msgstr "لم يصل أي حدث إلى قاعدة البيانات هذه حتى الآن."
+
+#. module: elblasy_waha_connector
 #. odoo-javascript
 #: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
 msgid "No replies yet today."
@@ -2186,9 +2315,25 @@ msgstr "يمكن لـ Odoo النشر هنا"
 
 #. module: elblasy_waha_connector
 #. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Odoo cannot reach WAHA: %s"
+msgstr "أودو لا يستطيع الوصول إلى WAHA: %s"
+
+#. module: elblasy_waha_connector
+#. odoo-python
 #: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
 msgid "Odoo is not allowed to post to this group."
 msgstr "غير مسموح لـ Odoo بالنشر في هذه المجموعة."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid ""
+"Odoo's scheduled jobs are not running on this server (last run: %s). Start "
+"Odoo with workers and max_cron_threads ≥ 1, without --no-cron."
+msgstr ""
+"المهام المجدولة في أودو لا تعمل على هذا الخادم (آخر تشغيل: %s). شغّل أودو بـ"
+" workers و max_cron_threads ≥ 1 وبدون --no-cron."
 
 #. module: elblasy_waha_connector
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_session__media_download__none
@@ -2468,6 +2613,16 @@ msgstr ""
 "object.amount_total }}..."
 
 #. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid ""
+"Point WAHA's webhook for this session to this Odoo? WAHA restarts the "
+"session (the phone stays linked). A WAHA session can only feed one Odoo "
+"database."
+msgstr ""
+"توجيه Webhook هذه الجلسة في WAHA إلى أودو هذا؟ سيعيد WAHA تشغيل الجلسة (يبقى"
+" الهاتف مرتبطًا). جلسة WAHA الواحدة تغذي قاعدة بيانات أودو واحدة فقط."
+
+#. module: elblasy_waha_connector
 #. odoo-javascript
 #: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
 #: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
@@ -2499,6 +2654,12 @@ msgid "Private chats"
 msgstr "الدردشات الخاصة"
 
 #. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Problems found: see the Connection check tab of the session."
+msgstr "توجد مشاكل: راجع قسم فحص الاتصال في الجلسة."
+
+#. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__profile_image
 msgid "Profile Image"
 msgstr "صورة الملف الشخصي"
@@ -2507,6 +2668,12 @@ msgstr "صورة الملف الشخصي"
 #: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_group_view_form
 msgid "Promote"
 msgstr "ترقية"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Public address of Odoo"
+msgstr "العنوان العام لأودو"
 
 #. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__qr_image
@@ -2531,6 +2698,18 @@ msgstr ""
 #: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_webhook_event__payload
 msgid "Raw event; may contain message content."
 msgstr "حدث خام؛ قد يحتوي على محتوى الرسالة."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Reachable, but the session is %s: connect it again (QR code)."
+msgstr "يمكن الوصول إليه، لكن الجلسة %s: اربطها من جديد (رمز QR)."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Reachable. Session status: %s."
+msgstr "يمكن الوصول إليه. حالة الجلسة: %s."
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
@@ -2594,6 +2773,11 @@ msgstr "تحديث الصورة"
 #: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
 msgid "Refresh Status"
 msgstr "تحديث الحالة"
+
+#. module: elblasy_waha_connector
+#: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_session_view_form
+msgid "Register Webhook"
+msgstr "تسجيل الـ Webhook"
 
 #. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__reject_calls
@@ -2758,6 +2942,12 @@ msgid "Role"
 msgstr "الدور"
 
 #. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Running (last run %s)."
+msgstr "تعمل (آخر تشغيل %s)."
+
+#. module: elblasy_waha_connector
 #: model:ir.model.fields.selection,name:elblasy_waha_connector.selection__elblasy_waha_report_message__weekday__6
 msgid "Saturday"
 msgstr "السبت"
@@ -2777,6 +2967,12 @@ msgstr "مسح رمز QR"
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_queue__scheduled_for
 msgid "Scheduled For"
 msgstr "مجدولة في"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Scheduled jobs"
+msgstr "المهام المجدولة"
 
 #. module: elblasy_waha_connector
 #. odoo-javascript
@@ -3059,6 +3255,12 @@ msgstr "عرض مجموعات واتساب ورسائلها في صندوق ال
 #. module: elblasy_waha_connector
 #. odoo-javascript
 #: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Show all chats"
+msgstr "عرض كل الدردشات"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
 msgid "Show in chat"
 msgstr "عرض في الدردشة"
 
@@ -3266,6 +3468,16 @@ msgid "The WhatsApp window must be at least one day."
 msgstr "يجب ألا تقل نافذة واتساب عن يوم واحد."
 
 #. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid ""
+"The address is right but the events or the database header are outdated "
+"(reactions, edits and deletions may be missing). Press \"Register webhook\"."
+msgstr ""
+"العنوان صحيح لكن الأحداث أو ترويسة قاعدة البيانات قديمة (قد لا تصل التفاعلات"
+" والتعديلات والحذف). اضغط \"تسجيل الـ Webhook\"."
+
+#. module: elblasy_waha_connector
 #. odoo-javascript
 #: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
 msgid "The browser did not allow copying."
@@ -3359,6 +3571,16 @@ msgstr "الرسالة فارغة."
 #: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_conversation__about
 msgid "The person's WhatsApp \"About\" text."
 msgstr "نص \"النبذة\" الخاص بالشخص في واتساب."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid ""
+"The webhook uses %s, which WAHA cannot reach. Set \"Odoo Public URL\" on the"
+" WAHA server (e.g. https://your-domain)."
+msgstr ""
+"الـ Webhook يستخدم %s ولا يستطيع WAHA الوصول إليه. اضبط \"Odoo Public URL\" "
+"في خادم WAHA (مثل https://your-domain)."
 
 #. module: elblasy_waha_connector
 #: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_conversation__lid_chat_id
@@ -3690,6 +3912,41 @@ msgid "WAHA error (%(kind)s): %(msg)s"
 msgstr "خطأ WAHA (%(kind)s): %(msg)s"
 
 #. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid ""
+"WAHA has no webhook for this session: nothing is pushed to Odoo. Press "
+"\"Register webhook\"."
+msgstr ""
+"لا يوجد Webhook لهذه الجلسة في WAHA: لن يصل شيء إلى أودو. اضغط \"تسجيل الـ "
+"Webhook\"."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "WAHA sends the events to %s."
+msgstr "يرسل WAHA الأحداث إلى %s."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid ""
+"WAHA sends the messages to %(other)s, not to this Odoo (%(mine)s). This "
+"happens after moving to another server or when two Odoo databases use the "
+"same WAHA session. Press \"Register webhook\" (a WAHA session can only feed "
+"one Odoo)."
+msgstr ""
+"يرسل WAHA الرسائل إلى %(other)s وليس إلى أودو هذا (%(mine)s). يحدث هذا بعد "
+"النقل لخادم آخر أو عندما تستخدم قاعدتا أودو نفس جلسة WAHA. اضغط \"تسجيل الـ "
+"Webhook\" (جلسة WAHA الواحدة تغذي أودو واحدًا فقط)."
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "WAHA server"
+msgstr "خادم WAHA"
+
+#. module: elblasy_waha_connector
 #: model:ir.actions.server,name:elblasy_waha_connector.cron_waha_sync_messages_ir_actions_server
 msgid "WAHA: auto-sync incoming messages"
 msgstr "WAHA: مزامنة الرسائل الواردة تلقائيًا"
@@ -3798,6 +4055,18 @@ msgstr "رمز Webhook"
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__webhook_url
 msgid "Webhook Url"
 msgstr "رابط Webhook"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Webhook address reachable"
+msgstr "الوصول إلى عنوان الـ Webhook"
+
+#. module: elblasy_waha_connector
+#. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "Webhook on WAHA"
+msgstr "الـ Webhook في WAHA"
 
 #. module: elblasy_waha_connector
 #: model:ir.model.constraint,message:elblasy_waha_connector.constraint_elblasy_waha_session_webhook_token_uniq
@@ -4237,6 +4506,12 @@ msgstr "د"
 
 #. module: elblasy_waha_connector
 #. odoo-python
+#: code:addons/elblasy_waha_connector/models/waha_session_check.py:0
+msgid "never"
+msgstr "أبدًا"
+
+#. module: elblasy_waha_connector
+#. odoo-python
 #: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
 msgid "not confirmed"
 msgstr "غير مؤكد"
@@ -4280,18 +4555,3 @@ msgstr "· أنت"
 #: code:addons/elblasy_waha_connector/static/src/dashboard/dashboard.xml:0
 msgid "· last 30 days"
 msgstr "· آخر 30 يومًا"
-
-#. module: elblasy_waha_connector
-#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
-msgid "Draft:"
-msgstr "مسودة:"
-
-#. module: elblasy_waha_connector
-#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
-msgid "Lists"
-msgstr "القوائم"
-
-#. module: elblasy_waha_connector
-#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
-msgid "Show all chats"
-msgstr "عرض كل الدردشات"

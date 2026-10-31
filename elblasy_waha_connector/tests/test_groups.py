@@ -1221,6 +1221,34 @@ class TestGroups(TransactionCase):
         self.assertIn('/link_image', link['image'])
 
 
+    def test_61_connection_check_finds_a_webhook_sent_elsewhere(self):
+        """After moving Odoo, WAHA kept sending to the old server: the check says so and Register Webhook fixes it."""
+        import requests as http
+        self.session.status = 'WORKING'
+        self.server.webhook_base_url = 'https://vehicle.example.com'
+        old = {'status': 'WORKING', 'config': {'webhooks': [{'url': 'https://old.odoo.com/waha/webhook/zzz'}]}}
+
+        class Answer:
+            status_code = 403
+        with patch(f'{CLIENT}.get_session', return_value=old), patch.object(http, 'post', return_value=Answer()):
+            self.session.with_user(self.manager).action_check_connection()
+        report = str(self.session.check_report)
+        self.assertIn('old.odoo.com', report)
+        self.assertIn('vehicle.example.com', report)
+        self.assertIn('HTTP 403', report)  # the public address reaches this database
+        fixed = {'status': 'WORKING', 'config': self.session._webhook_config()}
+        with patch(f'{CLIENT}.update_session', return_value={}) as update, \
+                patch(f'{CLIENT}.get_session', return_value=fixed), patch.object(http, 'post', return_value=Answer()):
+            self.session.with_user(self.manager).action_register_webhook()
+        self.assertEqual(update.call_args.args[1]['webhooks'][0]['url'], self.session.webhook_url)
+        self.assertIn('WAHA sends the events to', str(self.session.check_report))
+        # a 404 means the proxy reaches another Odoo / database
+        Answer.status_code = 404
+        with patch(f'{CLIENT}.get_session', return_value=fixed), patch.object(http, 'post', return_value=Answer()):
+            self.session.with_user(self.manager).action_check_connection()
+        self.assertIn('not this database', str(self.session.check_report))
+
+
 def fields_dt_sub_minutes(minutes):
     from odoo import fields
     return fields.Datetime.subtract(fields.Datetime.now(), minutes=minutes)

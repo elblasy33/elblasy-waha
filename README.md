@@ -222,6 +222,24 @@ For Arabic right-to-left layouts Odoo needs [`rtlcss`](https://rtlcss.com/) on t
 A laptop that WAHA cannot reach can switch on **Auto-sync messages** on the session (polling every minute).
 </details>
 
+## 🩺 Troubleshooting — messages do not arrive
+
+Open the session and press **Check Connection**. It tests, in order: WAHA and the session status, **where WAHA sends the
+events** (the webhook address registered on WAHA), whether this Odoo's public address reaches **this database** through
+your reverse proxy, the events received, and Odoo's scheduled jobs. Each line says what to fix.
+
+Typical after moving Odoo to another server or domain:
+
+| Symptom in the check | Fix |
+|---|---|
+| *WAHA sends the messages to another address* | Press **Register Webhook** (a WAHA session feeds one Odoo database; the old server stops receiving). |
+| *uses http://localhost / an internal address* | Set **Odoo Public URL** on the WAHA server, e.g. `https://odoo.example.com`, then **Register Webhook**. |
+| *answers "not found"* | The proxy reaches an Odoo but not this database: set `dbfilter` (or one database per domain). |
+| *cannot be reached* / *HTTP 502* | Reverse proxy: forward the domain to Odoo's HTTP port, `/websocket` to the gevent port, enable SSL. |
+| *scheduled jobs are not running* | Start Odoo with `workers` and `max_cron_threads >= 1` (no `--no-cron`). |
+
+Behind a reverse proxy (Nginx, Nginx Proxy Manager…) also set `proxy_mode = True` in `odoo.conf`.
+
 ## 🧪 Tests
 
 ```bash

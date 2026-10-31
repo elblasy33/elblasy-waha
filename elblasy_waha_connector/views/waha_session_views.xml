@@ -33,6 +33,13 @@
                             help="Import recent incoming messages from WAHA (no webhook needed)."/>
                     <button name="action_sync_labels" type="object" string="Sync Labels"
                             invisible="status != 'WORKING'" groups="elblasy_waha_connector.group_waha_manager"/>
+                    <button name="action_check_connection" type="object" string="Check Connection"
+                            groups="elblasy_waha_connector.group_waha_manager"
+                            help="Find why messages do not arrive: WAHA, webhook address, reverse proxy, scheduled jobs."/>
+                    <button name="action_register_webhook" type="object" string="Register Webhook"
+                            groups="elblasy_waha_connector.group_waha_manager"
+                            confirm="Point WAHA's webhook for this session to this Odoo? WAHA restarts the session (the phone stays linked). A WAHA session can only feed one Odoo database."
+                            help="Make WAHA send this session's messages to this Odoo."/>
                     <button name="action_sync_groups" type="object" string="Sync Groups"
                             invisible="status != 'WORKING'" groups="elblasy_waha_connector.group_waha_manager"/>
                     <button name="action_logout" type="object" string="Log out"
@@ -80,6 +87,10 @@
                             <field name="webhook_url" widget="CopyClipboardChar"/>
                         </group>
                     </group>
+                    <div groups="elblasy_waha_connector.group_waha_manager" invisible="not check_date">
+                        <h4 class="mt-3">Connection check <small class="text-muted"><field name="check_date" readonly="1" nolabel="1"/></small></h4>
+                        <field name="check_report" nolabel="1"/>
+                    </div>
                 </sheet>
             </form>
         </field>
