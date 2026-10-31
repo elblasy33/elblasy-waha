@@ -179,6 +179,14 @@
                                         <div t-if="m.forwarded" class="o_waha_meta_line"><i class="oi me-1" data-icon="forward"/>Forwarded</div>
                                         <span t-if="m.revoked" class="o_waha_revoked" t-att-title="m.body"><span t-if="this.spaceAtStart(this.deletedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/><i class="oi me-1" data-icon="block"/><t t-out="this.deletedLabel"/><span t-if="!this.spaceAtStart(this.deletedLabel)" class="o_waha_space" t-att-style="this.spaceStyle(m)"/></span>
                                         <t t-else="">
+                                            <a t-if="m.link" class="o_waha_link_card" t-att-href="m.link.url" target="_blank" rel="noopener noreferrer">
+                                                <img t-if="m.link.image" t-att-src="m.link.image" alt="" loading="lazy" referrerpolicy="no-referrer"/>
+                                                <span class="o_waha_link_card_text">
+                                                    <span class="o_waha_link_title" dir="auto" t-out="m.link.title"/>
+                                                    <span class="o_waha_link_desc" dir="auto" t-out="m.link.description"/>
+                                                    <span class="o_waha_link_host" t-out="this.linkHost(m.link.url)"/>
+                                                </span>
+                                            </a>
                                             <div t-if="m.quoted" class="o_waha_quote"><span dir="auto" t-out="m.quoted"/></div>
                                             <t t-foreach="m.attachments" t-as="a" t-key="a.id">
                                                 <t t-set="kind" t-value="this.kindOf(a)"/>
@@ -269,6 +277,15 @@
 
                     <div t-if="this.sessionDisconnected" class="o_waha_offline">
                         <i class="oi me-1" data-icon="link_off"/>The WhatsApp number is not connected. Messages cannot be sent.
+                    </div>
+                    <div t-if="this.state.linkPreview and !this.state.editing" class="o_waha_link_draft">
+                        <img t-if="this.state.linkPreview.image" t-att-src="this.state.linkPreview.image" alt="" referrerpolicy="no-referrer"/>
+                        <div class="o_waha_link_draft_text">
+                            <div class="o_waha_link_title" dir="auto" t-out="this.state.linkPreview.title"/>
+                            <div class="o_waha_link_desc" dir="auto" t-out="this.state.linkPreview.description"/>
+                            <div class="o_waha_link_host" t-out="this.state.linkPreview.site or this.linkHost(this.state.linkPreview.url)"/>
+                        </div>
+                        <button class="btn o_waha_icon_btn" title="Send without preview" t-on-click="this.dismissLink"><i class="oi" data-icon="close"/></button>
                     </div>
                     <div t-if="this.state.replyTo or this.state.editing" class="o_waha_composer_bar">
                         <t t-set="target" t-value="this.state.replyTo or this.state.editing"/>

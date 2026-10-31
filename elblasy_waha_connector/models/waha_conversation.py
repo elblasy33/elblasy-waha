@@ -594,15 +594,66 @@ class WahaConversation(models.Model):
         self.sudo().label_ids = [(6, 0, labels.ids)]
         return [{'id': l.id, 'name': l.name, 'color': l.color_hex} for l in self.label_ids]
 
-    def inbox_send_text(self, text, client_token=None, reply_to_id=None):
-        """Send a text message, optionally as a reply. Idempotent on ``client_token`` (double click safe)."""
+    def inbox_send_text(self, text, client_token=None, reply_to_id=None, link_preview=None):
+        """Send a text message, optionally as a reply. Idempotent on ``client_token`` (double click safe).
+        ``link_preview``: the preview shown in the composer (sent with a WhatsApp preview), False to send the link
+        without preview, None when the text has no link."""
         self.ensure_one()
         self._check_user()
         text = (text or '').strip()
         if not text:
             raise UserError(self.env._("The message is empty."))
         reply_to = self._own_message(reply_to_id) if reply_to_id else None
-        return self._send_text(text, client_token, user=self.env.user, reply_to=reply_to)._to_ui()
+        message = self._send_text(text, client_token, user=self.env.user, reply_to=reply_to,
+                                  link_preview=bool(link_preview) if link_preview is not None else None)
+        if isinstance(link_preview, dict) and link_preview.get('url') in text:
+            message.sudo().write({
+                'link_url': str(link_preview['url'])[:500],
+                'link_title': str(link_preview.get('title') or '')[:250] or False,
+                'link_description': str(link_preview.get('description') or '')[:500] or False,
+                'link_image_url': str(link_preview.get('image') or '')[:1000] or False,
+            })
+        return message._to_ui()
+
+    @api.model
+    def _public_url(self, url):
+        """Only http(s) URLs of public hosts may be fetched by the server (no internal network, no SSRF)."""
+        import ipaddress
+        import socket
+        from urllib.parse import urlparse
+        parsed = urlparse(url or '')
+        if parsed.scheme not in ('http', 'https') or not parsed.hostname:
+            return False
+        try:
+            addresses = {info[4][0] for info in socket.getaddrinfo(parsed.hostname, parsed.port or None)}
+        except (socket.gaierror, UnicodeError, ValueError):
+            return False
+        for address in addresses:
+            ip = ipaddress.ip_address(address.split('%')[0])
+            if not ip.is_global:
+                return False
+        return True
+
+    def inbox_link_preview(self, url):
+        """Title, description and picture of a link typed in the composer (shown before sending, like WhatsApp)."""
+        self.ensure_one()
+        self._check_user()
+        url = (url or '').strip()[:1000]
+        if not self._public_url(url):
+            return False
+        from odoo.addons.mail.tools.link_preview import get_link_preview_from_url
+        preview = get_link_preview_from_url(url)
+        if not preview or not (preview.get('og_title') or preview.get('og_image')):
+            return False
+        from urllib.parse import urljoin, urlparse
+        image = preview.get('og_image')
+        return {
+            'url': url,
+            'title': (preview.get('og_title') or '').strip()[:250],
+            'description': (preview.get('og_description') or '').strip()[:500],
+            'image': urljoin(url, image) if image else '',
+            'site': preview.get('og_site_name') or urlparse(url).hostname,
+        }
 
     # ------------------------------------------------------------------
     # message actions (the menu of a message, like WhatsApp Web)
@@ -733,7 +784,7 @@ class WahaConversation(models.Model):
                                             author_id=self.env.user.partner_id.id)
         return True
 
-    def _send_text(self, text, client_token=None, user=None, is_auto=False, reply_to=None):
+    def _send_text(self, text, client_token=None, user=None, is_auto=False, reply_to=None, link_preview=None):
         """Create the message, send it through WAHA and record the outcome (idempotent on ``client_token``)."""
         self.ensure_one()
         Message = self.env['elblasy.waha.message']
@@ -755,7 +806,8 @@ class WahaConversation(models.Model):
         })
         client = session.sudo().server_id._get_client()
         message._deliver(lambda: client.send_text(session.session_name, self.remote_chat_id, text,
-                                                  reply_to=reply_to.remote_message_id if reply_to else None))
+                                                  reply_to=reply_to.remote_message_id if reply_to else None,
+                                                  link_preview=link_preview))
         return message
 
     MAX_FILE_BYTES = 15 * 1024 * 1024

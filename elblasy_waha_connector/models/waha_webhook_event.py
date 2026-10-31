@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import json
 import logging
@@ -7,6 +8,7 @@ from datetime import timedelta
 import psycopg2
 
 from odoo import api, fields, models
+from odoo.tools import BinaryBytes
 
 from .waha_client import WahaError
 from .waha_message import ACK_MAP, ACK_NAME_MAP, ts_to_datetime
@@ -89,6 +91,16 @@ def parse_content(p):
         vals.update(message_type=kind, body=body)
     else:
         vals.update(message_type='text' if body else 'other', body=body)
+    link = data.get('canonicalUrl') or data.get('matchedText')
+    if isinstance(link, str) and link.startswith(('http://', 'https://')) and (data.get('title') or data.get('description')):
+        vals.update(link_url=link[:500], link_title=str(data.get('title') or '')[:250] or False,
+                    link_description=str(data.get('description') or '')[:500] or False)
+        thumbnail = data.get('thumbnail')
+        if isinstance(thumbnail, str) and len(thumbnail) < 300000:
+            try:
+                vals['link_image'] = BinaryBytes(base64.b64decode(thumbnail))
+            except (ValueError, TypeError):
+                pass
     reply = p.get('replyTo') if isinstance(p.get('replyTo'), dict) else {}
     quoted = data.get('quotedMsg') if isinstance(data.get('quotedMsg'), dict) else {}
     if reply or quoted:

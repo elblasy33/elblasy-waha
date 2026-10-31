@@ -55,6 +55,11 @@ class WahaMessage(models.Model):
          ('failed', "Failed"), ('unknown', "Not confirmed")], copy=False)
     sender_identifier = fields.Char()
     author_name = fields.Char("Author", help="Name of the group member who wrote the message.")
+    link_url = fields.Char("Link", readonly=True)
+    link_title = fields.Char("Link title", readonly=True)
+    link_description = fields.Char("Link description", readonly=True)
+    link_image = fields.Binary("Link picture", attachment=True, readonly=True)
+    link_image_url = fields.Char("Link picture URL", readonly=True)
     media_size = fields.Integer("File size", readonly=True)
     media_duration = fields.Integer("Duration (s)", readonly=True)
     is_voice = fields.Boolean("Voice note", readonly=True)
@@ -150,6 +155,11 @@ class WahaMessage(models.Model):
             'failure': self.failure_reason, 'sender': self.sender_identifier, 'is_auto': self.is_auto,
             'author': self.author_name or '', 'media_pending': self.media_pending,
             'media_size': self.media_size, 'duration': self.media_duration, 'voice': self.is_voice,
+            'link': {
+                'url': self.link_url, 'title': self.link_title or '', 'description': self.link_description or '',
+                'image': (f'/web/image/elblasy.waha.message/{self.id}/link_image' if self.link_image
+                          else self.link_image_url or ''),
+            } if self.link_url and (self.link_title or self.link_description) else False,
             'auto': self.media_pending and self.message_type in ('image', 'sticker', 'audio') and bool(
                 self.session_id.sudo()._auto_download(self.message_type, self.media_size,
                                                       self.conversation_id.chat_type == 'group')),

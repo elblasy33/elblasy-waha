@@ -1186,6 +1186,41 @@ class TestGroups(TransactionCase):
         self.assertGreaterEqual(conv.unread_count, 1)
 
 
+    def test_60_link_previews(self):
+        import base64
+        import socket
+        self.session.status = 'WORKING'
+        conv = self._msg('lk0', body='hello').conversation_id.with_user(self.user)
+        Conv = type(self.env['elblasy.waha.conversation'])
+        # the server never fetches internal addresses (SSRF)
+        with patch.object(socket, 'getaddrinfo', return_value=[(2, 1, 6, '', ('127.0.0.1', 80))]):
+            self.assertFalse(conv.inbox_link_preview('http://intranet.local/admin'))
+        self.assertFalse(conv.inbox_link_preview('ftp://elblasy.app/file'))
+        og = {'og_title': 'elblasy.app — Odoo Implementation', 'og_description': 'Mobile apps and Odoo ERP',
+              'og_image': '/logo.png', 'og_site_name': 'elblasy.app', 'source_url': 'https://elblasy.app/'}
+        with patch.object(socket, 'getaddrinfo', return_value=[(2, 1, 6, '', ('185.199.108.153', 443))]), \
+                patch('odoo.addons.mail.tools.link_preview.get_link_preview_from_url', return_value=og):
+            preview = conv.inbox_link_preview('https://elblasy.app/')
+        self.assertEqual((preview['title'], preview['image'], preview['site']),
+                         ('elblasy.app — Odoo Implementation', 'https://elblasy.app/logo.png', 'elblasy.app'))
+        with patch(f'{CLIENT}.send_text', return_value={'id': 'true_lk1'}) as send:
+            ui = conv.inbox_send_text('see https://elblasy.app/', 'tok-lk1', link_preview=preview)
+        self.assertIs(send.call_args.kwargs['link_preview'], True)
+        self.assertEqual((ui['link']['title'], ui['link']['image']), (preview['title'], preview['image']))
+        with patch(f'{CLIENT}.send_text', return_value={'id': 'true_lk2'}) as send:
+            ui = conv.inbox_send_text('see https://elblasy.app/', 'tok-lk2', link_preview=False)
+        self.assertIs(send.call_args.kwargs['link_preview'], False)  # closed in the composer: no preview
+        self.assertFalse(ui['link'])
+        # previews of received messages are kept with their picture
+        thumb = base64.b64encode(b'\xff\xd8\xff-jpeg').decode()
+        incoming = self._msg('lk3', body='https://elblasy.app/', _data={
+            'type': 'chat', 'canonicalUrl': 'https://elblasy.app/', 'title': 'elblasy.app', 'description': 'Odoo',
+            'thumbnail': thumb})
+        link = incoming._to_ui()['link']
+        self.assertEqual((link['title'], link['url']), ('elblasy.app', 'https://elblasy.app/'))
+        self.assertIn('/link_image', link['image'])
+
+
 def fields_dt_sub_minutes(minutes):
     from odoo import fields
     return fields.Datetime.subtract(fields.Datetime.now(), minutes=minutes)

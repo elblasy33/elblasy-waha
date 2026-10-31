@@ -97,6 +97,9 @@ export class WahaInbox extends Component {
             flashId: 0,
             playing: 0,
             audio: {}, // message id -> { progress, time }
+            linkPreview: null, // { url, title, description, image, site } of the first link of the draft
+            linkDismissed: "",
+            linkLoading: false,
             viewer: null, // { items: [{ attachmentId, video, message }], index, zoom, reacting }
             uiRtl: false, // the layout direction really applied (Odoo.sh mirrors Arabic with rtlcss)
             conversations: [],
@@ -747,6 +750,63 @@ export class WahaInbox extends Component {
     onDraftInput(ev) {
         this.state.draft = ev.target.value;
         this.autoGrow(ev.target);
+        this.watchLink();
+    }
+
+    // ------------------------------------------------------------------ link preview before sending
+    get draftUrl() {
+        const match = (this.state.draft || "").match(/https?:\/\/[^\s<>"]+[^\s<>".,;:!?)\]]/);
+        return match ? match[0] : "";
+    }
+
+    watchLink() {
+        clearTimeout(this._linkTimer);
+        const url = this.draftUrl;
+        if (!url || this.state.editing) {
+            this.state.linkPreview = null;
+            return;
+        }
+        if (url === this.state.linkDismissed || (this.state.linkPreview && this.state.linkPreview.url === url)) {
+            return;
+        }
+        this._linkTimer = setTimeout(async () => {
+            this.state.linkLoading = true;
+            try {
+                const preview = await this.orm.silent.call(MODEL, "inbox_link_preview", [[this.state.current.id]], { url });
+                if (this.draftUrl === url) {
+                    this.state.linkPreview = preview || null;
+                }
+            } catch {
+                this.state.linkPreview = null;
+            } finally {
+                this.state.linkLoading = false;
+            }
+        }, 600);
+    }
+
+    dismissLink() {
+        this.state.linkDismissed = this.draftUrl;
+        this.state.linkPreview = null;
+    }
+
+    /** What to tell the server about the link of the draft. */
+    linkPreviewValue(text) {
+        const url = this.draftUrl;
+        if (!url || !text.includes(url)) {
+            return null;
+        }
+        if (url === this.state.linkDismissed) {
+            return false;
+        }
+        return this.state.linkPreview && this.state.linkPreview.url === url ? { ...this.state.linkPreview } : true;
+    }
+
+    linkHost(url) {
+        try {
+            return new URL(url).hostname.replace(/^www\./, "");
+        } catch {
+            return "";
+        }
     }
 
     onDraftKeydown(ev) {
@@ -822,8 +882,11 @@ export class WahaInbox extends Component {
                 text,
                 client_token: token,
                 reply_to_id: this.state.replyTo?.id || null,
+                link_preview: this.linkPreviewValue(text),
             });
             this.state.replyTo = null;
+            this.state.linkPreview = null;
+            this.state.linkDismissed = "";
             this.resetComposer();
             await this.loadMessages();
             await this.loadConversations();

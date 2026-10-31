@@ -104,8 +104,10 @@ class WahaClient:
         return self._request('GET', f'/api/{name}/auth/qr')
 
     # -- messages
-    def send_text(self, session, chat_id, text, reply_to=None):
+    def send_text(self, session, chat_id, text, reply_to=None, link_preview=None):
         payload = {'session': session, 'chatId': chat_id, 'text': text}
+        if link_preview is not None:
+            payload['linkPreview'] = bool(link_preview)  # WhatsApp builds the preview card of the first link
         if reply_to:
             payload['reply_to'] = reply_to  # quoted reply, like swiping a message on the phone
         return self._request('POST', '/api/sendText', json=payload)

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 12:27+0000\n"
-"PO-Revision-Date: 2026-10-31 12:27+0000\n"
+"POT-Creation-Date: 2026-10-31 12:36+0000\n"
+"PO-Revision-Date: 2026-10-31 12:36+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -1777,10 +1777,35 @@ msgid "Leave this WhatsApp group? Odoo will no longer post to it."
 msgstr "مغادرة مجموعة واتساب هذه؟ لن ينشر Odoo فيها بعد الآن."
 
 #. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__link_url
+msgid "Link"
+msgstr "الرابط"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__link_description
+msgid "Link description"
+msgstr "وصف الرابط"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__link_image
+msgid "Link picture"
+msgstr "صورة الرابط"
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__link_image_url
+msgid "Link picture URL"
+msgstr "رابط صورة الرابط"
+
+#. module: elblasy_waha_connector
 #. odoo-python
 #: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
 msgid "Link this chat to a contact first."
 msgstr "اربط هذه الدردشة بجهة اتصال أولًا."
+
+#. module: elblasy_waha_connector
+#: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__link_title
+msgid "Link title"
+msgstr "عنوان الرابط"
 
 #. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_create__link_to_partners
@@ -2879,6 +2904,12 @@ msgstr "إرسال إلى رقم العميل"
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_send__send_to_customer
 msgid "Send to this number"
 msgstr "إرسال إلى هذا الرقم"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Send without preview"
+msgstr "إرسال بدون معاينة"
 
 #. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_group_message__sender_id

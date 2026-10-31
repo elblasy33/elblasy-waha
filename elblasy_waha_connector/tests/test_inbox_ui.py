@@ -42,6 +42,14 @@ const wait = async (selector, count = 1) => {
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     await new Promise((resolve) => setTimeout(resolve, 200));
     if (document.querySelector(".o_waha_viewer")) throw new Error("viewer did not close");
+    // link preview before sending
+    const composer = document.querySelector(".o_waha_composer textarea");
+    composer.value = "look https://elblasy.app/";
+    composer.dispatchEvent(new Event("input"));
+    await wait(".o_waha_link_draft .o_waha_link_title");
+    document.querySelector(".o_waha_link_draft .o_waha_icon_btn").click(); // send without preview
+    composer.value = "";
+    composer.dispatchEvent(new Event("input"));
     // contact info drawer and search in the chat
     document.querySelector(".o_waha_thread_title").click();
     await wait(".o_waha_info .o_waha_info_actions");
@@ -104,7 +112,11 @@ class TestInboxUi(HttpCase):
                         'author_name': 'Sara', 'sender_identifier': '2010@c.us', 'date': '2026-10-28 09:00:00'})
         Conv.create({'session_id': session.id, 'remote_chat_id': '201001230099@c.us', 'wa_archived': True})
         client = 'odoo.addons.elblasy_waha_connector.models.waha_client.WahaClient'
-        with patch(f'{client}.get', return_value=[]):  # chat list mirror and history: nothing new on WhatsApp
+        preview = {'url': 'https://elblasy.app/', 'title': 'elblasy.app', 'description': 'Odoo', 'image': '',
+                   'site': 'elblasy.app'}
+        Conv = type(self.env['elblasy.waha.conversation'])
+        with patch(f'{client}.get', return_value=[]), \
+                patch.object(Conv, 'inbox_link_preview', lambda self_, url: preview):
             self.browser_js('/odoo/action-elblasy_waha_connector.waha_inbox_action', CHECK_INBOX, login='admin',
                             timeout=90)
 
