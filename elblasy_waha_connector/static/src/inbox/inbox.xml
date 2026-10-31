@@ -17,17 +17,31 @@
                     <i class="oi" data-icon="search"/>
                     <input type="search" placeholder="Search or start a new chat" t-on-input="this.onSearchInput"/>
                 </div>
-                <div class="o_waha_chips" t-on-wheel="this.onChipsWheel">
-                    <button class="o_waha_chip" t-att-class="{ active: this.isFilter('all') }" t-on-click="() => this.setFilter('all')">All</button>
-                    <button class="o_waha_chip" t-att-class="{ active: this.isFilter('unread') }" t-on-click="() => this.setFilter('unread')">Unread</button>
-                    <button class="o_waha_chip" t-att-class="{ active: this.isFilter('groups') }" t-on-click="() => this.setFilter('groups')">
-                        <i class="oi me-1" data-icon="group"/>Groups
+                <div class="o_waha_chips_bar">
+                    <div class="o_waha_chips" t-on-wheel="this.onChipsWheel">
+                        <button class="o_waha_chip" t-att-class="{ active: this.isFilter('all') }" t-on-click="() => this.setFilter('all')">All</button>
+                        <button class="o_waha_chip" t-att-class="{ active: this.isFilter('unread') }" t-on-click="() => this.setFilter('unread')">
+                            Unread<span t-if="this.state.counts.unread" class="o_waha_chip_count" t-out="this.state.counts.unread"/>
+                        </button>
+                        <button class="o_waha_chip" t-att-class="{ active: this.isFilter('groups') }" t-on-click="() => this.setFilter('groups')">
+                            Groups<span t-if="this.state.counts.groups" class="o_waha_chip_count" t-out="this.state.counts.groups"/>
+                        </button>
+                        <button t-if="this.activeLabel" class="o_waha_chip active" title="Show all chats" t-on-click="() => this.setFilter('all')">
+                            <span class="o_waha_chip_dot" t-att-style="'background-color:' + this.activeLabel.color"/>
+                            <t t-out="this.activeLabel.name"/>
+                        </button>
+                    </div>
+                    <button t-if="this.state.labels.length" class="o_waha_chip o_waha_lists_btn" title="Lists"
+                            t-att-class="{ active: this.state.listsOpen }" t-on-click="this.toggleLists">
+                        <i class="oi" data-icon="keyboard_arrow_down"/>
                     </button>
-                    <button t-foreach="this.state.labels" t-as="l" t-key="l.id" class="o_waha_chip"
-                            t-att-class="{ active: this.isFilter('label', l.id) }" t-on-click="() => this.setFilter('label', l.id)">
-                        <span class="o_waha_chip_dot" t-att-style="'background-color:' + l.color"/>
-                        <t t-out="l.name"/>
-                    </button>
+                    <div t-if="this.state.listsOpen" class="o_waha_lists_menu">
+                        <button t-foreach="this.state.labels" t-as="l" t-key="l.id" t-on-click="() => this.pickList(l)">
+                            <span class="o_waha_chip_dot" t-att-style="'background-color:' + l.color"/>
+                            <span class="flex-grow-1" dir="auto" t-out="l.name"/>
+                            <i t-if="this.isFilter('label', l.id)" class="oi" data-icon="check"/>
+                        </button>
+                    </div>
                 </div>
                 <div class="o_waha_conv_list">
                     <div t-if="this.state.filter === 'archived'" class="o_waha_archived_row" t-on-click="() => this.setFilter('all')">

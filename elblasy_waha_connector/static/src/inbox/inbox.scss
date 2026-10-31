@@ -89,6 +89,46 @@
         }
     }
     .o_waha_list_header, .o_waha_search { flex: none; }
+    .o_waha_chips_bar {
+        position: relative;
+        flex: none;
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        padding-inline-end: 12px;
+        border-bottom: 1px solid var(--waha-border);
+        .o_waha_chips { flex: 0 1 auto; min-width: 0; border-bottom: 0; }
+        .o_waha_lists_btn { flex: none; margin-top: 6px; padding: 4px 8px; .oi { font-size: 18px; vertical-align: -4px; } }
+    }
+    .o_waha_chip_count { margin-inline-start: 5px; font-weight: 600; }
+    .o_waha_lists_menu {
+        position: absolute;
+        top: 42px;
+        inset-inline-end: 10px;
+        z-index: 30;
+        min-width: 230px;
+        max-height: 360px;
+        overflow-y: auto;
+        padding: 8px 0;
+        border-radius: 12px;
+        background: var(--waha-panel);
+        box-shadow: 0 6px 24px rgba(11, 20, 26, 0.3);
+        button {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 10px 20px;
+            border: 0;
+            background: transparent;
+            color: var(--waha-text);
+            text-align: start;
+            font-size: 15px;
+            &:hover { background: var(--waha-hover); }
+            .o_waha_chip_dot { width: 12px; height: 12px; margin: 0; }
+            .oi { color: var(--waha-green-dark); font-size: 18px; }
+        }
+    }
     .o_waha_chips {
         flex: none;
         display: flex;

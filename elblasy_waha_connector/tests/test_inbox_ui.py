@@ -79,6 +79,11 @@ const wait = async (selector, count = 1) => {
     const box2 = document.querySelector(".o_waha_composer textarea");
     box2.value = "";
     box2.dispatchEvent(new Event("input"));
+    // WhatsApp lists (labels) live behind the ▾ button, the chosen one becomes an active chip
+    document.querySelector(".o_waha_lists_btn").click();
+    (await wait(".o_waha_lists_menu button"))[0].click();
+    await wait(".o_waha_chips .o_waha_chip.active .o_waha_chip_dot");
+    document.querySelector(".o_waha_chip:nth-child(1)").click(); // "All"
     document.querySelector(".o_waha_chip:nth-child(2)").click(); // "Unread": the chat was just read
     await new Promise((resolve) => setTimeout(resolve, 500));
     console.log("test successful");
@@ -125,6 +130,9 @@ class TestInboxUi(HttpCase):
         Message.create({'conversation_id': group.id, 'remote_message_id': 'g1', 'direction': 'in', 'body': 'hi all',
                         'author_name': 'Sara', 'sender_identifier': '2010@c.us', 'date': '2026-10-28 09:00:00'})
         Conv.create({'session_id': session.id, 'remote_chat_id': '201001230099@c.us', 'wa_archived': True})
+        vip = self.env['elblasy.waha.label'].create({'session_id': session.id, 'name': 'VIP', 'label_id': 'v1',
+                                                     'color_hex': '#4dabf7'})
+        conv.label_ids = [(4, vip.id)]
         client = 'odoo.addons.elblasy_waha_connector.models.waha_client.WahaClient'
         preview = {'url': 'https://elblasy.app/', 'title': 'elblasy.app', 'description': 'Odoo', 'image': '',
                    'site': 'elblasy.app'}

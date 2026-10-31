@@ -98,6 +98,8 @@ export class WahaInbox extends Component {
             flashId: 0,
             playing: 0,
             audio: {}, // message id -> { progress, time }
+            counts: { unread: 0, groups: 0, archived: 0 },
+            listsOpen: false, // the ▾ menu of WhatsApp labels
             drafts: {}, // conversation id -> { text, replyTo, linkDismissed } (WhatsApp keeps a draft per chat)
             linkPreview: null, // { url, title, description, image, site } of the first link of the draft
             linkDismissed: "",
@@ -152,6 +154,9 @@ export class WahaInbox extends Component {
             if (this.state.menuFor && !ev.target.closest?.(".o_waha_msg_menu, .o_waha_msg_menu_btn")) {
                 this.state.menuFor = 0;
             }
+            if (this.state.listsOpen && !ev.target.closest?.(".o_waha_lists_menu, .o_waha_lists_btn")) {
+                this.state.listsOpen = false;
+            }
         };
         const viewerKeys = (ev) => {
             if (!this.state.viewer || this.state.dialog) {
@@ -200,9 +205,9 @@ export class WahaInbox extends Component {
             unread: this.state.filter === "unread",
             kind: ["groups", "archived"].includes(this.state.filter) ? this.state.filter : null,
         });
-        this.state.archivedCount = await this.orm.call(MODEL, "inbox_archived_count", [], {
-            session_id: this.state.sessionId || null,
-        });
+        const counts = await this.orm.call(MODEL, "inbox_counts", [], { session_id: this.state.sessionId || null });
+        this.state.archivedCount = counts.archived;
+        this.state.counts = counts;
         const current = this.state.current;
         if (current) {
             const fresh = this.state.conversations.find((c) => c.id === current.id);
@@ -289,6 +294,19 @@ export class WahaInbox extends Component {
             ev.currentTarget.scrollLeft += this.state.uiRtl ? -ev.deltaY : ev.deltaY;
             ev.preventDefault();
         }
+    }
+
+    get activeLabel() {
+        return this.state.filter === "label" ? this.state.labels.find((l) => l.id === this.state.labelFilter) : null;
+    }
+
+    toggleLists() {
+        this.state.listsOpen = !this.state.listsOpen;
+    }
+
+    pickList(label) {
+        this.state.listsOpen = false;
+        return this.isFilter("label", label.id) ? this.setFilter("all") : this.setFilter("label", label.id);
     }
 
     setFilter(filter, labelId = 0) {

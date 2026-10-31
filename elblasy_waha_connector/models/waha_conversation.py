@@ -437,9 +437,20 @@ class WahaConversation(models.Model):
 
     @api.model
     def inbox_archived_count(self, session_id=None):
+        return self.inbox_counts(session_id)['archived']
+
+    @api.model
+    def inbox_counts(self, session_id=None):
+        """Numbers shown on the filter chips, like WhatsApp: unread chats, unread groups, archived chats."""
         self._check_user()
-        domain = [('wa_archived', '=', True)] + ([('session_id', '=', session_id)] if session_id else [])
-        return self.search_count(domain)
+        base = [('session_id', '=', session_id)] if session_id else []
+        visible = base + ['|', ('chat_type', '!=', 'group'), ('session_id.inbox_groups', '=', True),
+                          ('wa_archived', '=', False)]
+        return {
+            'unread': self.search_count(visible + [('unread_count', '>', 0)]),
+            'groups': self.search_count(visible + [('unread_count', '>', 0), ('chat_type', '=', 'group')]),
+            'archived': self.search_count(base + [('wa_archived', '=', True)]),
+        }
 
     REFRESH_SECONDS = 30
 
