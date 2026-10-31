@@ -67,6 +67,7 @@ powered by the [WAHA](https://waha.devlike.pro) server **you** control.
 - **Real conversations**: quoted replies, reactions, *Edited*, *This message was deleted*, *Forwarded*, day separators, read more, pinned banner, grey and blue ticks.
 - **History on demand**: opening a chat imports what Odoo missed; scrolling up loads older messages from WhatsApp.
 - **Contact info panel** (click the chat header): big photo, *About*, notes about the customer, media / links / docs, search in the chat with jump to the message, group members, archive, mark as unread, and the customer's documents in Odoo.
+- **Photo viewer** like WhatsApp: pictures and videos open inside Odoo with zoom, previous / next, thumbnails, reply, star, pin, react, forward and download.
 - **Voice notes** played in the bubble (progress, duration); pictures and voice notes load by themselves within the media size limit.
 - Emoji picker · dark theme · Arabic RTL · one pane at a time on phones · live updates.
 </details>

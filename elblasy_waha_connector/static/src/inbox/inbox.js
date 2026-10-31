@@ -97,6 +97,7 @@ export class WahaInbox extends Component {
             flashId: 0,
             playing: 0,
             audio: {}, // message id -> { progress, time }
+            viewer: null, // { items: [{ attachmentId, video, message }], index, zoom, reacting }
             uiRtl: false, // the layout direction really applied (Odoo.sh mirrors Arabic with rtlcss)
             conversations: [],
             current: null,
@@ -146,6 +147,24 @@ export class WahaInbox extends Component {
                 this.state.menuFor = 0;
             }
         };
+        const viewerKeys = (ev) => {
+            if (!this.state.viewer || this.state.dialog) {
+                return;
+            }
+            const back = this.state.uiRtl ? "ArrowRight" : "ArrowLeft";
+            if (ev.key === "Escape") {
+                this.closeViewer();
+            } else if (ev.key === back) {
+                this.viewerMove(-1);
+            } else if (ev.key === "ArrowLeft" || ev.key === "ArrowRight") {
+                this.viewerMove(1);
+            } else {
+                return;
+            }
+            ev.preventDefault();
+        };
+        onMounted(() => document.addEventListener("keydown", viewerKeys));
+        onWillDestroy(() => document.removeEventListener("keydown", viewerKeys));
         onMounted(() => {
             document.addEventListener("click", closeMenu, true);
             const root = this.rootRef();
@@ -437,6 +456,91 @@ export class WahaInbox extends Component {
     voiceTime(m) {
         const state = this.state.audio[m.id];
         return this.clock(state && state.time ? state.time : m.duration);
+    }
+
+    // ------------------------------------------------------------------ media viewer (like WhatsApp)
+    /** Pictures and videos of the loaded conversation, oldest first. */
+    get mediaItems() {
+        const items = [];
+        for (const m of this.state.messages) {
+            if (m.revoked) {
+                continue;
+            }
+            for (const a of m.attachments) {
+                const kind = this.kindOf(a);
+                if (kind === "image" || kind === "video") {
+                    items.push({ attachmentId: a.id, video: kind === "video", message: m });
+                }
+            }
+        }
+        return items;
+    }
+
+    openViewer(m, attachment) {
+        const items = this.mediaItems;
+        const index = Math.max(items.findIndex((item) => item.attachmentId === attachment.id), 0);
+        this.state.menuFor = 0;
+        this.state.viewer = { items, index, zoom: 1, reacting: false };
+    }
+
+    /** From the contact info drawer: its media list (messages may not be loaded). */
+    openViewerFromInfo(pic) {
+        const loaded = Object.fromEntries(this.mediaItems.map((item) => [item.attachmentId, item.message]));
+        const items = this.state.info.media.map((p) => ({ attachmentId: p.id, video: p.video, message: loaded[p.id] }));
+        this.state.viewer = { items, index: Math.max(items.findIndex((item) => item.attachmentId === pic.id), 0),
+                              zoom: 1, reacting: false };
+    }
+
+    get viewerItem() {
+        const viewer = this.state.viewer;
+        return viewer && viewer.items[viewer.index];
+    }
+
+    viewerMove(step) {
+        const viewer = this.state.viewer;
+        const index = viewer.index + step;
+        if (index >= 0 && index < viewer.items.length) {
+            Object.assign(viewer, { index, zoom: 1, reacting: false });
+        }
+    }
+
+    viewerGo(index) {
+        Object.assign(this.state.viewer, { index, zoom: 1, reacting: false });
+    }
+
+    viewerZoom(step) {
+        const viewer = this.state.viewer;
+        viewer.zoom = Math.min(Math.max(viewer.zoom + step, 1), 3);
+    }
+
+    closeViewer() {
+        this.state.viewer = null;
+    }
+
+    viewerReply() {
+        const m = this.viewerItem.message;
+        this.closeViewer();
+        this.startReply(m);
+    }
+
+    viewerForward() {
+        this.openDialog("forward", this.viewerItem.message);
+    }
+
+    async viewerReact(emoji) {
+        this.state.viewer.reacting = false;
+        await this.react(this.viewerItem.message, emoji);
+    }
+
+    viewerAuthor(item) {
+        const m = item && item.message;
+        if (!m) {
+            return this.displayName(this.state.current);
+        }
+        if (m.direction === "out") {
+            return m.user || _t("You");
+        }
+        return m.author || this.displayName(this.state.current);
     }
 
     // ------------------------------------------------------------------ contact info drawer

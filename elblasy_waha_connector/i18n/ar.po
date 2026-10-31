@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 20.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 12:00+0000\n"
-"PO-Revision-Date: 2026-10-31 12:00+0000\n"
+"POT-Creation-Date: 2026-10-31 12:27+0000\n"
+"PO-Revision-Date: 2026-10-31 12:27+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ar\n"
@@ -1101,6 +1101,12 @@ msgid "Done"
 msgstr "تم"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Download"
+msgstr "تنزيل"
+
+#. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_session__group_media_download
 msgid "Download group media"
 msgstr "تنزيل وسائط المجموعة"
@@ -2031,6 +2037,12 @@ msgid "New-contact lock"
 msgstr "قفل جهات الاتصال الجديدة"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Next"
+msgstr "التالي"
+
+#. module: elblasy_waha_connector
 #: model:res.groups.privilege,placeholder:elblasy_waha_connector.res_groups_privilege_waha
 msgid "No"
 msgstr "لا"
@@ -2450,6 +2462,12 @@ msgid "Posts"
 msgstr "المنشورات"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Previous"
+msgstr "السابق"
+
+#. module: elblasy_waha_connector
 #: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_chat_view_search
 #: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_report_message_view_search
 msgid "Private chats"
@@ -2488,6 +2506,12 @@ msgstr ""
 #: model:ir.model.fields,help:elblasy_waha_connector.field_elblasy_waha_webhook_event__payload
 msgid "Raw event; may contain message content."
 msgstr "حدث خام؛ قد يحتوي على محتوى الرسالة."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "React"
+msgstr "تفاعل"
 
 #. module: elblasy_waha_connector
 #: model:ir.model.fields,field_description:elblasy_waha_connector.field_elblasy_waha_message__reactions
@@ -4107,11 +4131,29 @@ msgid "Yesterday"
 msgstr "أمس"
 
 #. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.js:0
+msgid "You"
+msgstr "أنت"
+
+#. module: elblasy_waha_connector
 #. odoo-python
 #: code:addons/elblasy_waha_connector/models/waha_conversation.py:0
 #: code:addons/elblasy_waha_connector/models/waha_group_post.py:0
 msgid "You are not allowed to use WhatsApp."
 msgstr "غير مسموح لك باستخدام واتساب."
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Zoom in"
+msgstr "تكبير"
+
+#. module: elblasy_waha_connector
+#. odoo-javascript
+#: code:addons/elblasy_waha_connector/static/src/inbox/inbox.xml:0
+msgid "Zoom out"
+msgstr "تصغير"
 
 #. module: elblasy_waha_connector
 #: model_terms:ir.ui.view,arch_db:elblasy_waha_connector.waha_conversation_view_form

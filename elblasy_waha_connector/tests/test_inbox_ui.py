@@ -35,6 +35,13 @@ const wait = async (selector, count = 1) => {
     document.querySelector(".o_waha_msg_menu .o_waha_act_reply").click();
     await wait(".o_waha_composer_bar");
     document.querySelector(".o_waha_composer_bar .o_waha_icon_btn").click();
+    // media viewer instead of a new tab
+    document.querySelector(".o_waha_media_link").click();
+    await wait(".o_waha_viewer .o_waha_viewer_media img");
+    await wait(".o_waha_viewer_thumbs button.active");
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    if (document.querySelector(".o_waha_viewer")) throw new Error("viewer did not close");
     // contact info drawer and search in the chat
     document.querySelector(".o_waha_thread_title").click();
     await wait(".o_waha_info .o_waha_info_actions");

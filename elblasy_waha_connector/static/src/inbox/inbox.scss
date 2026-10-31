@@ -28,6 +28,7 @@
     --waha-chip-active-text: #008069;
     --waha-avatar-group: #dfe5e7;
 
+    position: relative;
     display: flex;
     height: 100%;
     overflow: hidden;
@@ -784,6 +785,135 @@
     // wide screens: the chat moves aside for the drawer, like WhatsApp Web
     @media (min-width: 1100px) {
         .o_waha_thread.o_waha_with_info > :not(.o_waha_info):not(.o_waha_modal) { margin-inline-end: 400px; }
+    }
+
+    // ------------------------------------------------------------ media viewer
+    .o_waha_viewer {
+        position: absolute;
+        inset: 0;
+        z-index: 45;
+        display: flex;
+        flex-direction: column;
+        background: var(--waha-panel);
+        color: var(--waha-text);
+    }
+    .o_waha_viewer_bar {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 18px;
+    }
+    .o_waha_viewer_name { font-size: 16px; color: var(--waha-text); }
+    .o_waha_viewer_date { font-size: 13px; color: var(--waha-muted); }
+    .o_waha_viewer_tools {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        button, a {
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--waha-muted);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            .oi { font-size: 24px; }
+            &:hover:not(:disabled) { background: rgba(127, 127, 127, 0.15); color: var(--waha-text); }
+            &:disabled { opacity: 0.35; }
+            &.o_waha_on { color: var(--waha-green-dark); }
+        }
+    }
+    .o_waha_viewer_reactions {
+        position: absolute;
+        top: 46px;
+        inset-inline-end: 0;
+        z-index: 2;
+        display: flex;
+        padding: 4px 6px;
+        border-radius: 24px;
+        background: var(--waha-panel);
+        box-shadow: 0 4px 16px rgba(11, 20, 26, 0.3);
+        button { width: 40px; height: 40px; font-size: 22px; }
+    }
+    .o_waha_viewer_stage {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 80px;
+        overflow: hidden;
+    }
+    .o_waha_viewer_media {
+        flex: 1 1 auto;
+        min-height: 0;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+        img, video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.15s ease;
+            cursor: zoom-in;
+            &.o_waha_zoomed { cursor: zoom-out; }
+        }
+    }
+    .o_waha_viewer_caption {
+        flex: none;
+        max-width: 760px;
+        margin-top: 12px;
+        color: var(--waha-text);
+        text-align: center;
+        white-space: pre-wrap;
+    }
+    .o_waha_viewer_nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 48px;
+        height: 48px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: var(--waha-header);
+        color: var(--waha-muted);
+        .oi { font-size: 30px; }
+        &:hover { filter: brightness(0.95); }
+    }
+    .o_waha_viewer_prev { inset-inline-start: 20px; }
+    .o_waha_viewer_next { inset-inline-end: 20px; }
+    .o_waha_viewer_thumbs {
+        flex: none;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        border-top: 1px solid var(--waha-border);
+        overflow-x: auto;
+        button {
+            flex: none;
+            width: 72px;
+            height: 72px;
+            padding: 0;
+            border: 3px solid transparent;
+            border-radius: 6px;
+            background: transparent;
+            overflow: hidden;
+            opacity: 0.7;
+            &.active { border-color: var(--waha-green-dark); opacity: 1; }
+            img, .o_waha_media_video { width: 100%; height: 100%; object-fit: cover; }
+        }
     }
 
     // ticks drawn with two check marks, grey or blue like WhatsApp

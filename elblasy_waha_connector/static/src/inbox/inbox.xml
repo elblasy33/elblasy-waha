@@ -182,7 +182,8 @@
                                             <div t-if="m.quoted" class="o_waha_quote"><span dir="auto" t-out="m.quoted"/></div>
                                             <t t-foreach="m.attachments" t-as="a" t-key="a.id">
                                                 <t t-set="kind" t-value="this.kindOf(a)"/>
-                                                <a t-if="kind === 'image'" t-att-href="'/web/content/' + a.id" target="_blank" class="o_waha_media_link">
+                                                <a t-if="kind === 'image'" t-att-href="'/web/content/' + a.id" target="_blank" class="o_waha_media_link"
+                                                   t-on-click.prevent="() => this.openViewer(m, a)">
                                                     <img t-att-class="m.type === 'sticker' ? 'o_waha_sticker' : 'o_waha_img'"
                                                          t-att-src="'/web/image/' + a.id" t-att-alt="a.name" loading="lazy"/>
                                                 </a>
@@ -329,7 +330,8 @@
                             </t>
                             <!-- media / docs / links -->
                             <div t-elif="this.state.infoView === 'media'" class="o_waha_media_grid">
-                                <a t-foreach="info.media" t-as="pic" t-key="pic.id" t-att-href="'/web/content/' + pic.id" target="_blank">
+                                <a t-foreach="info.media" t-as="pic" t-key="pic.id" t-att-href="'/web/content/' + pic.id" target="_blank"
+                                   t-on-click.prevent="() => this.openViewerFromInfo(pic)">
                                     <img t-if="!pic.video" t-att-src="'/web/image/' + pic.id + '/200x200?crop=1'" alt="" loading="lazy"/>
                                     <span t-else="" class="o_waha_media_video"><i class="oi" data-icon="videocam"/></span>
                                 </a>
@@ -401,7 +403,8 @@
                                         <span><i class="oi me-2" data-icon="image"/>Media</span><span class="text-muted" t-out="info.media_count"/>
                                     </div>
                                     <div t-if="info.media.length" class="o_waha_media_strip">
-                                        <a t-foreach="info.media.slice(0, 4)" t-as="pic" t-key="pic.id" t-att-href="'/web/content/' + pic.id" target="_blank">
+                                        <a t-foreach="info.media.slice(0, 4)" t-as="pic" t-key="pic.id" t-att-href="'/web/content/' + pic.id" target="_blank"
+                                           t-on-click.prevent="() => this.openViewerFromInfo(pic)">
                                             <img t-if="!pic.video" t-att-src="'/web/image/' + pic.id + '/160x160?crop=1'" alt="" loading="lazy"/>
                                             <span t-else="" class="o_waha_media_video"><i class="oi" data-icon="videocam"/></span>
                                         </a>
@@ -480,6 +483,56 @@
                     <h3>Elblasy WhatsApp</h3>
                     <p>Send and receive WhatsApp messages from Odoo.<br/>Select a chat to start.</p>
                     <small><i class="oi me-1" data-icon="lock"/>Messages go through your own WAHA server.</small>
+                </div>
+            </div>
+            <!-- media viewer, like WhatsApp -->
+            <div t-if="this.state.viewer" class="o_waha_viewer">
+                <t t-set="item" t-value="this.viewerItem"/>
+                <t t-set="vm" t-value="item.message"/>
+                <div class="o_waha_viewer_bar">
+                    <div class="o_waha_viewer_who">
+                        <div class="o_waha_viewer_name" dir="auto" t-out="this.viewerAuthor(item)"/>
+                        <div t-if="vm" class="o_waha_viewer_date" t-out="this.fullDate(vm.date)"/>
+                    </div>
+                    <div class="o_waha_viewer_tools">
+                        <button title="Zoom out" t-att-disabled="this.state.viewer.zoom &lt;= 1 or item.video" t-on-click="() => this.viewerZoom(-0.5)"><i class="oi" data-icon="zoom_out"/></button>
+                        <button title="Zoom in" t-att-disabled="this.state.viewer.zoom &gt;= 3 or item.video" t-on-click="() => this.viewerZoom(0.5)"><i class="oi" data-icon="zoom_in"/></button>
+                        <t t-if="vm and vm.remote">
+                            <button title="Reply" t-on-click="this.viewerReply"><i class="oi" data-icon="reply"/></button>
+                            <button title="Star" t-att-class="{ o_waha_on: vm.starred }" t-on-click="() => this.toggleStar(vm)"><i class="oi" data-icon="star"/></button>
+                            <button title="Pin" t-att-class="{ o_waha_on: vm.pinned }" t-on-click="() => this.togglePin(vm)"><i class="oi" data-icon="push_pin"/></button>
+                            <span class="position-relative">
+                                <button title="React" t-on-click="() => this.state.viewer.reacting = !this.state.viewer.reacting"><i class="oi" data-icon="sentiment_satisfied"/></button>
+                                <div t-if="this.state.viewer.reacting" class="o_waha_viewer_reactions">
+                                    <button t-foreach="this.quickReactions" t-as="emoji" t-key="emoji" t-on-click="() => this.viewerReact(emoji)" t-out="emoji"/>
+                                </div>
+                            </span>
+                            <button title="Forward" t-on-click="this.viewerForward"><i class="oi" data-icon="forward"/></button>
+                        </t>
+                        <a title="Download" t-att-href="'/web/content/' + item.attachmentId + '?download=true'"><i class="oi" data-icon="download"/></a>
+                        <button title="Close" t-on-click="this.closeViewer"><i class="oi" data-icon="close"/></button>
+                    </div>
+                </div>
+                <div class="o_waha_viewer_stage" t-on-click.self="this.closeViewer">
+                    <button t-if="this.state.viewer.index &gt; 0" class="o_waha_viewer_nav o_waha_viewer_prev" title="Previous"
+                            t-on-click="() => this.viewerMove(-1)"><i class="oi" data-icon="chevron_left"/></button>
+                    <div class="o_waha_viewer_media" t-on-click.self="this.closeViewer">
+                        <video t-if="item.video" t-att-src="'/web/content/' + item.attachmentId" controls="controls" autoplay="autoplay"/>
+                        <img t-else="" t-att-src="'/web/content/' + item.attachmentId" alt=""
+                             t-att-style="'transform: scale(' + this.state.viewer.zoom + ')'"
+                             t-att-class="{ o_waha_zoomed: this.state.viewer.zoom &gt; 1 }"
+                             t-on-click="() => this.viewerZoom(this.state.viewer.zoom &gt; 1 ? -2 : 1)"/>
+                    </div>
+                    <div t-if="vm and vm.body" class="o_waha_viewer_caption" dir="auto" t-out="vm.body"/>
+                    <button t-if="this.state.viewer.index &lt; this.state.viewer.items.length - 1" class="o_waha_viewer_nav o_waha_viewer_next"
+                            title="Next" t-on-click="() => this.viewerMove(1)"><i class="oi" data-icon="chevron_right"/></button>
+                </div>
+                <div class="o_waha_viewer_thumbs">
+                    <button t-foreach="this.state.viewer.items" t-as="thumb" t-key="thumb.attachmentId"
+                            t-att-class="{ active: thumb_index === this.state.viewer.index }" t-on-click="() => this.viewerGo(thumb_index)">
+                        <img t-if="!thumb.video" t-att-src="'/web/image/' + thumb.attachmentId + '/120x120?crop=1'" alt="" loading="lazy"/>
+                        <span t-else="" class="o_waha_media_video"><i class="oi" data-icon="videocam"/></span>
+                    </button>
                 </div>
             </div>
         </div>
